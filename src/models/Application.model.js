@@ -18,7 +18,6 @@ const applicationSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
       trim: true,
-      unique: true,
     },
     contact: {
       type: String,

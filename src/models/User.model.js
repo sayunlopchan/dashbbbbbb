@@ -32,7 +32,10 @@ const userSchema = new mongoose.Schema(
   },
   {
     // Add index for case-insensitive email search
-    indexes: [{ email: 1 }, { username: 1 }],
+    indexes: [
+      { email: 1, unique: true },
+      { username: 1 }
+    ],
   }
 );
 
