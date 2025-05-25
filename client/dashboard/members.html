@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knox Barbell - Members</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/members.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Knox Barbell</h3>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <div class="tooltip">Dashboard</div>
+                </a>
+            </li>
+            <li>
+                <a href="/members" class="active">
+                    <i class="fas fa-user"></i>
+                    <span>Member</span>
+                    <div class="tooltip">Member</div>
+                </a>
+            </li>
+            <li>
+                <a href="/application">
+                    <i class="fas fa-user"></i>
+                    <span>Application</span>
+                    <div class="tooltip">Application</div>
+                </a>
+            </li>
+            <li>
+                <a href="/membership">
+                    <i class="fas fa-id-card"></i>
+                    <span>Membership</span>
+                    <div class="tooltip">Membership</div>
+                </a>
+            </li>
+            <li>
+                <a href="/trainers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Trainers</span>
+                    <div class="tooltip">Trainers</div>
+                </a>
+            </li>
+            <li>
+                <a href="/employee">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                    <div class="tooltip">Employee</div>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="tooltip">Notifications</div>
+                </a>
+            </li>
+            <li>
+                <a href="/attendance">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <div class="tooltip">Attendance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                    <div class="tooltip">Events</div>
+                </a>
+            </li>
+            <li>
+                <a href="/finance">
+                    <i class="fas fa-wallet"></i>
+                    <span>Finance</span>
+                    <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/product">
+                    <i class="fas fa-box"></i>
+                    <span>Product</span>
+                    <div class="tooltip">Product</div>
+                </a>
+            </li>
+            <li class="logout-item">
+                <a href="#" id="logoutButton">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                    <div class="tooltip">Logout</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h3>Members</h3>
+            </div>
+            <div class="topbar-right">
+                <!-- notification  -->
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">0</span>
+                    
+                    <!-- Notification Modal -->
+                    <div class="notification-modal">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-actions">
+                                <a href="/notifications" class="view-all-link">View All</a>
+                                <button class="close-notifications">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="notification-list">
+                            <!-- Notifications will be populated here -->
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-greeting">
+                    <img src="/img/Knox Logo-01.png" alt="User">
+                    <span>Hello, Knox Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Buttons  -->
+            <div class="content-header">
+                <h1>Members Management</h1>
+                <div class="add-renew-members">
+                    <button id="addMemberBtn">
+                        <span>+</span>
+                        <p>Add Members</p>
+                    </button>
+                    <button id="renewMemberBtn">
+                        <span>+</span>
+                        <p>Renew Members</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters">
+                <!-- gender filter -->
+                <div class="filter-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender">
+                        <option value="">All</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <!-- membership filter -->
+                <div class="filter-group">
+                    <label for="membership">Memberships:</label>
+                    <select id="membership">
+                        <option value="">All</option>
+                        <option value="silver">Silver</option>
+                        <option value="gold">Gold</option>
+                        <option value="platinum">Platinum</option>
+                        <option value="diamond">Diamond</option>
+                    </select>
+                </div>
+                <!-- search filter -->
+                <div class="filter-group search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search Member..." autocomplete="off">
+                </div>
+                <!-- refresh button -->
+                <div class="filter-group">
+                    <button class="reset" id="resetFilters" title="Reset Filters">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Members Table -->
+            <div class="table-container">
+                <table class="members-table">
+                    <!-- Table Header -->
+                    <thead>
+                        <tr>
+                            <th>S.N</th>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Contact</th>
+                            <th>Emergency No.</th>
+                            <th>Joined Date</th>
+                            <th>Membership</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <!-- Table Body -->
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td class="member-detail-link" id="kb20">loading...</td>
+                            <!-- Clickable ID opens popup with members details, status, attendance, and payment histroy -->
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td><span class="membership-type silver">Loading...</span></td>
+
+                            <td>
+                                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls">
+                <button id="prevPage" class="pagination-btn" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <span id="pageInfo">Page 1</span>
+                <button id="nextPage" class="pagination-btn" disabled>
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Member Detail Modal -->
+    <div class="modal-overlay" id="memberDetailModal">
+        <div class="modal-content member-detail">
+            <div class="modal-header">
+                <h2>Member Details</h2>
+                <i id="closeDetail" class="fa-regular fa-circle-xmark"></i>
+            </div>
+            <div class="form-grid">
+                <div class="form-group ">
+                    <label>Full Name</label>
+                    <input type="text" class="fullName" disabled>
+                </div>
+                <div class="form-group ">
+                    <label>Email</label>
+                    <input type="email" class="email" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Contact</label>
+                    <input type="tel" class="contact" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" class="address" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" class="dateOfBirth" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Emergency Contact Name</label>
+                    <input type="text" class="emergencyContactName" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Emergency Contact Relationship</label>
+                    <input type="text" class="emergencyContactRelationship" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Emergency Number</label>
+                    <input type="tel" class="emergencyNumber" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Membership Type</label>
+                    <select class="membershipType" disabled>
+                        <option value="silver">Silver (1 Month)</option>
+                        <option value="gold">Gold (3 Months)</option>
+                        <option value="platinum">Platinum (6 Months)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Membership Start Date</label>
+                    <input type="date" class="membershipStartDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Membership End Date</label>
+                    <input type="date" class="membershipEndDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Cancellation Date</label>
+                    <input type="date" class="cancellationDate" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Cancellation Reason</label>
+                    <input type="text" class="cancellationReason" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Attendance This Month</label>
+                    <input type="text" class="attendanceThisMonth" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Payment Status</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="payment" class="paymentStatusPaid" value="paid" disabled>
+                            <label>Paid</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="payment" class="paymentStatusUnpaid" value="unpaid" disabled>
+                            <label>Unpaid</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="status" class="statusActive" value="active" disabled>
+                            <label>Active</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="status" class="statusInactive" value="inactive" disabled>
+                            <label>Inactive</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="payment-history">
+                <div class="filters">
+                    <h3>Payment History</h3>
+                    <div class="filter-group download-filter">
+                        <select name="download-filter" id="filterDay">
+                            <option value="today" selected>Today</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="365">Last 12 Months</option>
+                            <option value="all">All Time</option>
+                        </select>
+                        <select name="download-filter" id="filterMethod">
+                            <option value="all" selected>All Methods</option>
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="bank">Bank</option>
+                            <option value="online_payment">Online Payment</option>
+                        </select>
+                        <select name="download-filter" id="filterType">
+                            <option value="all" selected>All Types</option>
+                            <option value="first_payment">First Payment</option>
+                            <option value="renewal">Renewal</option>
+                            <option value="additional">Additional</option>
+                        </select>
+                        <button class="download" id="downloadPaymentHistory" title="Download Payment History">
+                            <i class="fa-solid fa-download"></i>
+                        </button>
+                        <button class="print" id="printPaymentHistory" title="Print Payment History">
+                            <i class="fa-solid fa-print"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- Finance Table -->
+                <div class="table-container">
+                    <table class="members-table">
+                        <thead>
+                            <tr>
+                                <th>S.N</th>
+                                <th>Payment ID</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Method</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentHistoryTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading payment history...
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal-overlay" id="addMemberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Add New Member</h2>
+                    <p>Fill in the details to add a new member.</p>
+                </div>
+                <!-- Close Button -->
+                <div>
+                    <button class="close-button" id="cancelBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Form -->
+            <form class="form-container" id="memberForm">
+                <div class="column">
+                    <h4>Member Info</h4>
+                    <div class="fl-container">
+                        <input type="text" id="fullName" placeholder="Full Name" required>
+                    </div>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="tel" id="contact" placeholder="Phone Number" required pattern="[0-9]{10,15}">
+                    <input type="text" id="address" placeholder="Address">
+                    <div>
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" required>
+                    </div>
+                    <div>
+                        <label for="gender">Gender</label>
+                        <div class="radio-group" id="genderRadio">
+                            <div class="radio-option">
+                                <input type="radio" id="genderMale" name="gender" value="male" required>
+                                <label for="genderMale">Male</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="genderFemale" name="gender" value="female" required>
+                                <label for="genderFemale">Female</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="genderOther" name="gender" value="other" required>
+                                <label for="genderOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <h4>Emergency Info</h4>
+                    <input type="text" id="emergencyContactName" placeholder="Emergency Contact Name" required>
+                    <input type="text" id="emergencyContactRelationship" placeholder="Relationship" required>
+                    <input type="tel" id="emergencyNumber" placeholder="Emergency Contact Phone" required
+                        pattern="[0-9]{10,15}">
+                    <h4>Membership</h4>
+                    <select id="membershipType" required>
+                        <option value="">Select Membership Type</option>
+                        <option value="silver">Silver (1 Month)</option>
+                        <option value="gold">Gold (3 Months)</option>
+                        <option value="diamond">Diamond (6 Months)</option>
+                        <option value="platinum">Platinum (12 Months)</option>
+                    </select>
+                    <div>
+                        <label for="membershipStartDate">Membership Start Date</label>
+                        <input type="date" id="membershipStartDate" required>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <h4>Member Status</h4>
+                    <div class="form-group">
+                        <label>Payment Status</label>
+                        <div class="radio-group" name="payment">
+                            <div class="radio-option">
+                                <input type="radio" id="paymentPaid" name="paymentStatus" value="paid" required>
+                                <label for="paymentPaid">Paid</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="paymentUnpaid" name="paymentStatus" value="unpaid" required
+                                    checked>
+                                <label for="paymentUnpaid">Unpaid</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="paymentAmountContainer" style="display: none;">
+                        <div class="form-group">
+                            <label for="paymentAmount">Payment Amount</label>
+                            <input type="number" id="paymentAmount" name="paymentAmount" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentMethod">Payment Method</label>
+                            <select name="paymentMethod" id="paymentMethod">
+                                <option value="">Select Payment Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="bank">Bank</option>
+                                <option value="online_payment">Online Payment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-btn">Add Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Member Modal -->
+    <div class="modal-overlay" id="editMemberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Edit Member</h2>
+                    <p>Update member details.</p>
+                </div>
+                <!-- Close Button -->
+                <div>
+                    <button class="close-button" id="editCancelBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Form -->
+            <form class="edit-form-container" id="editMemberForm">
+                <div class="column">
+                    <h4>Member Info</h4>
+                    <div class="fl-container">
+                        <input type="text" id="fullName" placeholder="Full Name" required>
+                    </div>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="tel" id="contact" placeholder="Phone Number" required pattern="[0-9]{10,15}">
+                    <input type="text" id="address" placeholder="Address">
+                    <div>
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" required>
+                    </div>
+                    <div>
+                        <label for="gender">Gender</label>
+                        <div class="radio-group" id="genderRadio">
+                            <div class="radio-option">
+                                <input type="radio" id="genderMale" name="gender" value="male" required>
+                                <label for="genderMale">Male</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="genderFemale" name="gender" value="female" required>
+                                <label for="genderFemale">Female</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="genderOther" name="gender" value="other" required>
+                                <label for="genderOther">Other</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <h4>Emergency Info</h4>
+                    <input type="text" id="emergencyContactName" placeholder="Emergency Contact Name" required>
+                    <input type="text" id="emergencyContactRelationship" placeholder="Relationship" required>
+                    <input type="tel" id="emergencyNumber" placeholder="Emergency Contact Phone" required
+                        pattern="[0-9]{10,15}">
+                    <h4>Membership</h4>
+                    <select id="membershipType" required>
+                        <option value="">Select Membership Type</option>
+                        <option value="silver">Silver (1 Month)</option>
+                        <option value="gold">Gold (3 Months)</option>
+                        <option value="diamond">Diamond (6 Months)</option>
+                        <option value="platinum">Platinum (12 Months)</option>
+                    </select>
+                    <div>
+                        <label for="membershipStartDate">Membership Start Date</label>
+                        <input type="date" id="membershipStartDate" required>
+                    </div>
+                    <button type="submit" class="btn-btn">Edit Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Renew Member Modal -->
+    <div class="modal-overlay" id="renewMemberModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Renew Member</h2>
+                    <p>Search and select a member to renew their membership.</p>
+                </div>
+                <button class="close-button" id="renewCancelBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="renewMemberForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="renewMemberId">Search Member</label>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="renewMemberSearch" placeholder="Search by name or ID..."
+                                autocomplete="off">
+                            <div class="search-result-container"></div>
+                        </div>
+                        <input type="hidden" id="renewMemberId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="renewMembershipType">Membership Type</label>
+                        <select name="renewMembershipType" id="renewMembershipType" required>
+                            <option value="">Select Membership Type</option>
+                            <option value="silver">Silver (1 Month)</option>
+                            <option value="gold">Gold (3 Months)</option>
+                            <option value="diamond">Diamond (6 Months)</option>
+                            <option value="platinum">Platinum (12 Months)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="renewPaymentMethod">Payment Method</label>
+                        <select name="renewPaymentMethod" id="renewPaymentMethod" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="bank">Bank</option>
+                            <option value="online_payment">Online Payment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="renewAmount">Amount</label>
+                        <input type="number" id="renewAmount" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="renewCancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Renew Membership</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Confirmation Dialog Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="confirmationTitle">Confirm Action</h2>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+            </div>
+            <div class="form-actions" style="justify-content: center; gap: 20px;">
+                <button type="button" class="btn btn-secondary" id="cancelAction">Cancel</button>
+                <button type="button" class="btn" id="confirmAction" style="transition: all 0.3s ease;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // DOM Elements
+            const addMemberBtn = document.getElementById('addMemberBtn');
+            const renewMemberBtn = document.getElementById('renewMemberBtn');
+            const addMemberModal = document.getElementById('addMemberModal');
+            const renewMemberModal = document.getElementById('renewMemberModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const memberForm = document.getElementById('memberForm');
+            const editMemberModal = document.getElementById('editMemberModal');
+            const editMemberForm = document.getElementById('editMemberForm');
+            const editCancelBtn = document.getElementById('editCancelBtn');
+            const tableBody = document.querySelector(".members-table tbody");
+            const genderFilter = document.getElementById("gender");
+            const membershipFilter = document.getElementById("membership");
+            const searchInput = document.querySelector(".search-box input");
+            const prevPageBtn = document.getElementById("prevPage");
+            const nextPageBtn = document.getElementById("nextPage");
+            const pageInfo = document.getElementById("pageInfo");
+            const memberDetailModal = document.getElementById('memberDetailModal');
+            const closeDetailBtn = document.getElementById('closeDetail');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const confirmationTitle = document.getElementById('confirmationTitle');
+            const confirmationMessage = document.getElementById('confirmationMessage');
+            const confirmActionBtn = document.getElementById('confirmAction');
+            const cancelActionBtn = document.getElementById('cancelAction');
+
+            let currentAction = null;
+            let currentMemberId = null;
+
+            // Show Confirmation Dialog
+            function showConfirmationDialog(title, message, action, memberId) {
+                confirmationTitle.textContent = title;
+                confirmationMessage.textContent = message;
+                currentAction = action;
+                currentMemberId = memberId;
+
+                // Update confirm button color based on action
+                const confirmBtn = document.getElementById('confirmAction');
+                if (action === 'delete') {
+                    confirmBtn.style.backgroundColor = '#e74c3c';
+                    confirmBtn.style.borderColor = '#e74c3c';
+                    confirmBtn.style.color = 'white';
+                }
+
+                confirmationModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // Hide Confirmation Dialog
+            function hideConfirmationDialog() {
+                confirmationModal.classList.remove('active');
+                document.body.style.overflow = '';
+                currentAction = null;
+                currentMemberId = null;
+
+                // Reset confirm button color
+                const confirmBtn = document.getElementById('confirmAction');
+                confirmBtn.style.backgroundColor = '';
+                confirmBtn.style.borderColor = '';
+                confirmBtn.style.color = '';
+            }
+
+            // Confirmation Dialog Event Listeners
+            confirmActionBtn.addEventListener('click', async () => {
+                if (currentAction === 'delete' && currentMemberId) {
+                    try {
+                        const response = await fetch(`/api/members/${currentMemberId}`, {
+                            method: 'DELETE'
+                        });
+
+                        if (response.ok) {
+                            window.showNotification('Member deleted successfully!', 'success');
+                            confirmationModal.classList.remove('active');
+                            fetchMembers();
+                        } else {
+                            const error = await response.json();
+                            window.showNotification(error.message || 'Failed to delete member', 'error');
+                        }
+                    } catch (error) {
+                        window.showNotification('Error: ' + error.message, 'error');
+                    }
+                } else if (currentAction === 'delete_payment' && currentMemberId) {
+                    try {
+                        const response = await fetch(`http://localhost:4000/api/payments/${currentMemberId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            window.showNotification('Payment deleted successfully!', 'success');
+                            confirmationModal.classList.remove('active');
+                            // Refresh payment history
+                            const memberId = document.querySelector('.member-detail-link').id;
+                            if (memberId) {
+                                fetchPaymentHistory(memberId);
+                            }
+                        } else {
+                            const error = await response.json();
+                            window.showNotification(error.message || 'Failed to delete payment', 'error');
+                        }
+                    } catch (error) {
+                        window.showNotification('Error: ' + error.message, 'error');
+                    }
+                }
+            });
+
+            cancelActionBtn.addEventListener('click', hideConfirmationDialog);
+
+            // Close modal when clicking outside
+            confirmationModal.addEventListener('click', (e) => {
+                if (e.target === confirmationModal) {
+                    hideConfirmationDialog();
+                }
+            });
+
+            // Delete member handler
+            tableBody.addEventListener("click", (e) => {
+                if (e.target.closest(".delete")) {
+                    const memberId = e.target.closest("button").dataset.id;
+                    if (memberId) {
+                        showConfirmationDialog(
+                            'Delete Member',
+                            'Are you sure you want to delete this member? This action cannot be undone.',
+                            'delete',
+                            memberId
+                        );
+                    }
+                }
+            });
+
+            // Modal Handling for Add Member
+            addMemberBtn.addEventListener('click', function () {
+                resetModal();
+                addMemberModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Modal Handling for Edit Member
+            tableBody.addEventListener('click', async function (e) {
+                const editBtn = e.target.closest('.edit');
+                if (editBtn) {
+                    const memberId = editBtn.dataset.id;
+                    if (!memberId) return;
+
+                    try {
+                        const response = await fetch(`/api/members/${memberId}`);
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const member = result.data;
+                            populateEditForm(member);
+                            editMemberModal.classList.add('active');
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            alert('Failed to fetch member details: ' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching member details:', error);
+                        alert('Failed to fetch member details. Please try again.');
+                    }
+                }
+            });
+
+            // Close modals when clicking cancel button
+            [cancelBtn, editCancelBtn].forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const modal = this.closest('.modal-overlay');
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            // Close modals when clicking outside
+            [addMemberModal, editMemberModal].forEach(modal => {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+
+            // Populate edit form with member data
+            function populateEditForm(member) {
+                const form = editMemberForm;
+                form.dataset.memberId = member.memberId;
+
+                // Populate basic info
+                form.querySelector('#fullName').value = member.fullName || '';
+                form.querySelector('#email').value = member.email || '';
+                form.querySelector('#contact').value = member.contact || '';
+                form.querySelector('#address').value = member.address || '';
+                form.querySelector('#dateOfBirth').value = member.dateOfBirth ? new Date(member.dateOfBirth).toISOString().split('T')[0] : '';
+
+                // Set gender
+                const genderRadio = form.querySelector(`input[name="gender"][value="${member.gender}"]`);
+                if (genderRadio) genderRadio.checked = true;
+
+                // Populate emergency info
+                form.querySelector('#emergencyContactName').value = member.emergencyContactName || '';
+                form.querySelector('#emergencyContactRelationship').value = member.emergencyContactRelationship || '';
+                form.querySelector('#emergencyNumber').value = member.emergencyNumber || '';
+
+                // Populate membership info
+                form.querySelector('#membershipType').value = member.membershipType || '';
+                form.querySelector('#membershipStartDate').value = member.startDate ? new Date(member.startDate).toISOString().split('T')[0] : '';
+            }
+
+            // Reset edit modal form
+            function resetEditModal() {
+                if (editMemberForm) {
+                    editMemberForm.reset();
+                    delete editMemberForm.dataset.memberId;
+                }
+            }
+
+            // Reset add member modal form
+            function resetModal() {
+                memberForm.reset();
+                document.querySelector('#addMemberModal .modal-header h2').textContent = 'Add New Member';
+                document.querySelector('#memberForm button[type="submit"]').textContent = 'Add Member';
+                memberForm.dataset.mode = 'add';
+                delete memberForm.dataset.memberId;
+            }
+
+            // Pagination state
+            let currentPage = 1;
+            let totalPages = 1;
+            const itemsPerPage = 10;
+            let allMembers = []; // Store all members
+
+            // Fetch and render members
+            async function fetchMembers(page = 1) {
+                const gender = genderFilter.value;
+                const membership = membershipFilter.value;
+                const search = searchInput.value.trim();
+
+                let query = [];
+                if (gender) query.push(`gender=${gender}`);
+                if (membership) query.push(`membershipType=${membership}`);
+                if (search) query.push(`search=${search}`);
+                // Remove page and limit from query to get all data
+                const queryString = query.length ? "?" + query.join("&") : "";
+
+                try {
+                    const res = await fetch(`/api/members${queryString}`);
+                    const response = await res.json();
+
+                    if (response.success) {
+                        // Store all members
+                        allMembers = response.data;
+
+                        // Calculate pagination
+                        const startIndex = (page - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        const paginatedMembers = allMembers.slice(startIndex, endIndex);
+
+                        // Calculate total pages
+                        totalPages = Math.ceil(allMembers.length / itemsPerPage);
+
+                        // Render the table with paginated data
+                        renderTable(paginatedMembers);
+
+                        // Update pagination
+                        updatePagination({
+                            currentPage: page,
+                            totalPages: totalPages,
+                            total: allMembers.length
+                        });
+                    } else {
+                        console.error('Failed to fetch members:', response.message);
+                        tableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading members. Please try again.</td></tr>`;
+                        // Reset pagination on error
+                        updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+                    }
+                } catch (error) {
+                    console.error('Error fetching members:', error);
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading members. Please try again.</td></tr>`;
+                    // Reset pagination on error
+                    updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+                }
+            }
+
+            function updatePagination(paginationData) {
+                // Ensure we have valid numbers for pagination
+                currentPage = parseInt(paginationData.currentPage) || 1;
+                totalPages = parseInt(paginationData.totalPages) || 1;
+
+                console.log('Updating pagination:', { currentPage, totalPages, total: paginationData.total }); // Debug log
+
+                // Update page info with proper number formatting
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} members)`;
+
+                // Update button states
+                prevPageBtn.disabled = currentPage <= 1;
+                nextPageBtn.disabled = currentPage >= totalPages;
+
+                // Add visual feedback for disabled state
+                prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+                nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
+            }
+
+            function renderTable(members) {
+                tableBody.innerHTML = ""; // Clear previous
+
+                if (!members || !Array.isArray(members) || members.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="9" class="text-center">No members found.</td></tr>`;
+                    return;
+                }
+
+                members.forEach((member, index) => {
+                    if (!member) return; // Skip invalid members
+
+                    const tr = document.createElement("tr");
+                    const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+
+                    // Format dates safely
+                    const startDate = member.startDate ?
+                        new Date(member.startDate).toLocaleDateString() : 'N/A';
+
+                    // Safely access nested properties with optional chaining
+                    const membershipType = member.membershipType?.toLowerCase() || 'silver';
+                    const membershipDisplay = member.membershipType || 'N/A';
+
+                    tr.innerHTML = `
+                        <td>${rowNumber}</td>
+                        <td class="member-detail-link" id="${member.memberId || ''}">${member.memberId || 'N/A'}</td>
+                        <td>${member.fullName || 'N/A'}</td>
+                        <td>${member.email || 'N/A'}</td>
+                        <td>${member.contact || 'N/A'}</td>
+                        <td>${member.emergencyNumber || 'N/A'}</td>
+                        <td>${startDate}</td>
+                        <td><span class="membership-type ${membershipType}">${membershipDisplay}</span></td>
+                        <td>
+                            <button class="action-btn edit" data-id="${member.memberId || ''}" ${!member.memberId ? 'disabled' : ''}>
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn delete" data-id="${member.memberId || ''}" ${!member.memberId ? 'disabled' : ''}>
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            }
+
+            // Pagination event listeners
+            prevPageBtn.addEventListener("click", () => {
+                if (currentPage > 1) {
+                    fetchMembers(currentPage - 1);
+                }
+            });
+
+            nextPageBtn.addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    fetchMembers(currentPage + 1);
+                }
+            });
+
+            // Filters and search event listeners
+            genderFilter.addEventListener("change", () => {
+                currentPage = 1; // Reset to first page on filter change
+                fetchMembers(currentPage);
+            });
+            membershipFilter.addEventListener("change", () => {
+                currentPage = 1; // Reset to first page on filter change
+                fetchMembers(currentPage);
+            });
+            searchInput.addEventListener("input", debounce(() => {
+                currentPage = 1; // Reset to first page on search
+                fetchMembers(currentPage);
+            }, 300));
+
+            // Debounce to avoid too many calls
+            function debounce(func, delay) {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func(...args), delay);
+                };
+            }
+
+            // Modal Handling for Member Details
+            tableBody.addEventListener('click', async function (e) {
+                const memberIdCell = e.target.closest('.member-detail-link');
+                if (memberIdCell) {
+                    const memberId = memberIdCell.id;
+                    if (!memberId) return;
+
+                    try {
+                        const response = await fetch(`/api/members/${memberId}`);
+                        const result = await response.json();
+
+                        if (result.success) {
+                            const member = result.data;
+                            populateMemberDetails(member);
+                            memberDetailModal.classList.add('active');
+                            document.body.style.overflow = 'hidden';
+                        } else {
+                            alert('Failed to fetch member details: ' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching member details:', error);
+                        alert('Failed to fetch member details. Please try again.');
+                    }
+                }
+            });
+
+            // Close member detail modal
+            closeDetailBtn.addEventListener('click', function () {
+                memberDetailModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close member detail modal when clicking outside
+            memberDetailModal.addEventListener('click', function (e) {
+                if (e.target === memberDetailModal) {
+                    memberDetailModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Populate member details in the modal
+            function populateMemberDetails(member) {
+                // Basic Info
+                memberDetailModal.querySelector('.fullName').value = member.fullName || '';
+                memberDetailModal.querySelector('.email').value = member.email || '';
+                memberDetailModal.querySelector('.contact').value = member.contact || '';
+                memberDetailModal.querySelector('.address').value = member.address || '';
+                memberDetailModal.querySelector('.dateOfBirth').value = member.dateOfBirth ? new Date(member.dateOfBirth).toISOString().split('T')[0] : '';
+
+                // Emergency Info
+                memberDetailModal.querySelector('.emergencyContactName').value = member.emergencyContactName || '';
+                memberDetailModal.querySelector('.emergencyContactRelationship').value = member.emergencyContactRelationship || '';
+                memberDetailModal.querySelector('.emergencyNumber').value = member.emergencyNumber || '';
+
+                // Membership Info
+                memberDetailModal.querySelector('.membershipType').value = member.membershipType || '';
+                memberDetailModal.querySelector('.membershipStartDate').value = member.startDate ? new Date(member.startDate).toISOString().split('T')[0] : '';
+                memberDetailModal.querySelector('.membershipEndDate').value = member.endDate ? new Date(member.endDate).toISOString().split('T')[0] : '';
+
+                // Cancellation Info
+                memberDetailModal.querySelector('.cancellationDate').value = member.cancellationDate ? new Date(member.cancellationDate).toISOString().split('T')[0] : '';
+                memberDetailModal.querySelector('.cancellationReason').value = member.cancellationReason || '';
+
+                // Status
+                const statusActive = memberDetailModal.querySelector('.statusActive');
+                const statusInactive = memberDetailModal.querySelector('.statusInactive');
+                if (statusActive && statusInactive) {
+                    statusActive.checked = member.memberStatus === 'active';
+                    statusInactive.checked = member.memberStatus === 'inactive';
+                }
+
+                // Payment Status
+                const paymentPaid = memberDetailModal.querySelector('.paymentStatusPaid');
+                const paymentUnpaid = memberDetailModal.querySelector('.paymentStatusUnpaid');
+                if (paymentPaid && paymentUnpaid) {
+                    const hasPayments = member.payments && member.payments.length > 0;
+                    paymentPaid.checked = hasPayments;
+                    paymentUnpaid.checked = !hasPayments;
+                }
+
+                // Fetch and display payment history
+                fetchPaymentHistory(member.memberId);
+            }
+
+            // Function to fetch payment history
+            async function fetchPaymentHistory(memberId) {
+                const paymentHistoryTableBody = document.getElementById('paymentHistoryTableBody');
+                if (!paymentHistoryTableBody) return;
+
+                try {
+                    // Show loading state
+                    paymentHistoryTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">
+                                <div class="loading-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading payment history...
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+
+                    const response = await fetch(`${baseUrl}/payments/member/${memberId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch payment history');
+                    }
+
+                    const data = await response.json();
+                    console.log('Payment History Response:', data); // Debug log
+
+                    if (data.success && Array.isArray(data.data)) {
+                        const payments = data.data;
+
+                        if (payments.length === 0) {
+                            paymentHistoryTableBody.innerHTML = `
+                                <tr>
+                                    <td colspan="7" class="text-center">No payment history found</td>
+                                </tr>
+                            `;
+                            return;
+                        }
+
+                        // Clear loading state and populate table
+                        paymentHistoryTableBody.innerHTML = '';
+                        payments.forEach((payment, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${payment.paymentId}</td>
+                                <td>${formatCurrency(payment.amount)}</td>
+                                <td>${formatDate(payment.paymentDate)}</td>
+                                <td>${payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1)}</td>
+                                <td>${getPaymentMethodIcon(payment.paymentMethod)} ${payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1)}</td>
+                                <td>
+                                    <button class="action-btn delete" data-payment-id="${payment.paymentId}" title="Delete Payment">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            `;
+                            paymentHistoryTableBody.appendChild(row);
+                        });
+
+                        // Add event listeners for delete buttons
+                        const deleteButtons = paymentHistoryTableBody.querySelectorAll('.delete');
+                        deleteButtons.forEach(button => {
+                            button.addEventListener('click', async (e) => {
+                                const paymentId = e.currentTarget.dataset.paymentId;
+                                if (paymentId) {
+                                    showConfirmationDialog(
+                                        'Delete Payment',
+                                        'Are you sure you want to delete this payment record? This action cannot be undone.',
+                                        'delete_payment',
+                                        paymentId
+                                    );
+                                }
+                            });
+                        });
+                    } else {
+                        console.error('Invalid payment data structure:', data); // Debug log
+                        throw new Error('Invalid payment history data structure');
+                    }
+                } catch (error) {
+                    console.error('Error fetching payment history:', error);
+                    paymentHistoryTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">Error loading payment history: ${error.message}</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            // Helper function to format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'NPR',
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Helper function to format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            }
+
+            // Helper function to get payment method icon
+            function getPaymentMethodIcon(method) {
+                switch (method) {
+                    case 'cash':
+                        return '<i class="fa-solid fa-money-bill"></i>';
+                    case 'card':
+                        return '<i class="fa-solid fa-credit-card"></i>';
+                    case 'bank':
+                        return '<i class="fa-solid fa-university"></i>';
+                    case 'online_payment':
+                        return '<i class="fa-solid fa-globe"></i>';
+                    default:
+                        return '<i class="fa-solid fa-money-bill"></i>';
+                }
+            }
+
+            // Add event listeners for payment history filters
+            document.getElementById('filterDay').addEventListener('change', () => {
+                const memberId = document.querySelector('.member-detail-link').id;
+                if (memberId) {
+                    fetchPaymentHistory(memberId);
+                }
+            });
+
+            document.getElementById('filterMethod').addEventListener('change', () => {
+                const memberId = document.querySelector('.member-detail-link').id;
+                if (memberId) {
+                    fetchPaymentHistory(memberId);
+                }
+            });
+
+            document.getElementById('filterType').addEventListener('change', () => {
+                const memberId = document.querySelector('.member-detail-link').id;
+                if (memberId) {
+                    fetchPaymentHistory(memberId);
+                }
+            });
+
+            // Function to handle member form submission
+            async function handleMemberSubmit(e) {
+                e.preventDefault();
+
+                try {
+                    // Get form data
+                    const formData = {
+                        fullName: document.getElementById('fullName').value,
+                        email: document.getElementById('email').value,
+                        contact: document.getElementById('contact').value,
+                        address: document.getElementById('address').value,
+                        dateOfBirth: document.getElementById('dateOfBirth').value,
+                        gender: document.querySelector('input[name="gender"]:checked').value,
+                        emergencyContactName: document.getElementById('emergencyContactName').value,
+                        emergencyContactRelationship: document.getElementById('emergencyContactRelationship').value,
+                        emergencyNumber: document.getElementById('emergencyNumber').value,
+                        membershipType: document.getElementById('membershipType').value,
+                        startDate: document.getElementById('membershipStartDate').value,
+                        memberStatus: 'pending'
+                    };
+
+                    // Create member
+                    const memberResponse = await fetch(`${baseUrl}/members`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (!memberResponse.ok) {
+                        throw new Error('Failed to create member');
+                    }
+
+                    const memberData = await memberResponse.json();
+
+                    // If payment is marked as paid, create payment record
+                    const paymentStatus = document.querySelector('input[name="paymentStatus"]:checked').value;
+                    if (paymentStatus === 'paid') {
+                        const paymentData = {
+                            amount: parseFloat(document.getElementById('paymentAmount').value),
+                            paymentMethod: document.getElementById('paymentMethod').value,
+                            paymentType: 'membership',
+                            paymentDate: new Date(),
+                            description: `Initial payment for ${formData.membershipType} membership`
+                        };
+
+                        // Create payment using the new endpoint
+                        const paymentResponse = await fetch(`${baseUrl}/payments/member/${memberData.data.memberId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify(paymentData)
+                        });
+
+                        if (!paymentResponse.ok) {
+                            throw new Error('Failed to create payment');
+                        }
+                    }
+
+                    // Close modal and refresh member list
+                    closeModal();
+                    showNotification('Member added successfully', 'success');
+                    fetchMembers();
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification(error.message || 'Failed to add member', 'error');
+                }
+            }
+
+            // Add event listener for payment status change
+            document.querySelectorAll('input[name="paymentStatus"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const paymentAmountContainer = document.getElementById('paymentAmountContainer');
+                    const paymentAmount = document.getElementById('paymentAmount');
+                    const paymentMethod = document.getElementById('paymentMethod');
+
+                    if (e.target.value === 'paid') {
+                        paymentAmountContainer.style.display = 'block';
+                        paymentAmount.setAttribute('required', '');
+                        paymentMethod.setAttribute('required', '');
+                    } else {
+                        paymentAmountContainer.style.display = 'none';
+                        paymentAmount.removeAttribute('required');
+                        paymentMethod.removeAttribute('required');
+                        paymentAmount.value = '';
+                        paymentMethod.value = '';
+                    }
+                });
+            });
+
+            // Add form submit event listener
+            document.getElementById('memberForm').addEventListener('submit', handleMemberSubmit);
+
+            // Reset filters button
+            document.getElementById('resetFilters').addEventListener('click', () => {
+                currentPage = 1;
+                document.querySelector('.search-box input').value = '';
+                document.getElementById('gender').value = '';
+                document.getElementById('membership').value = '';
+                fetchMembers(1);
+            });
+
+            // Modal Handling for Renew Member
+            renewMemberBtn.addEventListener('click', function () {
+                renewMemberModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+
+            // Close renew modal when clicking cancel button
+            const renewCancelBtn = renewMemberModal.querySelector('#renewCancelBtn');
+            if (renewCancelBtn) {
+                renewCancelBtn.addEventListener('click', function () {
+                    renewMemberModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+
+            // Close renew modal when clicking outside
+            renewMemberModal.addEventListener('click', function (e) {
+                if (e.target === renewMemberModal) {
+                    renewMemberModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+
+            // Add this to your existing DOMContentLoaded event listener
+            const renewMemberSearch = document.getElementById('renewMemberSearch');
+            const searchResultContainer = document.querySelector('#renewMemberModal .search-result-container');
+
+            // Handle member search
+            renewMemberSearch.addEventListener('input', debounce(async function (e) {
+                const searchTerm = e.target.value.trim();
+                if (searchTerm.length < 2) {
+                    searchResultContainer.innerHTML = '';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${baseUrl}/members/search?q=${encodeURIComponent(searchTerm)}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const members = result.data;
+                        searchResultContainer.innerHTML = '';
+
+                        if (members.length === 0) {
+                            searchResultContainer.innerHTML = '<div class="no-results">No members found</div>';
+                            return;
+                        }
+
+                        members.forEach(member => {
+                            const div = document.createElement('div');
+                            div.className = 'search-result-item';
+                            div.innerHTML = `
+                                <div class="search-result-primary">
+                                    <strong>${member.fullName}</strong>
+                                    <span>${member.memberId}</span>
+                                </div>
+                                <div class="search-result-secondary">
+                                    <small>${member.email} • ${member.contact}</small>
+                                </div>
+                            `;
+                            div.addEventListener('click', () => {
+                                document.getElementById('renewMemberId').value = member.memberId;
+                                renewMemberSearch.value = `${member.fullName} (${member.memberId})`;
+                                searchResultContainer.innerHTML = '';
+                            });
+                            searchResultContainer.appendChild(div);
+                        });
+                    } else {
+                        searchResultContainer.innerHTML = '<div class="no-results">Error searching members</div>';
+                    }
+                } catch (error) {
+                    console.error('Error searching members:', error);
+                    searchResultContainer.innerHTML = '<div class="no-results">Error searching members</div>';
+                }
+            }, 300));
+
+            // Close search results when clicking outside
+            document.addEventListener('click', function (e) {
+                if (!e.target.closest('.search-box')) {
+                    searchResultContainer.innerHTML = '';
+                }
+            });
+
+            // Handle renew member form submission
+            const renewMemberForm = document.getElementById('renewMemberForm');
+            if (renewMemberForm) {
+                renewMemberForm.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+
+                    const memberId = document.getElementById('renewMemberId').value;
+                    if (!memberId) {
+                        showNotification('Please select a member first', 'error');
+                        return;
+                    }
+
+                    const membershipType = document.getElementById('renewMembershipType').value;
+                    const paymentMethod = document.getElementById('renewPaymentMethod').value;
+                    const amount = document.getElementById('renewAmount').value;
+
+                    try {
+                        const response = await fetch(`${baseUrl}/members/${memberId}/renew`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify({
+                                membershipType,
+                                paymentMethod,
+                                amount: parseFloat(amount)
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showNotification('Membership renewed successfully', 'success');
+                            renewMemberModal.classList.remove('active');
+                            document.body.style.overflow = '';
+                            fetchMembers(); // Refresh the member list
+                        } else {
+                            showNotification(result.message || 'Failed to renew membership', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error renewing membership:', error);
+                        showNotification('Failed to renew membership. Please try again.', 'error');
+                    }
+                });
+            }
+
+            fetchMembers(1); // Initial load
+        });
+
+        // Notification Modal Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationIcon = document.querySelector('.notification');
+            const notificationModal = document.querySelector('.notification-modal');
+            const closeNotifications = document.querySelector('.close-notifications');
+            const notificationList = document.querySelector('.notification-list');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Toggle notification modal
+            notificationIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.toggle('active');
+                if (notificationModal.classList.contains('active')) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close notification modal
+            closeNotifications.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                    notificationModal.classList.remove('active');
+                }
+            });
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const data = await response.json();
+                    if (data.success) {
+                        notificationBadge.textContent = data.data.unreadCount;
+                        // Show/hide badge based on count
+                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Fetch notifications from API
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notifications = data.data;
+                        
+                        if (notifications.length === 0) {
+                            notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Render notifications
+                        notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+                        // Add click handler to mark notifications as read
+                        const notificationItems = document.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const notificationId = item.dataset.notificationId;
+                                if (item.classList.contains('unread')) {
+                                    try {
+                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                            method: 'PATCH',
+                                            credentials: 'include'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            // Update UI
+                                            item.classList.remove('unread');
+                                            const unreadDot = item.querySelector('.unread-dot');
+                                            if (unreadDot) unreadDot.remove();
+                                            
+                                            // Update unread count
+                                            await fetchUnreadCount();
+                                        }
+                                    } catch (error) {
+                                        console.error('Error marking notification as read:', error);
+                                    }
+                                }
+
+                                // Close notification modal
+                                notificationModal.classList.remove('active');
+
+                                // Redirect to application page
+                                window.location.href = '/application';
+                            });
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch notifications');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial fetch of notifications and unread count
+            fetchNotifications();
+            fetchUnreadCount();
+
+            // Refresh unread count periodically
+            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        });
+    </script>
+    <script src="./js/logout.js"></script>
+    <style>
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-all-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .view-all-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .unread-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .notification-badge {
+            display: none; /* Hidden by default, shown only when there are unread notifications */
+        }
+    </style>
+</body>
+
+</html>

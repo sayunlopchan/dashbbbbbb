@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knox Barbell - Notifications</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/notification.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>Knox Barbell</h3>
+      <button class="toggle-btn" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <ul class="sidebar-menu">
+      <li>
+        <a href="/dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+          <div class="tooltip">Dashboard</div>
+        </a>
+      </li>
+      <li>
+        <a href="/members">
+          <i class="fas fa-user"></i>
+          <span>Member</span>
+          <div class="tooltip">Member</div>
+        </a>
+      </li>
+      <li>
+        <a href="/application">
+            <i class="fas fa-user"></i>
+            <span>Application</span>
+            <div class="tooltip">Application</div>
+        </a>
+    </li>
+      <li>
+        <a href="/membership">
+          <i class="fas fa-id-card"></i>
+          <span>Membership</span>
+          <div class="tooltip">Membership</div>
+        </a>
+      </li>
+      <li>
+        <a href="/trainers">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Trainers</span>
+          <div class="tooltip">Trainers</div>
+        </a>
+      </li>
+      <li>
+        <a href="/employee">
+          <i class="fas fa-users"></i>
+          <span>Employee</span>
+          <div class="tooltip">Employee</div>
+        </a>
+      </li>
+      <li>
+        <a href="/notifications" class="active">
+          <i class="fas fa-bell"></i>
+          <span>Notifications</span>
+          <div class="tooltip">Notifications</div>
+        </a>
+      </li>
+      <li>
+        <a href="/attendance">
+          <i class="fas fa-calendar-check"></i>
+          <span>Attendance</span>
+          <div class="tooltip">Attendance</div>
+        </a>
+      </li>
+      <li>
+        <a href="/events">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Events</span>
+          <div class="tooltip">Events</div>
+        </a>
+      </li>
+      <li>
+        <a href="/finance">
+          <i class="fas fa-wallet"></i>
+          <span>Finance</span>
+          <div class="tooltip">Finance</div>
+        </a>
+      </li>
+      <li>
+        <a href="/product">
+          <i class="fas fa-box"></i>
+          <span>Product</span>
+          <div class="tooltip">Product</div>
+        </a>
+      </li>
+      <li class="logout-item">
+        <a href="#" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+            <div class="tooltip">Logout</div>
+        </a>
+    </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-toggle" id="mobileToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h3>Notifications</h3>
+      </div>
+      <div class="topbar-right">
+        <div class="notification">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </div>
+        <div class="user-greeting">
+          <img src="/img/Knox Logo-01.png" alt="User">
+          <span>Hello, Knox Barbell</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="content-header">
+        <h1>Notifications Overview</h1>
+      </div>
+
+      <!-- Notifications Area -->
+      <div id="notifications">
+        <div class="tabs">
+          <button class="tab active" data-type="all">All (loading...)</button>
+          <button class="tab" data-type="unread">Unread (loading...)</button>
+          <button class="tab" data-type="expiry">Membership Expiry (loading...)</button>
+        </div>
+
+        <!-- All Notifications -->
+        <div class="notification" data-type="all">
+          <div class="notification-card">
+            <div class="notification-title">
+              <h4>Notification Title</h4>
+              <span class="tag">Notification Tag</span>
+            </div>
+            <div class="date-time">09/02/2025, 5:56 AM</div>
+            <div class="content">
+              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
+              voro adaug
+            </div>
+            <div class="actions">
+              
+            </div>
+          </div>
+
+          <div class="notification-card new">
+            <div class="notification-title">
+              <h4>Notification Title <span class="new-tag">New</span></h4>
+              <span class="tag">Notification Tag</span>
+            </div>
+            <div class="date-time">09/02/2025, 5:56 AM</div>
+            <div class="content">
+              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
+              voro adaug
+            </div>
+            <div class="actions">
+              <span class="mark-read"><i class="fa-solid fa-check-double"></i> Mark as read</span>
+              <button class="reminder-btn"><i class="fa-solid fa-envelope"></i> Send Remainder</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unread Notification -->
+        <div class="notification" data-type="unread">
+          <div class="notification-card new">
+            <div class="notification-title">
+              <h4>Notification Title <span class="new-tag">New</span></h4>
+              <span class="tag">Notification Tag</span>
+            </div>
+            <div class="date-time">09/02/2025, 5:56 AM</div>
+            <div class="content">
+              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
+              voro adaug
+            </div>
+            <div class="actions">
+              <span class="mark-read"><i class="fa-solid fa-check-double"></i> Mark as read</span>
+              <button class="reminder-btn"><i class="fa-solid fa-envelope"></i> Send Remainder</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Membership Expiry Notification -->
+        <div class="notification" data-type="expiry">
+          <div class="notification-card">
+            <div class="notification-title">
+              <h4>Notification Title</h4>
+              <span class="tag">Notification Tag</span>
+            </div>
+            <div class="date-time">09/02/2025, 5:56 AM</div>
+            <div class="content">
+              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
+              voro adaug
+            </div>
+            <div class="actions">
+             
+            </div>
+          </div>
+
+          <div class="notification-card new">
+            <div class="notification-title">
+              <h4>Notification Title <span class="new-tag">New</span></h4>
+              <span class="tag">Notification Tag</span>
+            </div>
+            <div class="date-time">09/02/2025, 5:56 AM</div>
+            <div class="content">
+              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
+              voro adaug
+            </div>
+            <div class="actions">
+              <span class="mark-read"><i class="fa-solid fa-check-double"></i> Mark as read</span>
+              <button class="reminder-btn"><i class="fa-solid fa-envelope"></i> Send Remainder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Notification Management
+    class NotificationManager {
+      constructor() {
+        this.notificationContainer = document.getElementById('notifications');
+        this.tabButtons = document.querySelectorAll('.tab');
+        this.initEventListeners();
+      }
+
+      initEventListeners() {
+        this.tabButtons.forEach(tab => {
+          tab.addEventListener('click', (event) => this.showTab(event.target.getAttribute('data-type')));
+        });
+
+        // Initial load of notifications
+        this.fetchNotifications();
+      }
+
+      async fetchNotifications() {
+        try {
+          const response = await fetch('/api/notifications', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch notifications');
+          }
+
+          const result = await response.json();
+          this.displayNotifications(result.data);
+          this.updateTabCounts(result.data);
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+          this.showErrorNotification(error.message);
+        }
+      }
+
+      displayNotifications(notifications) {
+        // Clear existing notifications
+        const notificationContainers = document.querySelectorAll('.notification');
+        notificationContainers.forEach(container => {
+          container.innerHTML = '';
+        });
+
+        if (notifications.length === 0) {
+          this.showNoNotificationsMessage();
+          return;
+        }
+
+        notifications.forEach(notification => {
+          const notificationCard = this.createNotificationCard(notification);
+          
+          // Determine which container to add the notification to
+          const container = document.querySelector(`.notification[data-type="${this.getNotificationType(notification)}"]`);
+          if (container) {
+            container.appendChild(notificationCard);
+          }
+        });
+      }
+
+      createNotificationCard(notification) {
+        const card = document.createElement('div');
+        card.classList.add('notification-card');
+        
+        // Add 'new' class if notification is unread
+        if (notification.status === 'unread') {
+          card.classList.add('new');
+        }
+
+        card.innerHTML = `
+          <div class="notification-title">
+            <h4>${notification.title} 
+              ${notification.status === 'unread' ? '<span class="new-tag">New</span>' : ''}
+            </h4>
+            <span class="tag">${notification.type}</span>
+          </div>
+          <div class="date-time">${new Date(notification.createdAt).toLocaleString()}</div>
+          <div class="content">${notification.message}</div>
+          <div class="actions">
+            ${notification.status === 'unread' ? `
+              <span class="mark-read" data-id="${notification._id}">
+                <i class="fa-solid fa-check-double"></i> Mark as read
+              </span>
+            ` : ''}
+            <button class="reminder-btn" data-id="${notification._id}">
+              <i class="fa-solid fa-envelope"></i> Send Reminder
+            </button>
+          </div>
+        `;
+
+        // Add event listeners for actions
+        const markReadSpan = card.querySelector('.mark-read');
+        if (markReadSpan) {
+          markReadSpan.addEventListener('click', () => this.markNotificationAsRead(notification._id));
+        }
+
+        const reminderBtn = card.querySelector('.reminder-btn');
+        reminderBtn.addEventListener('click', () => this.sendReminder(notification));
+
+        return card;
+      }
+
+      async markNotificationAsRead(notificationId) {
+        try {
+          const response = await fetch(`/api/notifications/${notificationId}/read`, {
+            method: 'PATCH'
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to mark notification as read');
+          }
+
+          // Refresh notifications after marking as read
+          this.fetchNotifications();
+        } catch (error) {
+          console.error('Error marking notification as read:', error);
+          this.showErrorNotification(error.message);
+        }
+      }
+
+      sendReminder(notification) {
+        // Implement reminder logic based on notification type
+        console.log('Sending reminder for notification:', notification);
+        // You might want to add specific reminder logic here
+        this.showNotification('Reminder sent successfully', 'success');
+      }
+
+      updateTabCounts(notifications) {
+        const allTab = document.querySelector('.tab[data-type="all"]');
+        const unreadTab = document.querySelector('.tab[data-type="unread"]');
+        const expiryTab = document.querySelector('.tab[data-type="expiry"]');
+
+        const allCount = notifications.length;
+        const unreadCount = notifications.filter(n => n.status === 'unread').length;
+        const expiryCount = notifications.filter(n => n.type === 'membershipExpiry').length;
+
+        if (allTab) allTab.textContent = `All (${allCount})`;
+        if (unreadTab) unreadTab.textContent = `Unread (${unreadCount})`;
+        if (expiryTab) expiryTab.textContent = `Membership Expiry (${expiryCount})`;
+      }
+
+      showTab(tabType) {
+        // Toggle tab styling
+        this.tabButtons.forEach(tab => tab.classList.remove('active'));
+        const activeTab = document.querySelector(`.tab[data-type="${tabType}"]`);
+        if (activeTab) activeTab.classList.add('active');
+
+        // Toggle notification visibility
+        const notifications = document.querySelectorAll('.notification');
+        notifications.forEach(n => {
+          if (tabType === 'all') {
+            n.style.display = 'block';
+          } else {
+            n.style.display = n.dataset.type === tabType ? 'block' : 'none';
+          }
+        });
+      }
+
+      showNoNotificationsMessage() {
+        const allContainer = document.querySelector('.notification[data-type="all"]');
+        if (allContainer) {
+          allContainer.innerHTML = `
+            <div class="no-notifications">
+              <i class="fas fa-bell-slash"></i>
+              <p>No notifications at the moment</p>
+            </div>
+          `;
+        }
+      }
+
+      showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.classList.add('notification-popup', type);
+        notification.textContent = message;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.classList.add('hide');
+          setTimeout(() => {
+            document.body.removeChild(notification);
+          }, 500);
+        }, 3000);
+      }
+
+      showErrorNotification(message) {
+        this.showNotification(message, 'error');
+      }
+
+      getNotificationType(notification) {
+        if (notification.status === 'unread') return 'unread';
+        if (notification.type === 'membershipExpiry') return 'expiry';
+        return 'all';
+      }
+    }
+
+    // Initialize notification manager when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      new NotificationManager();
+    });
+  </script>
+
+  <style>
+    .no-notifications {
+      text-align: center;
+      padding: 20px;
+      color: #888;
+    }
+
+    .no-notifications i {
+      font-size: 48px;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
+    .notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      color: white;
+      z-index: 1000;
+      transition: opacity 0.5s;
+      opacity: 1;
+    }
+
+    .notification-popup.success {
+      background-color: #4CAF50;
+    }
+
+    .notification-popup.error {
+      background-color: #f44336;
+    }
+
+    .notification-popup.hide {
+      opacity: 0;
+    }
+  </style>
+
+  <script src="/js/main.js"></script>
+  <script src="./js/logout.js"></script>
+</body>
+
+</html>

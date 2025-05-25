@@ -1,0 +1,137 @@
+.chart-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* Member vs Application chart legend colors */
+.members-legend {
+    background: linear-gradient(to top, #4e73df, #6b8cff);
+}
+
+.applications-legend {
+    background: linear-gradient(to top, #1cc88a, #3fe0a6);
+}
+
+/* Finance chart legend colors */
+.membership-legend {
+    background: linear-gradient(to top, #4e73df, #6b8cff);
+}
+
+.product-legend {
+    background: linear-gradient(to top, #f6c23e, #f8d775);
+}
+
+.legend-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.bar-chart {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 300px;
+    padding-top: 20px;
+    padding-bottom: 30px;
+    border-top: 1px solid #eee;
+    position: relative;
+}
+
+.bar-chart-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 40px;
+    position: relative;
+    cursor: default;
+}
+
+.bar-chart-bar {
+    width: 20px;
+    border-radius: 3px 3px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-bottom: 5px;
+    transform-origin: bottom center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Member vs Application chart styles */
+.bar-chart-bar.members-bar {
+    background: linear-gradient(to top, #4e73df, #6b8cff);
+}
+
+.bar-chart-bar.applications-bar {
+    background: linear-gradient(to top, #1cc88a, #3fe0a6);
+}
+
+/* Finance chart styles */
+.bar-chart-bar.membership-bar {
+    background: linear-gradient(to top, #4e73df, #6b8cff);
+}
+
+.bar-chart-bar.product-bar {
+    background: linear-gradient(to top, #f6c23e, #f8d775);
+}
+
+.bar-chart-label {
+    font-size: 12px;
+    color: #666;
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+/* Tooltip styles */
+.bar-chart-group:hover::after {
+    content: attr(title);
+    position: absolute;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .bar-chart {
+        height: 250px;
+    }
+    
+    .bar-chart-group {
+        width: 30px;
+    }
+    
+    .bar-chart-bar {
+        width: 15px;
+    }
+}

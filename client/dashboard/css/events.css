@@ -1,0 +1,112 @@
+.tabs {
+  padding: 10px 0;
+  width: 100%;
+  background-color: #dfdfdf;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}
+.content .tabs .tab {
+  background-color: transparent;
+  width: 50%;
+  padding: 0.5rem 2rem;
+  border: none;
+  cursor: pointer;
+  margin: 0 0.5rem;
+  border-radius: 5px;
+  transition: all 0.3s ease-in-out;
+}
+.content .tabs .tab.active {
+  background: #ffffff;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+}
+.search-add {
+  display: none;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease-in-out;
+}
+.search-add.active{
+  display: flex;
+}
+.search-box {
+  flex: 1;
+  margin-right: 1rem;
+}
+.search-box input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.add-btn {
+  padding: 0.5rem 1rem;
+  background: var(--btn-primary);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.ann-card-list{
+  display: flex;
+  gap: 1rem;
+}
+.card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+.card h3 {
+  margin: 0 0 0.5rem 0;
+}
+.card small {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+.card p {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.card .edit, .card .delete {
+  position: absolute;
+  top: 10px;
+  cursor: pointer;
+}
+.card .edit {
+  right: 40px;
+  color: #f4c542;
+}
+.card .delete {
+  right: 10px;
+  color: red;
+}
+.card .participants {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6a6a6a;
+  font-weight: 500;
+}
+
+
+.image-preview-container{
+  display: flex;
+  gap: 1rem;
+}
+
+.image-preview {
+  width: 90px;
+  height: 60px;
+  border-radius: 5px;
+  object-fit: cover;
+}

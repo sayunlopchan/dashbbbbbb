@@ -1,0 +1,90 @@
+.pie-chart {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: visible; /* Allow tooltips to be visible outside */
+}
+
+.pie-chart svg {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.pie-chart path {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.pie-chart path:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.2));
+}
+
+.pie-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.pie-chart-tooltip {
+    position: fixed; /* Change to fixed positioning */
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s;
+    text-align: center;
+    min-width: 120px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translate(-50%, -100%); /* Center horizontally and position above cursor */
+    margin-top: -10px; /* Add some space between cursor and tooltip */
+}
+
+.pie-chart-tooltip strong {
+    display: block;
+    margin-bottom: 4px;
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .pie-chart {
+        height: 250px;
+    }
+    
+    .pie-chart svg {
+        width: 180px;
+        height: 180px;
+    }
+    
+    .pie-chart-legend {
+        gap: 10px;
+    }
+}

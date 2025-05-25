@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knox Barbell - Application</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/trainer.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Knox Barbell</h3>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <div class="tooltip">Dashboard</div>
+                </a>
+            </li>
+            <li>
+                <a href="/members">
+                    <i class="fas fa-user"></i>
+                    <span>Member</span>
+                    <div class="tooltip">Member</div>
+                </a>
+            </li>
+            <li>
+                <a href="/application" class="active">
+                    <i class="fas fa-user"></i>
+                    <span>Application</span>
+                    <div class="tooltip">Application</div>
+                </a>
+            </li>
+            <li>
+                <a href="/membership">
+                    <i class="fas fa-id-card"></i>
+                    <span>Membership</span>
+                    <div class="tooltip">Membership</div>
+                </a>
+            </li>
+            <li>
+                <a href="/trainers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Trainers</span>
+                    <div class="tooltip">Trainers</div>
+                </a>
+            </li>
+            <li>
+                <a href="/employee">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                    <div class="tooltip">Employee</div>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="tooltip">Notifications</div>
+                </a>
+            </li>
+            <li>
+                <a href="/attendance">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <div class="tooltip">Attendance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                    <div class="tooltip">Events</div>
+                </a>
+            </li>
+            <li>
+                <a href="/finance">
+                    <i class="fas fa-wallet"></i>
+                    <span>Finance</span>
+                    <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/product">
+                    <i class="fas fa-box"></i>
+                    <span>Product</span>
+                    <div class="tooltip">Product</div>
+                </a>
+            </li>
+            <li class="logout-item">
+                <a href="#" id="logoutButton">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                    <div class="tooltip">Logout</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h3>Applications</h3>
+            </div>
+            <div class="topbar-right">
+                <!-- notification  -->
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">0</span>
+                    
+                    <!-- Notification Modal -->
+                    <div class="notification-modal">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-actions">
+                                <a href="/notifications" class="view-all-link">View All</a>
+                                <button class="close-notifications">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="notification-list">
+                            <!-- Notifications will be populated here -->
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-greeting">
+                    <img src="/img/Knox Logo-01.png" alt="User">
+                    <span>Hello, Knox Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="content-header">
+                <h1>Applications Management</h1>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters">
+                <!-- gender filter -->
+                <div class="filter-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender">
+                        <option value="">All</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <!-- membership type filter -->
+                <div class="filter-group">
+                    <label for="membershipType">Membership:</label>
+                    <select id="membershipType">
+                        <option value="">All</option>
+                        <option value="silver">Silver</option>
+                        <option value="gold">Gold</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="platinum">Platinum</option>
+                    </select>
+                </div>
+                <!-- age filter -->
+                <div class="filter-group">
+                    <label for="age">Age:</label>
+                    <select id="age">
+                        <option value="">All</option>
+                        <option value="under18">Under 18</option>
+                        <option value="18-25">18-25</option>
+                        <option value="26-35">26-35</option>
+                        <option value="36-45">36-45</option>
+                        <option value="46-55">46-55</option>
+                        <option value="56+">56+</option>
+                    </select>
+                </div>
+                <!-- search filter -->
+                <div class="filter-group search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search by name or ID..." autocomplete="off">
+                </div>
+                <!-- refresh button -->
+                <div class="filter-group">
+                    <button class="reset" id="resetFilters" title="Reset Filters">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enrolled Applications Table -->
+            <table class="trainer-table">
+                <thead>
+                    <tr>
+                        <th>S.N</th>
+                        <th>Id</th>
+                        <th>Full Name</th>
+                        <th>Email Id</th>
+                        <th>Contact No.</th>
+                        <th>Starting Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>                        
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td><span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span></td>
+                        <td>
+                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls">
+                <button id="prevPage" class="pagination-btn" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <span id="pageInfo">Page 1</span>
+                <button id="nextPage" class="pagination-btn" disabled>
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="confirmationTitle">Confirm Action</h2>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+            </div>
+            <div class="form-actions" style="justify-content: center; gap: 20px;">
+                <button type="button" class="btn btn-secondary" id="cancelAction">Cancel</button>
+                <button type="button" class="btn" id="confirmAction" style="transition: all 0.3s ease;">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const trainerTableBody = document.querySelector('.trainer-table tbody');
+        const prevPageBtn = document.getElementById("prevPage");
+        const nextPageBtn = document.getElementById("nextPage");
+        const pageInfo = document.getElementById("pageInfo");
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationTitle = document.getElementById('confirmationTitle');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmActionBtn = document.getElementById('confirmAction');
+        const cancelActionBtn = document.getElementById('cancelAction');
+
+        let currentAction = null;
+        let currentApplicationId = null;
+
+        // Pagination state
+        let currentPage = 1;
+        let totalPages = 1;
+        const itemsPerPage = 10;
+        let allApplications = []; // Store all applications
+
+        // Utility Functions
+        const validateForm = (formData) => {
+            const errors = [];
+
+            // Full Name validation
+            if (!formData.fullName || formData.fullName.trim().length < 2) {
+                errors.push('Please enter a valid full name');
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!formData.email || !emailRegex.test(formData.email)) {
+                errors.push('Please enter a valid email address');
+            }
+
+            // Contact validation
+            const contactRegex = /^[0-9]{10,15}$/;
+            if (!formData.contact || !contactRegex.test(formData.contact)) {
+                errors.push('Please enter a valid 10-15 digit contact number');
+            }
+
+            // Starting Date validation
+            if (!formData.startDate) {
+                errors.push('Please select a start date');
+            }
+
+            // Status validation
+            if (!['pending', 'accepted', 'rejected'].includes(formData.status)) {
+                errors.push('Please select a valid status');
+            }
+
+            return errors;
+        };
+
+        // Function to calculate age from date of birth
+        function calculateAge(dateOfBirth) {
+            const birthDate = new Date(dateOfBirth);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // Function to get age range from age
+        function getAgeRange(age) {
+            if (age < 18) return 'under18';
+            if (age <= 25) return '18-25';
+            if (age <= 35) return '26-35';
+            if (age <= 45) return '36-45';
+            if (age <= 55) return '46-55';
+            return '56+';
+        }
+
+        // Fetch and Display Applications
+        async function fetchApplications(page = 1) {
+            try {
+                const response = await fetch('/api/applications');
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store all applications
+                    allApplications = result.data;
+
+                    // Apply filters
+                    const gender = document.getElementById('gender').value;
+                    const membershipType = document.getElementById('membershipType').value;
+                    const ageRange = document.getElementById('age').value;
+                    const search = document.querySelector('.search-box input').value.trim().toLowerCase();
+
+                    // Filter applications
+                    let filteredApplications = allApplications.filter(application => {
+                        // Gender filter
+                        if (gender && application.gender !== gender) {
+                            return false;
+                        }
+
+                        // Membership type filter
+                        if (membershipType && application.membershipType !== membershipType) {
+                            return false;
+                        }
+
+                        // Age filter
+                        if (ageRange && application.dateOfBirth) {
+                            const age = calculateAge(application.dateOfBirth);
+                            const applicationAgeRange = getAgeRange(age);
+                            if (applicationAgeRange !== ageRange) {
+                                return false;
+                            }
+                        }
+
+                        // Search filter
+                        if (search) {
+                            const searchFields = [
+                                application.fullName,
+                                application.email,
+                                application.contact,
+                                application.applicationId
+                            ];
+                            return searchFields.some(field => 
+                                field && field.toLowerCase().includes(search)
+                            );
+                        }
+
+                        return true;
+                    });
+
+                    // Calculate pagination
+                    const startIndex = (page - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedApplications = filteredApplications.slice(startIndex, endIndex);
+
+                    // Calculate total pages
+                    totalPages = Math.ceil(filteredApplications.length / itemsPerPage);
+
+                    // Render the table with paginated data
+                    displayApplications(paginatedApplications);
+
+                    // Update pagination
+                    updatePagination({
+                        currentPage: page,
+                        totalPages: totalPages,
+                        total: filteredApplications.length
+                    });
+                } else {
+                    console.error('Failed to fetch applications:', result.message);
+                    trainerTableBody.innerHTML = `<tr><td colspan="8" class="text-center">Error loading applications. Please try again.</td></tr>`;
+                    // Reset pagination on error
+                    updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+                }
+            } catch (error) {
+                console.error('Error fetching applications:', error);
+                trainerTableBody.innerHTML = `<tr><td colspan="8" class="text-center">Error loading applications. Please try again.</td></tr>`;
+                // Reset pagination on error
+                updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+            }
+        }
+
+        function updatePagination(paginationData) {
+            // Ensure we have valid numbers for pagination
+            currentPage = parseInt(paginationData.currentPage) || 1;
+            totalPages = parseInt(paginationData.totalPages) || 1;
+
+            // Update page info with proper number formatting
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} applications)`;
+
+            // Update button states
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+
+            // Add visual feedback for disabled state
+            prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+            nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
+        }
+
+        // Display Applications in Table
+        function displayApplications(applications) {
+            trainerTableBody.innerHTML = '';
+
+            if (!applications || !Array.isArray(applications) || applications.length === 0) {
+                trainerTableBody.innerHTML = `<tr><td colspan="8" class="text-center">No applications found.</td></tr>`;
+                return;
+            }
+
+            applications.forEach((application, index) => {
+                if (!application) return; // Skip invalid applications
+
+                const tr = document.createElement("tr");
+                const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+
+                // Format dates safely
+                let startDate = 'N/A';
+                if (application.startDate) {
+                    const date = new Date(application.startDate);
+                    if (!isNaN(date.getTime())) {
+                        startDate = date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        });
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td>${rowNumber}</td>
+                    <td>${application.applicationId || 'N/A'}</td>
+                    <td>${application.fullName || 'N/A'}</td>
+                    <td>${application.email || 'N/A'}</td>
+                    <td>${application.contact || 'N/A'}</td>
+                    <td>${startDate}</td>
+                    <td>
+                        <span class="status ${application.applicationStatus || 'pending'}">
+                            <i class="fa-solid fa-${application.applicationStatus === 'rejected' ? 'xmark' : 'circle-check'}"></i> 
+                            ${application.applicationStatus ? application.applicationStatus.charAt(0).toUpperCase() + application.applicationStatus.slice(1) : 'Pending'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn approve" data-application-id="${application.applicationId || ''}" ${!application.applicationId || application.applicationStatus === 'accepted' ? 'disabled' : ''}>
+                            <i class="fa-solid fa-square-check" style="color: #2ecc71;"></i>
+                        </button>
+                        <button class="action-btn delete" data-application-id="${application.applicationId || ''}" ${!application.applicationId ? 'disabled' : ''}>
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                trainerTableBody.appendChild(tr);
+            });
+
+            attachActionListeners();
+        }
+
+        // Pagination event listeners
+        prevPageBtn.addEventListener("click", () => {
+            if (currentPage > 1) {
+                fetchApplications(currentPage - 1);
+            }
+        });
+
+        nextPageBtn.addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                fetchApplications(currentPage + 1);
+            }
+        });
+
+        // Show Confirmation Dialog
+        function showConfirmationDialog(title, message, action, applicationId) {
+            confirmationTitle.textContent = title;
+            confirmationMessage.textContent = message;
+            currentAction = action;
+            currentApplicationId = applicationId;
+
+            // Update confirm button color based on action
+            const confirmBtn = document.getElementById('confirmAction');
+            if (action === 'approve') {
+                confirmBtn.style.backgroundColor = '#2ecc71';
+                confirmBtn.style.borderColor = '#2ecc71';
+                confirmBtn.style.color = 'white';
+            } else if (action === 'delete') {
+                confirmBtn.style.backgroundColor = '#e74c3c';
+                confirmBtn.style.borderColor = '#e74c3c';
+                confirmBtn.style.color = 'white';
+            }
+
+            confirmationModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide Confirmation Dialog
+        function hideConfirmationDialog() {
+            confirmationModal.classList.remove('active');
+            document.body.style.overflow = '';
+            currentAction = null;
+            currentApplicationId = null;
+
+            // Reset confirm button color
+            const confirmBtn = document.getElementById('confirmAction');
+            confirmBtn.style.backgroundColor = '';
+            confirmBtn.style.borderColor = '';
+            confirmBtn.style.color = '';
+        }
+
+        // Confirmation Dialog Event Listeners
+        confirmActionBtn.addEventListener('click', () => {
+            if (currentAction === 'approve') {
+                approveApplication(currentApplicationId);
+            } else if (currentAction === 'delete') {
+                deleteApplication(currentApplicationId);
+            }
+            hideConfirmationDialog();
+        });
+
+        cancelActionBtn.addEventListener('click', hideConfirmationDialog);
+
+        // Close modal when clicking outside
+        confirmationModal.addEventListener('click', (e) => {
+            if (e.target === confirmationModal) {
+                hideConfirmationDialog();
+            }
+        });
+
+        // Approve Application
+        function approveApplication(applicationId) {
+            // Show loading notification
+            const loadingNotification = showNotification('Approving application...', 'info');
+
+            fetch(`/api/applications/accept/${applicationId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    fetchApplications();
+                    // Remove loading notification and show success
+                    if (loadingNotification) {
+                        loadingNotification.remove();
+                    }
+                    showNotification('Application approved successfully!', 'success');
+                } else {
+                    throw new Error(result.message || 'Failed to approve application');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Remove loading notification and show error
+                if (loadingNotification) {
+                    loadingNotification.remove();
+                }
+                showNotification(error.message || 'Failed to approve application', 'error');
+            });
+        }
+
+        // Delete Application
+        function deleteApplication(applicationId) {
+            fetch(`/api/applications/delete/${applicationId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    fetchApplications();
+                    showNotification('Application deleted successfully!', 'success');
+                } else {
+                    throw new Error(result.message || 'Failed to delete application');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification(error.message || 'Failed to delete application', 'error');
+            });
+        }
+
+        // Attach Action Listeners
+        function attachActionListeners() {
+            document.querySelectorAll('.action-btn.approve').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const applicationId = btn.getAttribute('data-application-id');
+                    showConfirmationDialog(
+                        'Approve Application',
+                        'Are you sure you want to approve this application?',
+                        'approve',
+                        applicationId
+                    );
+                });
+            });
+
+            document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const applicationId = btn.getAttribute('data-application-id');
+                    showConfirmationDialog(
+                        'Delete Application',
+                        'Are you sure you want to delete this application? This action cannot be undone.',
+                        'delete',
+                        applicationId
+                    );
+                });
+            });
+        }
+
+        // Add event listeners for filters
+        document.addEventListener('DOMContentLoaded', () => {
+            // Gender filter change
+            document.getElementById('gender').addEventListener('change', () => {
+                currentPage = 1;
+                fetchApplications(1);
+            });
+
+            // Membership type filter change
+            document.getElementById('membershipType').addEventListener('change', () => {
+                currentPage = 1;
+                fetchApplications(1);
+            });
+
+            // Age filter change
+            document.getElementById('age').addEventListener('change', () => {
+                currentPage = 1;
+                fetchApplications(1);
+            });
+
+            // Search input with debounce
+            let searchTimeout;
+            document.querySelector('.search-box input').addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    fetchApplications(1);
+                }, 500);
+            });
+
+            // Reset filters button
+            document.getElementById('resetFilters').addEventListener('click', () => {
+                currentPage = 1;
+                document.querySelector('.search-box input').value = '';
+                document.getElementById('gender').value = '';
+                document.getElementById('membershipType').value = '';
+                document.getElementById('age').value = '';
+                fetchApplications(1);
+            });
+
+            // Initial fetch
+            fetchApplications(1);
+        });
+    </script>
+
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
+    <script>
+        // Notification Modal Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationIcon = document.querySelector('.notification');
+            const notificationModal = document.querySelector('.notification-modal');
+            const closeNotifications = document.querySelector('.close-notifications');
+            const notificationList = document.querySelector('.notification-list');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Toggle notification modal
+            notificationIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.toggle('active');
+                if (notificationModal.classList.contains('active')) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close notification modal
+            closeNotifications.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                    notificationModal.classList.remove('active');
+                }
+            });
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const data = await response.json();
+                    if (data.success) {
+                        notificationBadge.textContent = data.data.unreadCount;
+                        // Show/hide badge based on count
+                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Fetch notifications from API
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notifications = data.data;
+                        
+                        if (notifications.length === 0) {
+                            notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Render notifications
+                        notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+                        // Add click handler to mark notifications as read
+                        const notificationItems = document.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const notificationId = item.dataset.notificationId;
+                                if (item.classList.contains('unread')) {
+                                    try {
+                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                            method: 'PATCH',
+                                            credentials: 'include'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            // Update UI
+                                            item.classList.remove('unread');
+                                            const unreadDot = item.querySelector('.unread-dot');
+                                            if (unreadDot) unreadDot.remove();
+                                            
+                                            // Update unread count
+                                            await fetchUnreadCount();
+                                        }
+                                    } catch (error) {
+                                        console.error('Error marking notification as read:', error);
+                                    }
+                                }
+
+                                // Close notification modal
+                                notificationModal.classList.remove('active');
+
+                                // Redirect to application page
+                                window.location.href = '/application';
+                            });
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch notifications');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial fetch of notifications and unread count
+            fetchNotifications();
+            fetchUnreadCount();
+
+            // Refresh unread count periodically
+            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        });
+    </script>
+    <style>
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-all-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .view-all-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .unread-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .notification-badge {
+            display: none; /* Hidden by default, shown only when there are unread notifications */
+        }
+    </style>
+</body>
+
+</html>

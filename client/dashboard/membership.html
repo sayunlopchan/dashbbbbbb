@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knox Barbell - Membership</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/membership.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Knox Barbell</h3>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <div class="tooltip">Dashboard</div>
+                </a>
+            </li>
+            <li>
+                <a href="/members">
+                    <i class="fas fa-user"></i>
+                    <span>Member</span>
+                    <div class="tooltip">Member</div>
+                </a>
+            </li>
+            <li>
+                <a href="/application">
+                    <i class="fas fa-user"></i>
+                    <span>Application</span>
+                    <div class="tooltip">Application</div>
+                </a>
+            </li>
+            <li>
+                <a href="/membership" class="active">
+                    <i class="fas fa-id-card"></i>
+                    <span>Membership</span>
+                    <div class="tooltip">Membership</div>
+                </a>
+            </li>
+            <li>
+                <a href="/trainers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Trainers</span>
+                    <div class="tooltip">Trainers</div>
+                </a>
+            </li>
+            <li>
+                <a href="/employee">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                    <div class="tooltip">Employee</div>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="tooltip">Notifications</div>
+                </a>
+            </li>
+            <li>
+                <a href="/attendance">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <div class="tooltip">Attendance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                    <div class="tooltip">Events</div>
+                </a>
+            </li>
+            <li>
+                <a href="/finance">
+                    <i class="fas fa-wallet"></i>
+                    <span>Finance</span>
+                    <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/product">
+                  <i class="fas fa-box"></i>
+                  <span>Product</span>
+                  <div class="tooltip">Product</div>
+                </a>
+              </li>
+            <li class="logout-item">
+                <a href="#" id="logoutButton">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                    <div class="tooltip">Logout</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h3>Membership</h3>
+            </div>
+            <div class="topbar-right">
+                <!-- notification  -->
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">0</span>
+                    
+                    <!-- Notification Modal -->
+                    <div class="notification-modal">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-actions">
+                                <a href="/notifications" class="view-all-link">View All</a>
+                                <button class="close-notifications">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="notification-list">
+                            <!-- Notifications will be populated here -->
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-greeting">
+                    <img src="/img/Knox Logo-01.png" alt="User">
+                    <span>Hello, Knox Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="content-header">
+                <h1>Membership Management</h1>
+                <button id="addMembershipBtn">
+                    <span>+</span>
+                    <p>Add Membership</p>
+                </button>
+            </div>
+
+            <div class="membership-cards">
+                <div class="membership-card silver">
+                    <h2>Silver</h2>
+                    <h3 class="rate">Rs 3000</h3>
+                    <h6 class="duration">Duration: 1 Month</h6>
+                </div>
+
+                <div class="membership-card gold">
+                    <h2>Gold</h2>
+                    <h3 class="rate">Rs 9000</h3>
+                    <h6 class="duration">Duration: 3 Months</h6>
+                </div>
+
+                <div class="membership-card diamond">
+                    <h2>Diamond</h2>
+                    <h3 class="rate">Rs 36000</h3>
+                    <h6 class="duration">Duration: 6 Months</h6>
+                </div>
+
+                <div class="membership-card platinum">
+                    <h2>Platinum</h2>
+                    <h3 class="rate">Rs 18000</h3>
+                    <h6 class="duration">Duration: 12 Months</h6>
+                </div>
+            </div>
+
+            <!-- Enrolled Members Table -->
+            <table class="enrolled-table">
+                <thead>
+                    <tr>
+                        <th>S.N</th>
+                        <th>Membership Type</th>
+                        <th>Created at</th>
+                        <th>Enrolled Members</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Silver</td>
+                        <td>06/05/2025</td>
+                        <td>30</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Gold</td>
+                        <td>06/05/2025</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Platinum</td>
+                        <td>06/05/2025</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Diamond</td>
+                        <td>06/05/2025</td>
+                        <td>5</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
+    <script>
+        // Notification Modal Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationIcon = document.querySelector('.notification');
+            const notificationModal = document.querySelector('.notification-modal');
+            const closeNotifications = document.querySelector('.close-notifications');
+            const notificationList = document.querySelector('.notification-list');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Toggle notification modal
+            notificationIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.toggle('active');
+                if (notificationModal.classList.contains('active')) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close notification modal
+            closeNotifications.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                    notificationModal.classList.remove('active');
+                }
+            });
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const data = await response.json();
+                    if (data.success) {
+                        notificationBadge.textContent = data.data.unreadCount;
+                        // Show/hide badge based on count
+                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Fetch notifications from API
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notifications = data.data;
+                        
+                        if (notifications.length === 0) {
+                            notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Render notifications
+                        notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+                        // Add click handler to mark notifications as read
+                        const notificationItems = document.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const notificationId = item.dataset.notificationId;
+                                if (item.classList.contains('unread')) {
+                                    try {
+                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                            method: 'PATCH',
+                                            credentials: 'include'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            // Update UI
+                                            item.classList.remove('unread');
+                                            const unreadDot = item.querySelector('.unread-dot');
+                                            if (unreadDot) unreadDot.remove();
+                                            
+                                            // Update unread count
+                                            await fetchUnreadCount();
+                                        }
+                                    } catch (error) {
+                                        console.error('Error marking notification as read:', error);
+                                    }
+                                }
+
+                                // Close notification modal
+                                notificationModal.classList.remove('active');
+
+                                // Redirect to application page
+                                window.location.href = '/application';
+                            });
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch notifications');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial fetch of notifications and unread count
+            fetchNotifications();
+            fetchUnreadCount();
+
+            // Refresh unread count periodically
+            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        });
+    </script>
+    <style>
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-all-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .view-all-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .unread-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .notification-badge {
+            display: none; /* Hidden by default, shown only when there are unread notifications */
+        }
+    </style>
+</body>
+
+<>

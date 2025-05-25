@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knox Barbell - Membership</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/empolyee.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Knox Barbell</h3>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <div class="tooltip">Dashboard</div>
+                </a>
+            </li>
+            <li>
+                <a href="/members">
+                    <i class="fas fa-user"></i>
+                    <span>Member</span>
+                    <div class="tooltip">Member</div>
+                </a>
+            </li>
+            <li>
+                <a href="/application">
+                    <i class="fas fa-user"></i>
+                    <span>Application</span>
+                    <div class="tooltip">Application</div>
+                </a>
+            </li>
+            <li>
+                <a href="/membership">
+                    <i class="fas fa-id-card"></i>
+                    <span>Membership</span>
+                    <div class="tooltip">Membership</div>
+                </a>
+            </li>
+            <li>
+                <a href="/trainers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Trainers</span>
+                    <div class="tooltip">Trainers</div>
+                </a>
+            </li>
+            <li>
+                <a href="/employee" class="active">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                    <div class="tooltip">Employee</div>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="tooltip">Notifications</div>
+                </a>
+            </li>
+            <li>
+                <a href="/attendance">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <div class="tooltip">Attendance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                    <div class="tooltip">Events</div>
+                </a>
+            </li>
+            <li>
+                <a href="/finance">
+                    <i class="fas fa-wallet"></i>
+                    <span>Finance</span>
+                    <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/product">
+                  <i class="fas fa-box"></i>
+                  <span>Product</span>
+                  <div class="tooltip">Product</div>
+                </a>
+              </li>
+            <li class="logout-item">
+                <a href="#" id="logoutButton">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                    <div class="tooltip">Logout</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h3>Employee</h3>
+            </div>
+            <div class="topbar-right">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-greeting">
+                    <img src="/img/Knox Logo-01.png" alt="User">
+                    <span>Hello, Knox Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="content-header">
+                <h1>Employee Management</h1>
+                <div class="header-actions">
+                    <select id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                <button id="addEmployeeBtn">
+                    <span>+</span>
+                    <p>Add Employee</p>
+                </button>
+                </div>
+            </div>
+            <!-- Enrolled Members Table -->
+            <table class="trainer-table">
+                <thead>
+                    <tr>
+                        <th>S.N</th>
+                        <th>Id</th>
+                        <th>Full Name</th>
+                        <th>Email Id</th>
+                        <th>Contact No.</th>
+                        <th>Joining Date</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>loading...</td>
+                        <td>
+                            <span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <!-- <tr>
+                        <td>2</td>
+                        <td>KB300</td>
+                        <td>Anish Karki</td>
+                        <td>karki@anish.com</td>
+                        <td>06/05/2025</td>
+                        <td>9876543210</td>
+                        <td>Receptionist</td>
+                        <td>
+                            <span class="status inactive"> <i class="fa-solid fa-circle-exclamation"></i> Inactive</span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>KB300</td>
+                        <td>Anish Karki</td>
+                        <td>karki@anish.com</td>
+                        <td>06/05/2025</td>
+                        <td>9876543210</td>
+                        <td>Receptionist</td>
+                        <td>
+                            <span class="status active"> <i class="fa-solid fa-circle-check"></i> Active</span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>KB300</td>
+                        <td>Anish Karki</td>
+                        <td>karki@anish.com</td>
+                        <td>06/05/2025</td>
+                        <td>9876543210</td>
+                        <td>Receptionist</td>
+                        <td>
+                            <span class="status inactive"> <i class="fa-solid fa-circle-exclamation"></i> Inactive</span>
+                        </td>
+                        <td>
+                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr> -->
+                </tbody>
+            </table>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-controls">
+                <button id="prevPage" class="pagination-btn" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <span id="pageInfo">Page 1</span>
+                <button id="nextPage" class="pagination-btn" disabled>
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div class="modal-overlay" id="addEmployeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Employee</h2>
+                <p>Fill in the details to add a new employee.</p>
+            </div>
+            <form id="employeeForm">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact">Contact</label>
+                        <input type="tel" id="contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Position</label>
+                        <input type="text" id="position" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Join Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="statusActive" name="status" value="active" checked>
+                                <label for="statusActive">Active</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="statusInactive" name="status" value="inactive">
+                                <label for="statusInactive">Inactive</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="confirmationTitle">Confirm Action</h2>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+            </div>
+            <div class="form-actions" style="justify-content: center; gap: 20px;">
+                <button type="button" class="btn btn-secondary" id="cancelAction">Cancel</button>
+                <button type="button" class="btn" id="confirmAction" style="transition: all 0.3s ease;">Confirm</button>
+            </div>
+        </div>
+    </div>
+    <script src="/js/main.js"></script>
+
+    <script>
+        // DOM Elements
+        const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+        const addEmployeeModal = document.getElementById('addEmployeeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const employeeForm = document.getElementById('employeeForm');
+        const employeeTableBody = document.querySelector('.trainer-table tbody');
+        const prevPageBtn = document.getElementById("prevPage");
+        const nextPageBtn = document.getElementById("nextPage");
+        const pageInfo = document.getElementById("pageInfo");
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationTitle = document.getElementById('confirmationTitle');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const confirmActionBtn = document.getElementById('confirmAction');
+        const cancelActionBtn = document.getElementById('cancelAction');
+
+        // Pagination state
+        let currentPage = 1;
+        let totalPages = 1;
+        const itemsPerPage = 10;
+        let allEmployees = []; // Store all employees
+        let currentAction = null;
+        let currentEmployeeId = null;
+
+        // Utility Functions
+        const showNotification = (message, type = 'success') => {
+            window.showNotification(message, type);
+        };
+
+        const validateForm = (formData) => {
+            const errors = [];
+
+            // Full Name validation
+            if (!formData.fullName || formData.fullName.trim().length < 2) {
+                errors.push('Please enter a valid full name');
+            }
+
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!formData.email || !emailRegex.test(formData.email)) {
+                errors.push('Please enter a valid email address');
+            }
+
+            // Contact validation
+            const contactRegex = /^[0-9]{10,15}$/;
+            if (!formData.contact || !contactRegex.test(formData.contact)) {
+                errors.push('Please enter a valid 10-15 digit contact number');
+            }
+
+            // Position validation
+            if (!formData.position || formData.position.trim().length < 2) {
+                errors.push('Please enter a valid position');
+            }
+
+            // Join Date validation
+            if (!formData.joiningDate) {
+                errors.push('Please select a joining date');
+            }
+
+            // Status validation
+            if (!['active', 'inactive'].includes(formData.status)) {
+                errors.push('Please select a valid status');
+            }
+
+            return errors;
+        };
+
+        const resetModal = () => {
+            employeeForm.reset();
+            document.querySelector('#addEmployeeModal .modal-header h2').textContent = 'Add New Employee';
+            document.querySelector('#employeeForm button[type="submit"]').textContent = 'Add Employee';
+            employeeForm.dataset.mode = 'add';
+            delete employeeForm.dataset.employeeId;
+        };
+
+        // Fetch and Display Employees
+        async function fetchEmployees(page = 1) {
+            try {
+                // Get status filter value
+                const statusFilter = document.getElementById('statusFilter').value;
+
+                let query = [];
+                if (statusFilter) query.push(`status=${statusFilter}`);
+                const queryString = query.length ? "?" + query.join("&") : "";
+
+                const response = await fetch(`/api/employees${queryString}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store all employees
+                    allEmployees = result.data;
+
+                    // Calculate pagination
+                    const startIndex = (page - 1) * itemsPerPage;
+                    const endIndex = startIndex + itemsPerPage;
+                    const paginatedEmployees = allEmployees.slice(startIndex, endIndex);
+
+                    // Calculate total pages
+                    totalPages = Math.ceil(allEmployees.length / itemsPerPage);
+
+                    // Render the table with paginated data
+                    displayEmployees(paginatedEmployees);
+
+                    // Update pagination
+                    updatePagination({
+                        currentPage: page,
+                        totalPages: totalPages,
+                        total: allEmployees.length
+                    });
+                } else {
+                    console.error('Failed to fetch employees:', result.message);
+                    employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading employees. Please try again.</td></tr>`;
+                    // Reset pagination on error
+                    updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+                }
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+                employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading employees. Please try again.</td></tr>`;
+                // Reset pagination on error
+                updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+            }
+        }
+
+        function updatePagination(paginationData) {
+            // Ensure we have valid numbers for pagination
+            currentPage = parseInt(paginationData.currentPage) || 1;
+            totalPages = parseInt(paginationData.totalPages) || 1;
+
+            // Update page info with proper number formatting
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} employees)`;
+
+            // Update button states
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+
+            // Add visual feedback for disabled state
+            prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+            nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
+        }
+
+        // Display Employees in Table
+        function displayEmployees(employees) {
+            employeeTableBody.innerHTML = '';
+
+            if (!employees || !Array.isArray(employees) || employees.length === 0) {
+                employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">No employees found.</td></tr>`;
+                return;
+            }
+
+            employees.forEach((employee, index) => {
+                if (!employee) return; // Skip invalid employees
+
+                const tr = document.createElement("tr");
+                const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+
+                // Format dates safely
+                const joinDate = employee.joiningDate ?
+                    new Date(employee.joiningDate).toLocaleDateString() : 'N/A';
+
+                tr.innerHTML = `
+                    <td>${rowNumber}</td>
+                    <td>${employee.employeeId || 'N/A'}</td>
+                    <td>${employee.fullName || 'N/A'}</td>
+                    <td>${employee.email || 'N/A'}</td>
+                    <td>${employee.contact || 'N/A'}</td>
+                    <td>${joinDate}</td>
+                    <td>${employee.position || 'N/A'}</td>
+                    <td>
+                        <span class="status ${employee.status || 'active'}">
+                            <i class="fa-solid fa-${employee.status === 'inactive' ? 'xmark' : 'circle-check'}"></i> 
+                            ${employee.status ? employee.status.charAt(0).toUpperCase() + employee.status.slice(1) : 'Active'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn edit" data-employee-id="${employee.employeeId || ''}" ${!employee.employeeId ? 'disabled' : ''}>
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="action-btn delete" data-employee-id="${employee.employeeId || ''}" ${!employee.employeeId ? 'disabled' : ''}>
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                employeeTableBody.appendChild(tr);
+            });
+
+            attachActionListeners();
+        }
+
+        // Edit Employee
+        function editEmployee(employeeId) {
+            console.log('Attempting to edit employee with ID:', employeeId);
+            
+            fetch(`/api/employees/${employeeId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                console.log('Received employee data:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.message || 'Failed to fetch employee details');
+                }
+
+                const employee = result.data;
+                
+                // Safe date parsing
+                let formattedDate = '';
+                try {
+                    const joiningDate = new Date(employee.joiningDate);
+                    
+                    // Check if date is valid
+                    if (!isNaN(joiningDate.getTime())) {
+                        // Format date to YYYY-MM-DD for input
+                        const year = joiningDate.getFullYear();
+                        const month = String(joiningDate.getMonth() + 1).padStart(2, '0');
+                        const day = String(joiningDate.getDate()).padStart(2, '0');
+                        formattedDate = `${year}-${month}-${day}`;
+                    } else {
+                        console.warn('Invalid date received:', employee.joiningDate);
+                    }
+                } catch (dateError) {
+                    console.error('Error parsing date:', dateError);
+                }
+                
+                // Populate form with employee data
+                document.getElementById('fullName').value = employee.fullName || '';
+                document.getElementById('email').value = employee.email || '';
+                document.getElementById('contact').value = employee.contact || '';
+                document.getElementById('position').value = employee.position || '';
+                document.getElementById('date').value = formattedDate;
+                
+                // Set status
+                const statusActive = document.getElementById('statusActive');
+                const statusInactive = document.getElementById('statusInactive');
+                
+                if (employee.status === 'inactive') {
+                    statusInactive.checked = true;
+                } else {
+                    statusActive.checked = true;
+                }
+
+                // Change modal title and button text
+                document.querySelector('#addEmployeeModal .modal-header h2').textContent = 'Update Employee';
+                document.querySelector('#employeeForm button[type="submit"]').textContent = 'Update Employee';
+                
+                // Set form mode and employee ID
+                employeeForm.dataset.mode = 'edit';
+                employeeForm.dataset.employeeId = employeeId;
+
+                // Show modal
+                addEmployeeModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(error => {
+                console.error('Error in editEmployee:', error);
+                showNotification(`Failed to fetch employee details: ${error.message}`, 'error');
+            });
+        }
+
+        // Show Confirmation Dialog
+        function showConfirmationDialog(title, message, action, employeeId) {
+            confirmationTitle.textContent = title;
+            confirmationMessage.textContent = message;
+            currentAction = action;
+            currentEmployeeId = employeeId;
+
+            // Update confirm button color based on action
+            const confirmBtn = document.getElementById('confirmAction');
+            if (action === 'delete') {
+                confirmBtn.style.backgroundColor = '#e74c3c';
+                confirmBtn.style.borderColor = '#e74c3c';
+                confirmBtn.style.color = 'white';
+            }
+
+            confirmationModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide Confirmation Dialog
+        function hideConfirmationDialog() {
+            confirmationModal.classList.remove('active');
+            document.body.style.overflow = '';
+            currentAction = null;
+            currentEmployeeId = null;
+
+            // Reset confirm button color
+            const confirmBtn = document.getElementById('confirmAction');
+            confirmBtn.style.backgroundColor = '';
+            confirmBtn.style.borderColor = '';
+            confirmBtn.style.color = '';
+        }
+
+        // Confirmation Dialog Event Listeners
+        confirmActionBtn.addEventListener('click', async () => {
+            if (currentAction === 'delete') {
+                try {
+                    const response = await fetch(`/api/employees/${currentEmployeeId}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        window.showNotification('Employee deleted successfully', 'success');
+                        fetchEmployees(currentPage); // refresh current page
+                    } else {
+                        window.showNotification(result.message || 'Failed to delete employee', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting employee:', error);
+                    window.showNotification('Failed to delete employee. Please try again.', 'error');
+                }
+            }
+            hideConfirmationDialog();
+        });
+
+        cancelActionBtn.addEventListener('click', hideConfirmationDialog);
+
+        // Close modal when clicking outside
+        confirmationModal.addEventListener('click', (e) => {
+            if (e.target === confirmationModal) {
+                hideConfirmationDialog();
+            }
+        });
+
+        // Attach Action Listeners
+        function attachActionListeners() {
+            document.querySelectorAll('.action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const employeeId = btn.getAttribute('data-employee-id');
+                    editEmployee(employeeId);
+                });
+            });
+
+            document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const employeeId = btn.getAttribute('data-employee-id');
+                    if (employeeId) {
+                        showConfirmationDialog(
+                            'Delete Employee',
+                            'Are you sure you want to delete this employee? This action cannot be undone.',
+                            'delete',
+                            employeeId
+                        );
+                    }
+                });
+            });
+        }
+
+        // Modal Handling
+        addEmployeeBtn.addEventListener('click', function() {
+            resetModal();
+            addEmployeeModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            addEmployeeModal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Close modal when clicking outside
+        addEmployeeModal.addEventListener('click', function(e) {
+            if (e.target === addEmployeeModal) {
+                addEmployeeModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Pagination event listeners
+        prevPageBtn.addEventListener("click", () => {
+            if (currentPage > 1) {
+                fetchEmployees(currentPage - 1);
+            }
+        });
+
+        nextPageBtn.addEventListener("click", () => {
+            if (currentPage < totalPages) {
+                fetchEmployees(currentPage + 1);
+            }
+        });
+
+        // Modify existing event listeners to work with pagination
+        document.getElementById('statusFilter').addEventListener('change', () => {
+            currentPage = 1; // Reset to first page when filter changes
+            fetchEmployees(currentPage);
+        });
+
+        // Form Submission Handler
+        employeeForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                contact: document.getElementById('contact').value,
+                position: document.getElementById('position').value,
+                joiningDate: document.getElementById('date').value,
+                status: document.querySelector('input[name="status"]:checked').value
+            };
+
+            const validationErrors = validateForm(formData);
+            if (validationErrors.length > 0) {
+                showNotification(validationErrors.join(', '), 'error');
+                return;
+            }
+
+            try {
+                const mode = employeeForm.dataset.mode || 'add';
+                const employeeId = employeeForm.dataset.employeeId;
+                
+                console.log('Form submission mode:', mode);
+                console.log('Employee ID:', employeeId);
+                console.log('Form data:', formData);
+
+                const url = mode === 'add' 
+                    ? '/api/employees' 
+                    : `/api/employees/${employeeId}`;
+                
+                const method = mode === 'add' ? 'POST' : 'PUT';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                console.log('Server response:', result);
+
+                if (response.ok) {
+                    addEmployeeModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    
+                    resetModal();
+                    fetchEmployees();
+
+                    showNotification(`Employee ${mode === 'add' ? 'added' : 'updated'} successfully!`);
+                } else {
+                    throw new Error(result.message || `Failed to ${mode} employee`);
+                }
+            } catch (error) {
+                console.error('Error in form submission:', error);
+                showNotification(error.message, 'error');
+            }
+        });
+
+        // Initial fetch of employees
+        fetchEmployees();
+    </script>
+    <script src="./js/logout.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knox Barbell - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/dash.css">
+    <link rel="stylesheet" href="/css/barChart.css">
+    <link rel="stylesheet" href="/css/PieChart.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Knox Barbell</h3>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard" class="active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <div class="tooltip">Dashboard</div>
+                </a>
+            </li>
+            <li>
+                <a href="/members">
+                    <i class="fas fa-user"></i>
+                    <span>Member</span>
+                    <div class="tooltip">Member</div>
+                </a>
+            </li>
+            <li>
+                <a href="/application">
+                    <i class="fas fa-user"></i>
+                    <span>Application</span>
+                    <div class="tooltip">Application</div>
+                </a>
+            </li>
+            <li>
+                <a href="/membership">
+                    <i class="fas fa-id-card"></i>
+                    <span>Membership</span>
+                    <div class="tooltip">Membership</div>
+                </a>
+            </li>
+            <li>
+                <a href="/trainers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Trainers</span>
+                    <div class="tooltip">Trainers</div>
+                </a>
+            </li>
+            <li>
+                <a href="/employee">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                    <div class="tooltip">Employee</div>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="tooltip">Notifications</div>
+                </a>
+            </li>
+            <li>
+                <a href="/attendance">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <div class="tooltip">Attendance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/events">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                    <div class="tooltip">Events</div>
+                </a>
+            </li>
+            <li>
+                <a href="/finance">
+                    <i class="fas fa-wallet"></i>
+                    <span>Finance</span>
+                    <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/product">
+                    <i class="fas fa-box"></i>
+                    <span>Product</span>
+                    <div class="tooltip">Product</div>
+                </a>
+            </li>
+            <li class="logout-item">
+                <a href="#" id="logoutButton">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                    <div class="tooltip">Logout</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h3>Dashboard</h3>
+            </div>
+            <div class="topbar-right">
+                <!-- notification  -->
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">0</span>
+                    
+                    <!-- Notification Modal -->
+                    <div class="notification-modal">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-actions">
+                                <a href="/notifications" class="view-all-link">View All</a>
+                                <button class="close-notifications">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="notification-list">
+                            <!-- Notifications will be populated here -->
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-greeting">
+                    <img src="/img/Knox Logo-01.png" alt="User">
+                    <span>Hello, Knox Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="content-header">
+                <h1>Dashboard Overview</h1>
+
+            </div>
+
+            <!-- Info Boxes -->
+            <div class="info-boxes">
+                <!-- Total neumber of members -->
+                <div class="info-box">
+                    <div class="info-box-header">
+                        <span class="info-box-title">Total Members</span>
+                        <div class="info-box-icon members">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="info-box-content">
+                        <span class="info-box-number">0</span>
+                        <span class="info-box-text">Active Members: 0</span>
+                        <a href="/members" class="info-box-link">View all members</a>
+                    </div>
+                </div>
+
+                <!-- number of member Attendance to day  -->
+                <div class="info-box">
+                    <div class="info-box-header">
+                        <span class="info-box-title">Attendance</span>
+                        <div class="info-box-icon attendance">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                    <div class="info-box-content">
+                        <span class="info-box-number">0</span>
+                        <span class="info-box-text">Check-ins today</span>
+                        <a href="/attendance" class="info-box-link">View attendance</a>
+                    </div>
+                </div>
+
+                <!--Total Revenue this month -->
+                <div class="info-box">
+                    <div class="info-box-header">
+                        <span class="info-box-title">Revenue</span>
+                        <div class="info-box-icon revenue">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div class="info-box-content">
+                        <span class="info-box-number">NPR 0</span>
+                        <span class="info-box-text">This Month</span>
+                        <a href="/finance" class="info-box-link">View revenue</a>
+                    </div>
+                </div>
+
+                <!-- Upcomming EVENTS -->
+                <div class="info-box">
+                    <div class="info-box-header">
+                        <span class="info-box-title">Events</span>
+                        <div class="info-box-icon events">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                    <div class="info-box-content">
+                        <span class="info-box-number">0</span>
+                        <span class="info-box-text">Upcoming Events</span>
+                        <a href="/events" class="info-box-link">View events</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <!-- Bar chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <span class="chart-title" id="barChartYear">Members vs Applications - 2025</span>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color members-legend"></span>
+                                <span class="legend-text">Members</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color applications-legend"></span>
+                                <span class="legend-text">Applications</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="memberBarChart" class="bar-chart">
+                        <!-- Bar chart will be dynamically generated here -->
+                    </div>
+                </div>
+                <!-- Pie chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <span class="chart-title">Membership</span>
+                        <!-- <a href="#" class="chart-view-all">View All</a> -->
+                    </div>
+                    <div id="membershipPieChart" class="pie-chart">
+                        <!-- Pie chart will be dynamically generated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiry Alert Section -->
+            <div class="expiry-alert">
+                <div class="section-header">
+                    <span class="section-title">Expiry Alert</span>
+                    <a href="/notifications" class="section-view-all">View All</a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member Id</th>
+                            <th>Members</th>
+                            <th>Email Address</th>
+                            <th>Status</th>
+                            <th>Days</th>
+                        </tr>
+                    </thead>
+                    <tbody id="expiryAlertTableBody">
+                        <tr>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td><span class="">loading...</span></td>
+                            <td>loading...</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Events and Announcements -->
+            <div class="events-announcements">
+                <div class="events-container">
+                    <div class="section-header">
+                        <span class="section-title">Upcoming Events</span>
+                        <a href="/events" class="section-view-all">View All</a>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-title">loading...</div>
+                        <div class="event-description">loading...</div>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-title">loading...</div>
+                        <div class="event-description">loading...</div>
+                    </div>
+                </div>
+
+                <div class="announcements-container">
+                    <div class="section-header">
+                        <span class="section-title">Recent Announcements</span>
+                        <a href="/events" class="section-view-all">View All</a>
+                    </div>
+                    <div class="announcement-item">
+                        <div class="announcement-title">loading...</div>
+                        <div class="announcement-description">loading...</div>
+                        <div class="announcement-meta">
+                            <span>loading...</span>
+                            <span>loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Fetch and update dashboard info boxes
+            async function updateDashboardInfoBoxes() {
+                try {
+                    // Fetch members data
+                    const membersResponse = await fetch(`${baseUrl}/members`);
+                    const membersData = await membersResponse.json();
+                    const totalMembers = membersData.data.length;
+
+                    // Fetch revenue stats
+                    const revenueResponse = await fetch(`${baseUrl}/payments/stats`);
+                    const revenueData = await revenueResponse.json();
+
+                    // Update Revenue info box
+                    const revenueBox = document.querySelector('.info-box:nth-child(3)');
+                    if (revenueBox && revenueData.success) {
+                        const revenueNumber = revenueBox.querySelector('.info-box-number');
+                        const revenueText = revenueBox.querySelector('.info-box-text');
+
+                        if (revenueNumber) {
+                            // Format the monthly revenue with commas
+                            const formattedRevenue = revenueData.data.monthlyRevenue.toLocaleString('en-IN', {
+                                style: 'currency',
+                                currency: 'NPR',
+                                maximumFractionDigits: 0
+                            });
+                            revenueNumber.textContent = formattedRevenue;
+                        }
+                        if (revenueText) {
+                            revenueText.textContent = 'This Month';
+                        }
+                    }
+
+                    // Fetch attendance data
+                    const attendancesResponse = await fetch(`${baseUrl}/attendances`);
+                    const attendancesData = await attendancesResponse.json();
+
+                    // Get today's date in YYYY-MM-DD format
+                    const today = new Date();
+                    const todayStr = today.toISOString().split('T')[0];
+
+                    // Count today's check-ins
+                    let todayCheckInsCount = 0;
+                    if (attendancesData && attendancesData.data && Array.isArray(attendancesData.data)) {
+                        todayCheckInsCount = attendancesData.data.filter(attendance => {
+                            try {
+                                if (!attendance.date) return false;
+                                const attendanceDate = new Date(attendance.date).toISOString().split('T')[0];
+                                return attendanceDate === todayStr;
+                            } catch (error) {
+                                console.error('Error processing attendance date:', error);
+                                return false;
+                            }
+                        }).length;
+                    }
+
+                    // Update info boxes
+                    document.querySelector('.info-box:nth-child(1) .info-box-number').textContent = totalMembers;
+                    document.querySelector('.info-box:nth-child(2) .info-box-number').textContent = todayCheckInsCount;
+
+                } catch (error) {
+                    console.error('Error updating dashboard info boxes:', error);
+                }
+            }
+
+            // Initial data fetch
+            await updateDashboardInfoBoxes();
+
+            // Refresh data periodically
+            setInterval(updateDashboardInfoBoxes, 10 * 60 * 1000); // Refresh every 10 minutes
+
+            // Add this function to the existing script block
+            async function fetchMembersExpiringWithin7Days() {
+                try {
+                    console.log('Starting fetchMembersExpiringWithin7Days function');
+
+                    const response = await fetch(`${baseUrl}/members`, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    console.log('Fetch response:', response);
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('Fetch error response:', errorText);
+                        throw new Error(`Failed to fetch members. Status: ${response.status}, ${errorText}`);
+                    }
+
+                    const membersData = await response.json();
+                    console.log('Full Members Data:', membersData);
+
+                    const expiryAlertTableBody = document.getElementById('expiryAlertTableBody');
+
+                    // Validate expiryAlertTableBody exists
+                    if (!expiryAlertTableBody) {
+                        console.error('Expiry alert table body not found');
+                        return;
+                    }
+
+                    // Clear existing rows
+                    expiryAlertTableBody.innerHTML = '';
+
+                    // Current date
+                    const currentDate = new Date();
+                    console.log('Current Date:', currentDate);
+
+                    // Extract the actual members array
+                    const membersArray = membersData.data || [];
+                    console.log('Members Array:', membersArray);
+
+                    if (!Array.isArray(membersArray)) {
+                        console.error('Invalid members data structure', membersData);
+                        expiryAlertTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center">Unable to load members data</td>
+                        </tr>
+                    `;
+                        return;
+                    }
+
+                    // Filter and populate expiring members
+                    const expiringMembers = membersArray.filter(member => {
+                        if (!member.endDate) {
+                            console.warn('Member without end date:', member);
+                            return false;
+                        }
+
+                        const endDate = new Date(member.endDate);
+                        const daysDifference = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+
+                        // Return members expiring within 7 days (both future and past)
+                        return daysDifference <= 7;
+                    }).sort((a, b) => {
+                        // Sort by closest to expiration
+                        const aEndDate = new Date(a.endDate);
+                        const bEndDate = new Date(b.endDate);
+                        return Math.abs(aEndDate - currentDate) - Math.abs(bEndDate - currentDate);
+                    });
+
+                    console.log('Expiring Members:', expiringMembers);
+
+                    // Populate table with expiring members
+                    if (expiringMembers.length === 0) {
+                        expiryAlertTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center">No members expiring within 7 days</td>
+                        </tr>
+                    `;
+                        return;
+                    }
+
+                    expiringMembers.forEach(member => {
+                        const endDate = new Date(member.endDate);
+                        const daysDifference = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                        <td>${member.memberId || 'N/A'}</td>
+                        <td>${member.fullName || 'Unknown'}</td>
+                        <td>${member.email || 'N/A'}</td>
+                        <td>
+                            <span class="status ${daysDifference < 0 ? 'expired' : 'expiring'}">
+                                ${daysDifference < 0 ? 'Expired' : 'Expiring'}
+                            </span>
+                        </td>
+                        <td>${daysDifference < 0 ? `${Math.abs(daysDifference)} days ago` : `In ${daysDifference} days`}</td>
+                    `;
+                        expiryAlertTableBody.appendChild(row);
+                    });
+
+                    // Limit to top 5 expiring members
+                    const rows = expiryAlertTableBody.querySelectorAll('tr');
+                    if (rows.length > 5) {
+                        for (let i = 5; i < rows.length; i++) {
+                            rows[i].remove();
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('FULL Error in fetchMembersExpiringWithin7Days:', error);
+
+                    const expiryAlertTableBody = document.getElementById('expiryAlertTableBody');
+                    if (expiryAlertTableBody) {
+                        expiryAlertTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center">
+                                Error loading expiring members: ${error.message}
+                            </td>
+                        </tr>
+                    `;
+                    }
+                }
+            }
+
+            // Call the function when the dashboard loads
+            await fetchMembersExpiringWithin7Days();
+        });
+        // Function to fetch and update upcoming event count
+        async function updateUpcomingEventCount() {
+            try {
+                const response = await fetch(`${baseUrl}/events`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const data = await response.json();
+                console.log('API Response:', {
+                    success: data.success,
+                    totalEvents: data.pagination.total,
+                    currentPage: data.pagination.page,
+                    eventsPerPage: data.pagination.limit
+                });
+                
+                // Get current date
+                const currentDate = new Date();
+                console.log('Current Date:', currentDate.toISOString());
+                
+                // Filter upcoming events (events that haven't started yet)
+                const upcomingEvents = data.docs.filter(event => {
+                    const eventDate = new Date(event.startTime);
+                    console.log('Processing Event:', {
+                        eventId: event.eventId,
+                        title: event.title,
+                        startTime: event.startTime,
+                        endTime: event.endTime,
+                        location: event.location,
+                        parsedDate: eventDate.toISOString(),
+                        isUpcoming: eventDate > currentDate,
+                        participantCount: event.participantCount,
+                        tags: event.tags
+                    });
+                    return eventDate > currentDate;
+                });
+                
+                console.log('Upcoming Events Summary:', {
+                    totalEvents: data.docs.length,
+                    upcomingCount: upcomingEvents.length,
+                    upcomingEvents: upcomingEvents.map(event => ({
+                        eventId: event.eventId,
+                        title: event.title,
+                        startTime: event.startTime,
+                        endTime: event.endTime,
+                        location: event.location,
+                        participantCount: event.participantCount
+                    }))
+                });
+                
+                // Update the count in the events info box
+                const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
+                if (eventCountElement) {
+                    console.log('Updating event count to:', upcomingEvents.length);
+                    eventCountElement.textContent = upcomingEvents.length;
+                } else {
+                    console.error('Could not find event count element');
+                }
+            } catch (error) {
+                console.error('Error fetching upcoming events:', error);
+                const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
+                if (eventCountElement) {
+                    eventCountElement.textContent = '0';
+                }
+            }
+        }
+
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Content Loaded - Calling updateUpcomingEventCount');
+            updateUpcomingEventCount();
+        });
+
+        // Function to fetch and display events and announcements
+        async function updateEventsAndAnnouncements() {
+            try {
+                // Fetch events
+                const eventsResponse = await fetch(`${baseUrl}/events`);
+                if (!eventsResponse.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const eventsData = await eventsResponse.json();
+                console.log('Events Data:', eventsData);
+
+                // Get current date
+                const currentDate = new Date();
+                
+                // Filter and sort upcoming events
+                const upcomingEvents = eventsData.docs
+                    .filter(event => new Date(event.startTime) > currentDate)
+                    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                    .slice(0, 2); // Get only 2 most recent upcoming events
+
+                // Update events container
+                const eventsContainer = document.querySelector('.events-container');
+                if (eventsContainer) {
+                    const eventCards = eventsContainer.querySelectorAll('.event-card');
+                    eventCards.forEach((card, index) => {
+                        if (upcomingEvents[index]) {
+                            const event = upcomingEvents[index];
+                            card.querySelector('.event-title').textContent = event.title;
+                            card.querySelector('.event-description').textContent = 
+                                event.description.join(' ').substring(0, 100) + '...';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Fetch announcements
+                const announcementsResponse = await fetch(`${baseUrl}/announcements`);
+                if (!announcementsResponse.ok) {
+                    throw new Error('Failed to fetch announcements');
+                }
+                const announcementsData = await announcementsResponse.json();
+                console.log('Announcements Data:', announcementsData);
+
+                // Get most recent announcement
+                const recentAnnouncement = announcementsData.docs[0];
+
+                // Update announcements container
+                const announcementsContainer = document.querySelector('.announcements-container');
+                if (announcementsContainer && recentAnnouncement) {
+                    const announcementItem = announcementsContainer.querySelector('.announcement-item');
+                    if (announcementItem) {
+                        announcementItem.querySelector('.announcement-title').textContent = recentAnnouncement.title;
+                        announcementItem.querySelector('.announcement-description').textContent = 
+                            recentAnnouncement.description.substring(0, 150) + '...';
+                        announcementItem.querySelector('.announcement-meta span:first-child').textContent = 
+                            `by ${recentAnnouncement.authorName}`;
+                        announcementItem.querySelector('.announcement-meta span:last-child').textContent = 
+                            new Date(recentAnnouncement.createdAt).toLocaleDateString();
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error updating events and announcements:', error);
+                // Show error state in UI
+                const eventsContainer = document.querySelector('.events-container');
+                const announcementsContainer = document.querySelector('.announcements-container');
+                
+                if (eventsContainer) {
+                    const eventCards = eventsContainer.querySelectorAll('.event-card');
+                    eventCards.forEach(card => {
+                        card.querySelector('.event-title').textContent = 'Error loading events';
+                        card.querySelector('.event-description').textContent = 'Please try again later';
+                    });
+                }
+                
+                if (announcementsContainer) {
+                    const announcementItem = announcementsContainer.querySelector('.announcement-item');
+                    if (announcementItem) {
+                        announcementItem.querySelector('.announcement-title').textContent = 'Error loading announcement';
+                        announcementItem.querySelector('.announcement-description').textContent = 'Please try again later';
+                        announcementItem.querySelector('.announcement-meta').innerHTML = '<span>Error</span>';
+                    }
+                }
+            }
+        }
+
+        // Call both functions when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM Content Loaded - Initializing dashboard data');
+            updateUpcomingEventCount();
+            updateEventsAndAnnouncements();
+        });
+    </script>
+    <script src="./js/dashboard.js"></script>
+    <script src="./js/dashboardChart.js"></script>
+    <script>
+        // Notification Modal Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationIcon = document.querySelector('.notification');
+            const notificationModal = document.querySelector('.notification-modal');
+            const closeNotifications = document.querySelector('.close-notifications');
+            const notificationList = document.querySelector('.notification-list');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Toggle notification modal
+            notificationIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.toggle('active');
+                if (notificationModal.classList.contains('active')) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close notification modal
+            closeNotifications.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                    notificationModal.classList.remove('active');
+                }
+            });
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const data = await response.json();
+                    if (data.success) {
+                        notificationBadge.textContent = data.data.unreadCount;
+                        // Show/hide badge based on count
+                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Fetch notifications from API
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notifications = data.data;
+                        
+                        if (notifications.length === 0) {
+                            notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Render notifications
+                        notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+                        // Add click handler to mark notifications as read
+                        const notificationItems = document.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const notificationId = item.dataset.notificationId;
+                                if (item.classList.contains('unread')) {
+                                    try {
+                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                            method: 'PATCH',
+                                            credentials: 'include'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            // Update UI
+                                            item.classList.remove('unread');
+                                            const unreadDot = item.querySelector('.unread-dot');
+                                            if (unreadDot) unreadDot.remove();
+                                            
+                                            // Update unread count
+                                            await fetchUnreadCount();
+                                        }
+                                    } catch (error) {
+                                        console.error('Error marking notification as read:', error);
+                                    }
+                                }
+
+                                // Close notification modal
+                                notificationModal.classList.remove('active');
+
+                                // Redirect to application page
+                                window.location.href = '/application';
+                            });
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch notifications');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial fetch of notifications and unread count
+            fetchNotifications();
+            fetchUnreadCount();
+
+            // Refresh unread count periodically
+            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        });
+    </script>
+    <style>
+        .unread-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .notification-badge {
+            display: none; /* Hidden by default, shown only when there are unread notifications */
+        }
+
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-all-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .view-all-link:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+    </style>
+</body>
+
+</html>

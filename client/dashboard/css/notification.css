@@ -1,0 +1,92 @@
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.tab {
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  background: #eee;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.tab.active {
+  background: var(--btn-primary);
+  color: white;
+}
+
+.notification-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.notification-card.new {
+  border: 1px solid var(--danger-color);
+  border-left: 5px solid var(--danger-color);
+}
+.notification-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.notification-title h4 {
+  margin: 0;
+}
+.tag, .new-tag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+.tag {
+  background: #f2f2f2;
+}
+.new-tag {
+  background: red;
+  color: white;
+  margin-left: 0.5rem;
+}
+.date-time {
+  font-size: 0.8rem;
+  color: gray;
+}
+.content {
+  font-size: 0.95rem;
+}
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mark-read {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: red;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.mark-read:hover{
+  gap: 10px;
+}
+.reminder-btn {
+  padding: 0.5rem 0.8rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.reminder-btn:hover{
+  background-color: #eee;
+}

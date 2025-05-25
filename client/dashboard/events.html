@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Knox Barbell - Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+    <link rel="stylesheet" href="/css/events.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>Knox Barbell</h3>
+            <button class="toggle-btn" id="toggleSidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                    <div class="tooltip">Dashboard</div>
+                </a>
+            </li>
+            <li>
+                <a href="/members">
+                    <i class="fas fa-user"></i>
+                    <span>Member</span>
+                    <div class="tooltip">Member</div>
+                </a>
+            </li>
+            <li>
+                <a href="/application">
+                    <i class="fas fa-user"></i>
+                    <span>Application</span>
+                    <div class="tooltip">Application</div>
+                </a>
+            </li>
+            <li>
+                <a href="/membership">
+                    <i class="fas fa-id-card"></i>
+                    <span>Membership</span>
+                    <div class="tooltip">Membership</div>
+                </a>
+            </li>
+            <li>
+                <a href="/trainers">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Trainers</span>
+                    <div class="tooltip">Trainers</div>
+                </a>
+            </li>
+            <li>
+                <a href="/employee">
+                    <i class="fas fa-users"></i>
+                    <span>Employee</span>
+                    <div class="tooltip">Employee</div>
+                </a>
+            </li>
+            <li>
+                <a href="/notifications">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <div class="tooltip">Notifications</div>
+                </a>
+            </li>
+            <li>
+                <a href="/attendance">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Attendance</span>
+                    <div class="tooltip">Attendance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/events" class="active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                    <div class="tooltip">Events</div>
+                </a>
+            </li>
+            <li>
+                <a href="/finance">
+                    <i class="fas fa-wallet"></i>
+                    <span>Finance</span>
+                    <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/product">
+                    <i class="fas fa-box"></i>
+                    <span>Product</span>
+                    <div class="tooltip">Product</div>
+                </a>
+            </li>
+            <li class="logout-item">
+                <a href="#" id="logoutButton">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                    <div class="tooltip">Logout</div>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="mobile-toggle" id="mobileToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h3>Events</h3>
+            </div>
+            <div class="topbar-right">
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-greeting">
+                    <img src="/img/Knox Logo-01.png" alt="User">
+                    <span>Hello, Knox Barbell</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="content-header">
+                <h1>Events & Announcements</h1>
+            </div>
+
+            <!-- Switch tab-->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('events')">Events</button>
+                <button class="tab" onclick="switchTab('announcements')">Announcements</button>
+            </div>
+
+            <!-- Search and add -->
+            <div class="search-add active" id="eventSearch">
+                <div class="search-box">
+                    <input type="text" id="search" placeholder="Search event...">
+                </div>
+                <button id="addTrainerBtn" class="add-btn">
+                    <span>+</span>
+                    Add Event
+                </button>
+            </div>
+            <div class="search-add" id="announcementSearch">
+                <div class="search-box">
+                    <input type="text" id="search" placeholder="Search announcement...">
+                </div>
+                <button id="addTrainerBtn" class="add-btn">
+                    <span>+</span>
+                    Add Announcement
+                </button>
+            </div>
+            <!-- Search and add -->
+
+            <!-- Events Tab -->
+            <div id="events" class="card-list">
+                <div class="card">
+                    <h3>loading...</h3>
+                    <small>loading...</small>
+                    <p>loading...</p>
+                    <p class="participants">👥loading... participants <br> <span class="instructor">loading...</span></p>
+                    <p class="edit"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete"><i class="fa-solid fa-trash"></i></p>
+                </div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="announcements" class="ann-card-list" style="display:none">
+                <div class="card">
+                    <h3>New Equipment Arriving Soon</h3>
+                    <small>Posted on 4/27/2025 by Mrs. Manish Gaha</small>
+                    <p>Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla vobis. Solitudo consectetur
+                        supplanto caput solium. Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla
+                        vobis.</p>
+                    <p class="edit"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete"><i class="fa-solid fa-trash"></i></p>
+                </div>
+                <div class="card">
+                    <h3>New Equipment Arriving Soon</h3>
+                    <small>Posted on 4/27/2025 by Mrs. Manish Gaha</small>
+                    <p>Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla vobis. Solitudo consectetur
+                        supplanto caput solium. Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla
+                        vobis.</p>
+                    <p class="edit"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete"><i class="fa-solid fa-trash"></i></p>
+                </div>
+                <div class="card">
+                    <h3>New Equipment Arriving Soon</h3>
+                    <small>Posted on 4/27/2025 by Mrs. Manish Gaha</small>
+                    <p>Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla vobis. Solitudo consectetur
+                        supplanto caput solium. Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla
+                        vobis.</p>
+                    <p class="edit"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete"><i class="fa-solid fa-trash"></i></p>
+                </div>
+                <div class="card">
+                    <h3>New Equipment Arriving Soon</h3>
+                    <small>Posted on 4/27/2025 by Mrs. Manish Gaha</small>
+                    <p>Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla vobis. Solitudo consectetur
+                        supplanto caput solium. Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla
+                        vobis.</p>
+                    <p class="edit"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete"><i class="fa-solid fa-trash"></i></p>
+                </div>
+                <div class="card">
+                    <h3>New Equipment Arriving Soon</h3>
+                    <small>Posted on 4/27/2025 by Mrs. Manish Gaha</small>
+                    <p>Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla vobis. Solitudo consectetur
+                        supplanto caput solium. Contra apud blanditiis defungo curso chiropraghum utrum viscus nulla
+                        vobis.</p>
+                    <p class="edit"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete"><i class="fa-solid fa-trash"></i></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal-overlay" id="addEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Add New Event</h2>
+                    <p>Create a new event for Knox Barbell</p>
+                </div>
+                <button class="modal-close" id="closeEventModal">&times;</button>
+            </div>
+            <form id="addEventForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="eventTitle">Event Title</label>
+                        <input type="text" id="eventTitle" name="title" required placeholder="Enter event title">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventLocation">Location</label>
+                        <input type="text" id="eventLocation" name="location" required
+                            placeholder="Enter event location">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventStartTime">Start Time</label>
+                        <input type="datetime-local" id="eventStartTime" name="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventEndTime">End Time</label>
+                        <input type="datetime-local" id="eventEndTime" name="endTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDescription">Description</label>
+                        <textarea id="eventDescription" name="description" rows="4" required
+                            placeholder="Enter event description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventTags">Tags (optional)</label>
+                        <input type="text" id="eventTags" name="tags" placeholder="Enter tags separated by comma">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventImages">Images (optional)</label>
+                        <input type="file" id="eventImages" name="images" multiple accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <div class="image-preview-container"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelEventModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        // Function to render events
+        function renderEvents(events) {
+            const eventsContainer = document.getElementById('events');
+            eventsContainer.innerHTML = ''; // Clear existing events
+
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.classList.add('card');
+                eventCard.innerHTML = `
+                    <h3>${event.title}</h3>
+                    <small>${formatDate(event.startTime)}</small>
+                    <p>${event.description.join(' ')}</p>
+                    <p class="participants">👥 ${event.participantCount || 0} participants <br> 
+                        <span class="instructor">with ${event.authorName}</span>
+                    </p>
+                    <p class="edit" data-event-id="${event.eventId}"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete" data-event-id="${event.eventId}"><i class="fa-solid fa-trash"></i></p>
+                `;
+                eventsContainer.appendChild(eventCard);
+            });
+
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('.edit').forEach(editBtn => {
+                editBtn.addEventListener('click', handleEditEvent);
+            });
+
+            document.querySelectorAll('.delete').forEach(deleteBtn => {
+                deleteBtn.addEventListener('click', handleDeleteEvent);
+            });
+        }
+
+        // Fetch events from API
+        async function fetchEvents() {
+            try {
+                const response = await fetch('/api/events');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch events');
+                }
+                const data = await response.json();
+                renderEvents(data.docs || []); // Assuming mongoose-paginate returns docs
+            } catch (error) {
+                console.error('Error fetching events:', error);
+                window.showNotification('Failed to load events', 'error');
+            }
+        }
+
+        // Handle edit event
+        function handleEditEvent(event) {
+            const eventId = event.currentTarget.dataset.eventId;
+            // Open edit modal and populate with event details
+            openEditEventModal(eventId);
+        }
+
+        // Handle delete event
+        async function handleDeleteEvent(event) {
+            const eventId = event.currentTarget.dataset.eventId;
+            try {
+                const response = await fetch(`/api/events/${eventId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    window.showNotification('Event deleted successfully', 'success');
+                    fetchEvents(); // Refresh events list
+                } else {
+                    const errorData = await response.json();
+                    window.showNotification(errorData.message || 'Failed to delete event', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting event:', error);
+                window.showNotification('An error occurred while deleting the event', 'error');
+            }
+        }
+
+        // Open edit event modal (to be implemented)
+        function openEditEventModal(eventId) {
+            // TODO: Implement edit event modal functionality
+            window.showNotification('Edit functionality coming soon', 'info');
+        }
+
+        // Fetch events when page loads
+        document.addEventListener('DOMContentLoaded', fetchEvents);
+
+        // Existing switchTab function
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
+
+            document.getElementById('events').style.display = tab === 'events' ? 'grid' : 'none';
+            document.getElementById('announcements').style.display = tab === 'announcements' ? 'grid' : 'none';
+            if (tab == 'events') {
+                document.getElementById("eventSearch").classList.add("active");
+                document.getElementById("announcementSearch").classList.remove("active");
+            } else {
+                document.getElementById("eventSearch").classList.remove("active")
+                document.getElementById("announcementSearch").classList.add("active")
+            }
+        }
+
+        // Event Modal Functionality
+        const addEventBtn = document.getElementById('addTrainerBtn');
+        const addEventModal = document.getElementById('addEventModal');
+        const closeEventModalBtn = document.getElementById('closeEventModal');
+        const cancelEventModalBtn = document.getElementById('cancelEventModal');
+        const addEventForm = document.getElementById('addEventForm');
+        const imageUpload = document.getElementById('eventImages');
+        const imageUploadContainer = document.querySelector('.form-group input[type="file"]').closest('.form-group');
+
+        // Store uploaded images
+        let uploadedImages = [];
+
+        // Image Upload Handling
+        imageUpload.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            const imagePreviewContainer = document.querySelector('.image-preview-container');
+
+            // Check current number of images
+            const currentImageCount = imagePreviewContainer.querySelectorAll('.image-preview').length;
+
+            // Limit to 3 images total
+            if (currentImageCount + files.length > 3) {
+                window.showNotification('You can only upload a maximum of 3 images', 'error');
+                // Reset file input
+                e.target.value = '';
+                return;
+            }
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    // Create an image element to compress
+                    const img = new Image();
+                    img.src = event.target.result;
+
+                    img.onload = () => {
+                        // Create a canvas to compress the image
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+
+                        // Set maximum dimensions
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 600;
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Scale down if needed
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        // Draw the image with new dimensions
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convert to compressed base64
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                        const imagePreview = document.createElement('div');
+                        imagePreview.classList.add('image-preview');
+
+                        const previewImg = document.createElement('img');
+                        previewImg.src = compressedDataUrl;
+                        previewImg.classList.add('image-preview');
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '×';
+                        removeBtn.classList.add('remove-image');
+                        removeBtn.style.position = 'absolute';
+                        removeBtn.style.top = '5px';
+                        removeBtn.style.right = '5px';
+                        removeBtn.style.background = 'rgba(255,0,0,0.7)';
+                        removeBtn.style.color = 'white';
+                        removeBtn.style.border = 'none';
+                        removeBtn.style.borderRadius = '50%';
+                        removeBtn.style.width = '15px';
+                        removeBtn.style.height = '15px';
+                        removeBtn.style.fontSize = '10px';
+                        removeBtn.style.display = 'flex';
+                        removeBtn.style.justifyContent = 'center';
+                        removeBtn.style.alignItems = 'center';
+                        removeBtn.style.cursor = 'pointer';
+
+                        removeBtn.addEventListener('click', () => {
+                            imagePreviewContainer.removeChild(imagePreview);
+                            uploadedImages = uploadedImages.filter(i => i !== compressedDataUrl);
+
+                            // Re-enable file input if it was disabled
+                            imageUpload.disabled = false;
+                        });
+
+                        imagePreview.appendChild(previewImg);
+                        imagePreview.appendChild(removeBtn);
+                        imagePreview.style.position = 'relative';
+
+                        imagePreviewContainer.appendChild(imagePreview);
+
+                        // Store compressed image
+                        uploadedImages.push(compressedDataUrl);
+
+                        // Check if we've reached the maximum number of images
+                        const updatedImageCount = imagePreviewContainer.querySelectorAll('.image-preview').length;
+                        if (updatedImageCount >= 3) {
+                            imageUpload.disabled = true;
+                            window.showNotification('Maximum of 3 images reached', 'info');
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // Reset file input
+            e.target.value = '';
+        });
+
+        // Open Modal
+        addEventBtn.addEventListener('click', () => {
+            addEventModal.classList.add('active');
+            // Reset uploaded images
+            uploadedImages = [];
+            const existingPreviews = imageUploadContainer.querySelectorAll('.image-preview');
+            existingPreviews.forEach(preview => {
+                if (preview !== imageUpload.parentElement) {
+                    imageUploadContainer.removeChild(preview);
+                }
+            });
+
+            // Clear the image-preview-container
+            const imagePreviewContainer = document.querySelector('.image-preview-container');
+            imagePreviewContainer.innerHTML = '';
+        });
+
+        // Close Modal Functions
+        function closeEventModal() {
+            addEventModal.classList.remove('active');
+            addEventForm.reset();
+            uploadedImages = [];
+            const imagePreviewContainer = document.querySelector('.image-preview-container');
+            imagePreviewContainer.innerHTML = '';
+
+            // Re-enable file input
+            imageUpload.disabled = false;
+        }
+
+        closeEventModalBtn.addEventListener('click', closeEventModal);
+        cancelEventModalBtn.addEventListener('click', closeEventModal);
+
+        // Close modal when clicking outside
+        addEventModal.addEventListener('click', (e) => {
+            if (e.target === addEventModal) {
+                closeEventModal();
+            }
+        });
+
+        // Modify form submission to use fetchEvents for immediate update
+        addEventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Collect form data
+            const formData = {
+                title: document.getElementById('eventTitle').value,
+                location: document.getElementById('eventLocation').value,
+                startTime: new Date(document.getElementById('eventStartTime').value).toISOString(),
+                endTime: new Date(document.getElementById('eventEndTime').value).toISOString(),
+                description: document.getElementById('eventDescription').value.split('\n'),
+                tags: document.getElementById('eventTags').value
+                    ? document.getElementById('eventTags').value.split(',').map(tag => tag.trim())
+                    : [],
+                images: uploadedImages
+            };
+
+            try {
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Show success notification
+                    window.showNotification('Event created successfully!', 'success');
+
+                    // Close modal and refresh events
+                    closeEventModal();
+                    fetchEvents(); // Refresh events list
+                } else {
+                    // Show error notification
+                    window.showNotification(result.message || 'Failed to create event', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating event:', error);
+                window.showNotification('An error occurred while creating the event', 'error');
+            }
+        });
+
+        // Fetch announcements from API
+        async function fetchAnnouncements() {
+            try {
+                const response = await fetch('/api/announcements');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch announcements');
+                }
+                const data = await response.json();
+                renderAnnouncements(data.docs || []); // Assuming mongoose-paginate returns docs
+            } catch (error) {
+                console.error('Error fetching announcements:', error);
+                window.showNotification('Failed to load announcements', 'error');
+            }
+        }
+
+        // Function to render announcements
+        function renderAnnouncements(announcements) {
+            const announcementsContainer = document.getElementById('announcements');
+            announcementsContainer.innerHTML = ''; // Clear existing announcements
+
+            announcements.forEach(announcement => {
+                const announcementCard = document.createElement('div');
+                announcementCard.classList.add('card');
+                announcementCard.innerHTML = `
+                    <h3>${announcement.title}</h3>
+                    <small>Posted on ${formatDate(announcement.postDate)} by ${announcement.authorName}</small>
+                    <p>${announcement.description}</p>
+                    <p class="edit" data-announcement-id="${announcement.announcementId}"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete" data-announcement-id="${announcement.announcementId}"><i class="fa-solid fa-trash"></i></p>
+                `;
+                announcementsContainer.appendChild(announcementCard);
+            });
+
+            // Add event listeners for edit and delete buttons
+            document.querySelectorAll('#announcements .edit').forEach(editBtn => {
+                editBtn.addEventListener('click', handleEditAnnouncement);
+            });
+
+            document.querySelectorAll('#announcements .delete').forEach(deleteBtn => {
+                deleteBtn.addEventListener('click', handleDeleteAnnouncement);
+            });
+        }
+
+        // Handle edit announcement
+        function handleEditAnnouncement(event) {
+            const announcementId = event.currentTarget.dataset.announcementId;
+            // TODO: Implement edit announcement modal functionality
+            window.showNotification('Edit announcement functionality coming soon', 'info');
+        }
+
+        // Handle delete announcement
+        async function handleDeleteAnnouncement(event) {
+            const announcementId = event.currentTarget.dataset.announcementId;
+            try {
+                const response = await fetch(`/api/announcements/${announcementId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    window.showNotification('Announcement deleted successfully', 'success');
+                    fetchAnnouncements(); // Refresh announcements list
+                } else {
+                    const errorData = await response.json();
+                    window.showNotification(errorData.message || 'Failed to delete announcement', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting announcement:', error);
+                window.showNotification('An error occurred while deleting the announcement', 'error');
+            }
+        }
+
+        // Add Announcement Modal Functionality
+        const addAnnouncementBtn = document.querySelector('#announcementSearch .add-btn');
+        const addAnnouncementModal = document.createElement('div');
+        addAnnouncementModal.classList.add('modal-overlay');
+        addAnnouncementModal.id = 'addAnnouncementModal';
+        addAnnouncementModal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h2>Add New Announcement</h2>
+                        <p>Create a new announcement for Knox Barbell</p>
+                    </div>
+                    <button class="modal-close" id="closeAnnouncementModal">&times;</button>
+                </div>
+                <form id="addAnnouncementForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="announcementTitle">Announcement Title</label>
+                            <input type="text" id="announcementTitle" name="title" required placeholder="Enter announcement title">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="announcementDescription">Description</label>
+                            <textarea id="announcementDescription" name="description" rows="4" required placeholder="Enter announcement description"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelAnnouncementModal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Announcement</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(addAnnouncementModal);
+
+        // Open Announcement Modal
+        addAnnouncementBtn.addEventListener('click', () => {
+            addAnnouncementModal.classList.add('active');
+        });
+
+        // Close Announcement Modal Functions
+        const closeAnnouncementModalBtn = document.getElementById('closeAnnouncementModal');
+        const cancelAnnouncementModalBtn = document.getElementById('cancelAnnouncementModal');
+        const addAnnouncementForm = document.getElementById('addAnnouncementForm');
+
+        function closeAnnouncementModal() {
+            addAnnouncementModal.classList.remove('active');
+            addAnnouncementForm.reset();
+        }
+
+        closeAnnouncementModalBtn.addEventListener('click', closeAnnouncementModal);
+        cancelAnnouncementModalBtn.addEventListener('click', closeAnnouncementModal);
+
+        // Close modal when clicking outside
+        addAnnouncementModal.addEventListener('click', (e) => {
+            if (e.target === addAnnouncementModal) {
+                closeAnnouncementModal();
+            }
+        });
+
+        // Submit Announcement Form
+        addAnnouncementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Collect form data
+            const formData = {
+                title: document.getElementById('announcementTitle').value,
+                description: document.getElementById('announcementDescription').value,
+                authorName: 'Knox Barbell Admin' // TODO: Replace with actual logged-in user's name
+            };
+
+            try {
+                const response = await fetch('/api/announcements', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Show success notification
+                    window.showNotification('Announcement created successfully!', 'success');
+
+                    // Close modal and refresh announcements
+                    closeAnnouncementModal();
+                    fetchAnnouncements(); // Refresh announcements list
+                } else {
+                    // Show error notification
+                    window.showNotification(result.message || 'Failed to create announcement', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating announcement:', error);
+                window.showNotification('An error occurred while creating the announcement', 'error');
+            }
+        });
+
+        // Fetch announcements when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAnnouncements();
+        });
+
+        // Search functionality for events and announcements
+        function setupSearch() {
+            const eventSearchInput = document.querySelector('#eventSearch .search-box input');
+            const announcementSearchInput = document.querySelector('#announcementSearch .search-box input');
+
+            // Event search
+            eventSearchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase().trim();
+                const events = document.querySelectorAll('#events .card');
+
+                events.forEach(event => {
+                    const title = event.querySelector('h3').textContent.toLowerCase();
+                    const description = event.querySelector('p:not(.participants):not(.edit):not(.delete)').textContent.toLowerCase();
+
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        event.style.display = 'block';
+                    } else {
+                        event.style.display = 'none';
+                    }
+                });
+            });
+
+            // Announcement search
+            announcementSearchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase().trim();
+                const announcements = document.querySelectorAll('#announcements .card');
+
+                announcements.forEach(announcement => {
+                    const title = announcement.querySelector('h3').textContent.toLowerCase();
+                    const description = announcement.querySelector('p:not(.edit):not(.delete)').textContent.toLowerCase();
+
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        announcement.style.display = 'block';
+                    } else {
+                        announcement.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Modify existing DOMContentLoaded event to include search setup
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchEvents();
+            fetchAnnouncements();
+            setupSearch();
+        });
+    </script>
+
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
+</body>
+
+</html>
