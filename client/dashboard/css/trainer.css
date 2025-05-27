@@ -1,5 +1,6 @@
 /* trainer Members Table */
 .trainer-table {
+  min-width: 400px;
   width: 100%;
   border-collapse: collapse;
   background-color: white;
@@ -28,6 +29,7 @@
 .trainer-table tr{
   border: 1px solid #C8C8C8;
 }
+
 .trainer-table thead tr{
   border-radius: 10px;
 }

@@ -1,6 +1,8 @@
 import Event from "../models/Event.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import generateEventId from "../utils/idgenerator/generateEventId.js";
+import fs from 'fs';
+import path from 'path';
 
 // Create a new event
 export const createEvent = asyncHandler(async (req, res) => {
@@ -12,16 +14,36 @@ export const createEvent = asyncHandler(async (req, res) => {
     });
   }
 
-  const { title, description, startTime, endTime, location, tags, images } =
-    req.body;
+  const { 
+    title, 
+    organizer,
+    category,
+    location, 
+    startTime, 
+    endTime, 
+    description, 
+    tags
+  } = req.body;
 
   // Validate required fields
-  if (!title || !description || !startTime || !endTime || !location) {
+  if (!title || !organizer || !category || !location || !startTime || !endTime || !description) {
     return res.status(400).json({
       success: false,
       message: "Missing required event details",
     });
   }
+
+  // Validate category
+  const validCategories = ["fitness", "competition", "workshop", "social", "other"];
+  if (!validCategories.includes(category)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid event category",
+    });
+  }
+
+  // Handle uploaded files
+  const images = req.files ? req.files.map(file => `/uploads/events/${file.filename}`) : [];
 
   // Ensure description is an array
   const descriptionArray = Array.isArray(description)
@@ -43,13 +65,16 @@ export const createEvent = asyncHandler(async (req, res) => {
   const event = new Event({
     eventId,
     title,
-    description: descriptionArray,
+    organizer,
+    category,
+    location,
     startTime,
     endTime,
-    location,
+    description: descriptionArray,
     tags: tags || [],
-    images: images || [],
+    images,
     authorName,
+    participantCount: 0
   });
 
   await event.save();
@@ -64,7 +89,7 @@ export const createEvent = asyncHandler(async (req, res) => {
 // Get all events
 export const getAllEvents = asyncHandler(async (req, res) => {
   // Get all events without pagination
-  const events = await Event.find({}).sort({ createdAt: -1 });
+  const events = await Event.find({}).sort({ startTime: -1 });
 
   res.status(200).json({
     success: true,
@@ -102,8 +127,16 @@ export const getEventById = asyncHandler(async (req, res) => {
 // Update event
 export const updateEvent = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
-  const { title, description, startTime, endTime, location, tags, images } =
-    req.body;
+  const { 
+    title, 
+    organizer,
+    category,
+    location, 
+    startTime, 
+    endTime, 
+    description, 
+    tags
+  } = req.body;
 
   const event = await Event.findOne({ eventId });
 
@@ -114,8 +147,39 @@ export const updateEvent = asyncHandler(async (req, res) => {
     });
   }
 
-  // Only allow updates to specific fields
+  // Validate category if provided
+  if (category) {
+    const validCategories = ["fitness", "competition", "workshop", "social", "other"];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid event category",
+      });
+    }
+  }
+
+  // Handle uploaded files
+  if (req.files && req.files.length > 0) {
+    // Delete old images
+    if (event.images && event.images.length > 0) {
+      event.images.forEach(imagePath => {
+        const fullPath = path.join(process.cwd(), imagePath);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      });
+    }
+    // Add new images
+    event.images = req.files.map(file => `/uploads/events/${file.filename}`);
+  }
+
+  // Update fields if provided
   if (title) event.title = title;
+  if (organizer) event.organizer = organizer;
+  if (category) event.category = category;
+  if (location) event.location = location;
+  if (startTime) event.startTime = startTime;
+  if (endTime) event.endTime = endTime;
 
   // Ensure description is an array if provided
   if (description) {
@@ -124,14 +188,7 @@ export const updateEvent = asyncHandler(async (req, res) => {
       : [description];
   }
 
-  if (startTime) event.startTime = startTime;
-  if (endTime) event.endTime = endTime;
-
-  if (location) event.location = location;
-
   if (tags) event.tags = tags;
-
-  if (images) event.images = images;
 
   await event.save();
 
@@ -155,11 +212,20 @@ export const deleteEvent = asyncHandler(async (req, res) => {
     });
   }
 
-  // Use document method to trigger pre-delete middleware
+  // Delete associated images
+  if (event.images && event.images.length > 0) {
+    event.images.forEach(imagePath => {
+      const fullPath = path.join(process.cwd(), imagePath);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
+    });
+  }
+
   await event.deleteOne();
 
   res.status(200).json({
     success: true,
-    message: "Event and associated participants deleted successfully",
+    message: "Event deleted successfully",
   });
 });

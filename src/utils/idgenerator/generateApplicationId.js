@@ -7,7 +7,7 @@ const generateApplicationId = async () => {
     // Find and increment the application counter
     const counter = await Counter.findOneAndUpdate(
       { name: COUNTER_NAME },
-      { $inc: { sequence_value: 1 } },
+      { $inc: { count: 1 } },
       { 
         new: true,  // Return the updated document
         upsert: true,  // Create the document if it doesn't exist
@@ -15,8 +15,8 @@ const generateApplicationId = async () => {
       }
     );
 
-    // Ensure sequence_value is a number and pad to 2 digits
-    const paddedSequence = (counter.sequence_value || 1).toString().padStart(2, '0');
+    // Ensure count is a number and pad to 2 digits
+    const paddedSequence = (counter.count || 1).toString().padStart(2, '0');
 
     // Generate the application ID with KBA prefix
     return `KBA${paddedSequence}`;
@@ -27,11 +27,11 @@ const generateApplicationId = async () => {
     try {
       // If the first method fails, try a manual increment
       const manualCounter = await Counter.findOne({ name: COUNTER_NAME });
-      const newValue = manualCounter ? manualCounter.sequence_value + 1 : 1;
+      const newValue = manualCounter ? manualCounter.count + 1 : 1;
       
       await Counter.findOneAndUpdate(
         { name: COUNTER_NAME }, 
-        { sequence_value: newValue }, 
+        { count: newValue }, 
         { upsert: true }
       );
 

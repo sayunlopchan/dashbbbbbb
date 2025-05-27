@@ -47,6 +47,21 @@ const MemberSchema = new mongoose.Schema(
       trim: true,
       maxlength: [200, "Address cannot exceed 200 characters"],
     },
+    emergencyNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    emergencyContactName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    emergencyContactRelationship: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     membershipType: {
       type: String,
       enum: ["silver", "gold", "diamond", "platinum"],

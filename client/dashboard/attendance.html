@@ -415,7 +415,7 @@
 
             return await response.json();
           } catch (error) {
-            showNotification(error.message, 'error');
+            toast(error.message, 'error');
             throw error;
           }
         },
@@ -760,14 +760,14 @@
             const result = await response.json();
 
             if (result.success) {
-              showNotification('Check-out recorded successfully', 'success');
+              toast('Check-out recorded successfully', 'success');
               this.fetchAttendanceData();
             } else {
-              showNotification(result.message || 'Failed to record check-out', 'error');
+              toast(result.message || 'Failed to record check-out', 'error');
             }
           } catch (error) {
             console.error('Error recording check-out:', error);
-            showNotification('Failed to record check-out. Please try again.', 'error');
+            toast('Failed to record check-out. Please try again.', 'error');
           }
         },
 
@@ -848,14 +848,14 @@
             document.getElementById('selectedMemberId').value;
 
           if (!memberId) {
-            showNotification('Please select a member', 'error');
+            toast('Please select a member', 'error');
             return;
           }
 
           const checkInTime = this.elements.timeInput.value;
 
           if (!checkInTime) {
-            showNotification('Please provide check-in time', 'warning');
+            toast('Please provide check-in time', 'warning');
             return;
           }
 
@@ -876,7 +876,7 @@
               })
             });
 
-            showNotification(`${mode === 'edit' ? 'Updated' : 'Marked'} check-in successfully`, 'success');
+            toast(`${mode === 'edit' ? 'Updated' : 'Marked'} check-in successfully`, 'success');
 
             // Reset form and close modal
             this.elements.attenForm.reset();
@@ -894,7 +894,7 @@
 
           } catch (error) {
             console.error('Attendance submission error:', error);
-            showNotification(error.message, 'error');
+            toast(error.message, 'error');
           }
         }
       },
@@ -1023,11 +1023,11 @@
             document.body.removeChild(link);
 
             // Show success notification
-            showNotification(`Attendance records downloaded for ${downloadFilter} in CSV`, 'success');
+            toast(`Attendance records downloaded for ${downloadFilter} in CSV`, 'success');
 
           } catch (error) {
             console.error('Download error:', error);
-            showNotification('Failed to download attendance records', 'error');
+            toast('Failed to download attendance records', 'error');
           }
         },
 
@@ -1125,11 +1125,11 @@
               printWindow.close();
             };
 
-            showNotification('Printing attendance records...', 'success');
+            toast('Printing attendance records...', 'success');
 
           } catch (error) {
             console.error('Print error:', error);
-            showNotification('Failed to print attendance records', 'error');
+            toast('Failed to print attendance records', 'error');
           }
         }
       },
@@ -1296,14 +1296,14 @@
               const result = await response.json();
               
               if (result.success) {
-                showNotification('Attendance record deleted successfully', 'success');
+                toast('Attendance record deleted successfully', 'success');
                 this.attendanceData.fetchAttendanceData();
               } else {
-                showNotification(result.message || 'Failed to delete attendance record', 'error');
+                toast(result.message || 'Failed to delete attendance record', 'error');
               }
             } catch (error) {
               console.error('Error deleting attendance record:', error);
-              showNotification(error.message || 'Failed to delete attendance record. Please try again.', 'error');
+              toast(error.message || 'Failed to delete attendance record. Please try again.', 'error');
             }
           }
           this.confirmationDialog.hide();
@@ -1342,7 +1342,7 @@
           this.attendanceData.fetchAttendanceData();
           
           // Show notification
-          showNotification('Filters have been reset', 'success');
+          toast('Filters have been reset', 'success');
         });
       }
     };

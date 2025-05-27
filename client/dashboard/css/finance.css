@@ -52,6 +52,14 @@
   background-color: var(--warning-color);
 }
 
+.info-box-icon.membership {
+  background-color: #3498db;  /* Blue color for membership */
+}
+
+.info-box-icon.product {
+  background-color: #2ecc71;  /* Green color for product */
+}
+
 .info-box-icon.events {
   background-color: var(--danger-color);
 }

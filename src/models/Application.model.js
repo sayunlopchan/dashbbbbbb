@@ -24,11 +24,6 @@ const applicationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    emergencyNumber: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     dateOfBirth: {
       type: Date,
       required: true,
@@ -44,6 +39,11 @@ const applicationSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: [200, "Address cannot exceed 200 characters"],
+    },
+    emergencyNumber: {
+      type: String,
+      required: true,
+      trim: true,
     },
     emergencyContactName: {
       type: String,

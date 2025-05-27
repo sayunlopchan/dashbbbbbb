@@ -17,15 +17,20 @@ export const createPaymentService = async (paymentData) => {
     }
 
     // Check if payment already exists for this member with same amount and date
+    // Only check for exact duplicates (same amount, date, and type within 1 minute)
+    const oneMinuteAgo = new Date(Date.now() - 60000);
     const existingPayment = await Payment.findOne({
       memberId: paymentData.memberId,
       amount: paymentData.amount,
-      paymentDate: paymentData.paymentDate || new Date(),
       paymentType: paymentData.paymentType,
+      paymentDate: {
+        $gte: oneMinuteAgo,
+        $lte: new Date()
+      }
     });
 
     if (existingPayment) {
-      throw new Error("Payment already exists for this member");
+      throw new Error("Duplicate payment detected. Please wait a moment before trying again.");
     }
 
     // Generate unique payment ID
@@ -56,8 +61,8 @@ export const createPaymentService = async (paymentData) => {
       paymentMethod: paymentData.paymentMethod,
       paymentDate: payment.paymentDate,
       status: payment.status,
-      type: isFirstPayment ? "first_payment" : "additional", // Set type based on whether it's first payment
-      paymentId: payment.paymentId, // Store the payment ID reference
+      type: paymentData.paymentType, // Use the actual payment type instead of first_payment/additional
+      paymentId: payment.paymentId,
     };
 
     // Add payment to member's payment history

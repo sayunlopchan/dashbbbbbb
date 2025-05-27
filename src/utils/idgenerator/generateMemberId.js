@@ -9,7 +9,7 @@ export const generateMemberId = async () => {
   try {
     const counter = await Counter.findOneAndUpdate(
       { name: "member" },
-      { $inc: { sequence_value: 1 } },
+      { $inc: { count: 1 } },
       { new: true, upsert: true }
     );
 
@@ -17,7 +17,7 @@ export const generateMemberId = async () => {
       throw new Error("Failed to generate counter");
     }
 
-    const paddedSeq = counter.sequence_value.toString().padStart(2, "0");
+    const paddedSeq = counter.count.toString().padStart(2, "0");
     return `KB${paddedSeq}`;
   } catch (error) {
     console.error('Error generating member ID:', error);

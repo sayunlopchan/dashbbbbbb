@@ -9,11 +9,24 @@ export const createEventService = async (eventData, userId) => {
     }
 
     // Validate required fields
-    const { title, description, startTime, endTime, location, images } =
-      eventData;
+    const { 
+      title, 
+      organizer,
+      category,
+      location, 
+      startTime, 
+      endTime, 
+      description 
+    } = eventData;
 
-    if (!title || !description || !startTime || !endTime || !location) {
+    if (!title || !organizer || !category || !location || !startTime || !endTime || !description) {
       throw new Error("Missing required event details");
+    }
+
+    // Validate category
+    const validCategories = ["fitness", "competition", "workshop", "social", "other"];
+    if (!validCategories.includes(category)) {
+      throw new Error("Invalid event category");
     }
 
     // Ensure description is an array
@@ -25,8 +38,10 @@ export const createEventService = async (eventData, userId) => {
     const newEventData = {
       ...eventData,
       description: descriptionArray,
-      images: images || [],
+      images: eventData.images || [],
+      tags: eventData.tags || [],
       author: userId,
+      participantCount: 0
     };
 
     // Create new event
@@ -45,7 +60,7 @@ export const getAllEventsService = async () => {
   try {
     return await Event.find()
       .populate("author", "username email")
-      .sort({ createdAt: -1 });
+      .sort({ startTime: -1 });
   } catch (error) {
     console.error("Get Events Error:", error);
     throw new Error("Failed to retrieve events");
@@ -82,6 +97,14 @@ export const updateEventService = async (eventId, eventData, userId) => {
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
       throw new Error("Invalid event ID");
+    }
+
+    // Validate category if provided
+    if (eventData.category) {
+      const validCategories = ["fitness", "competition", "workshop", "social", "other"];
+      if (!validCategories.includes(eventData.category)) {
+        throw new Error("Invalid event category");
+      }
     }
 
     // Prepare update data

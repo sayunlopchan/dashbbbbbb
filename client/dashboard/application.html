@@ -152,6 +152,17 @@
         <div class="content">
             <div class="content-header">
                 <h1>Applications Management</h1>
+                <div class="header-actions">
+                    <button id="downloadApplications" title="Download CSV">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                    <button id="printApplications" title="Print">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                    <button id="resetFilters" title="Reset Filters">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Filters Section -->
@@ -194,12 +205,6 @@
                 <div class="filter-group search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search by name or ID..." autocomplete="off">
-                </div>
-                <!-- refresh button -->
-                <div class="filter-group">
-                    <button class="reset" id="resetFilters" title="Reset Filters">
-                        <i class="fa-solid fa-rotate"></i>
-                    </button>
                 </div>
             </div>
 
@@ -269,14 +274,6 @@
         const prevPageBtn = document.getElementById("prevPage");
         const nextPageBtn = document.getElementById("nextPage");
         const pageInfo = document.getElementById("pageInfo");
-        const confirmationModal = document.getElementById('confirmationModal');
-        const confirmationTitle = document.getElementById('confirmationTitle');
-        const confirmationMessage = document.getElementById('confirmationMessage');
-        const confirmActionBtn = document.getElementById('confirmAction');
-        const cancelActionBtn = document.getElementById('cancelAction');
-
-        let currentAction = null;
-        let currentApplicationId = null;
 
         // Pagination state
         let currentPage = 1;
@@ -511,152 +508,102 @@
             }
         });
 
-        // Show Confirmation Dialog
-        function showConfirmationDialog(title, message, action, applicationId) {
-            confirmationTitle.textContent = title;
-            confirmationMessage.textContent = message;
-            currentAction = action;
-            currentApplicationId = applicationId;
-
-            // Update confirm button color based on action
-            const confirmBtn = document.getElementById('confirmAction');
-            if (action === 'approve') {
-                confirmBtn.style.backgroundColor = '#2ecc71';
-                confirmBtn.style.borderColor = '#2ecc71';
-                confirmBtn.style.color = 'white';
-            } else if (action === 'delete') {
-                confirmBtn.style.backgroundColor = '#e74c3c';
-                confirmBtn.style.borderColor = '#e74c3c';
-                confirmBtn.style.color = 'white';
-            }
-
-            confirmationModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Hide Confirmation Dialog
-        function hideConfirmationDialog() {
-            confirmationModal.classList.remove('active');
-            document.body.style.overflow = '';
-            currentAction = null;
-            currentApplicationId = null;
-
-            // Reset confirm button color
-            const confirmBtn = document.getElementById('confirmAction');
-            confirmBtn.style.backgroundColor = '';
-            confirmBtn.style.borderColor = '';
-            confirmBtn.style.color = '';
-        }
-
-        // Confirmation Dialog Event Listeners
-        confirmActionBtn.addEventListener('click', () => {
-            if (currentAction === 'approve') {
-                approveApplication(currentApplicationId);
-            } else if (currentAction === 'delete') {
-                deleteApplication(currentApplicationId);
-            }
-            hideConfirmationDialog();
-        });
-
-        cancelActionBtn.addEventListener('click', hideConfirmationDialog);
-
-        // Close modal when clicking outside
-        confirmationModal.addEventListener('click', (e) => {
-            if (e.target === confirmationModal) {
-                hideConfirmationDialog();
-            }
-        });
-
         // Approve Application
-        function approveApplication(applicationId) {
+        async function approveApplication(applicationId) {
             // Show loading notification
-            const loadingNotification = showNotification('Approving application...', 'info');
+            const loadingNotification = toast('Approving application...', 'info');
 
-            fetch(`/api/applications/accept/${applicationId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
+            try {
+                const response = await fetch(`/api/applications/accept/${applicationId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json();
-            })
-            .then(result => {
+
+                const result = await response.json();
+                
                 if (result.success) {
                     fetchApplications();
                     // Remove loading notification and show success
                     if (loadingNotification) {
                         loadingNotification.remove();
                     }
-                    showNotification('Application approved successfully!', 'success');
+                    toast('Application approved successfully!', 'success');
                 } else {
                     throw new Error(result.message || 'Failed to approve application');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
                 // Remove loading notification and show error
                 if (loadingNotification) {
                     loadingNotification.remove();
                 }
-                showNotification(error.message || 'Failed to approve application', 'error');
-            });
+                toast(error.message || 'Failed to approve application', 'error');
+            }
         }
 
         // Delete Application
-        function deleteApplication(applicationId) {
-            fetch(`/api/applications/delete/${applicationId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
+        async function deleteApplication(applicationId) {
+            try {
+                const response = await fetch(`/api/applications/delete/${applicationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json();
-            })
-            .then(result => {
+
+                const result = await response.json();
+                
                 if (result.success) {
                     fetchApplications();
-                    showNotification('Application deleted successfully!', 'success');
+                    toast('Application deleted successfully!', 'success');
                 } else {
                     throw new Error(result.message || 'Failed to delete application');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
-                showNotification(error.message || 'Failed to delete application', 'error');
-            });
+                toast(error.message || 'Failed to delete application', 'error');
+            }
         }
 
         // Attach Action Listeners
         function attachActionListeners() {
             document.querySelectorAll('.action-btn.approve').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const applicationId = btn.getAttribute('data-application-id');
-                    showConfirmationDialog(
-                        'Approve Application',
-                        'Are you sure you want to approve this application?',
-                        'approve',
-                        applicationId
-                    );
+                    const confirmed = await window.confirmDialog({
+                        title: 'Approve Application',
+                        message: 'Are you sure you want to approve this application?',
+                        type: 'success'
+                    });
+
+                    if (confirmed) {
+                        approveApplication(applicationId);
+                    }
                 });
             });
 
             document.querySelectorAll('.action-btn.delete').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const applicationId = btn.getAttribute('data-application-id');
-                    showConfirmationDialog(
-                        'Delete Application',
-                        'Are you sure you want to delete this application? This action cannot be undone.',
-                        'delete',
-                        applicationId
-                    );
+                    const confirmed = await window.confirmDialog({
+                        title: 'Delete Application',
+                        message: 'Are you sure you want to delete this application? This action cannot be undone.',
+                        type: 'delete'
+                    });
+
+                    if (confirmed) {
+                        deleteApplication(applicationId);
+                    }
                 });
             });
         }
@@ -704,6 +651,214 @@
             // Initial fetch
             fetchApplications(1);
         });
+
+        // Add download button event listener
+        document.getElementById('downloadApplications').addEventListener('click', () => {
+            // Get the filtered applications
+            const filteredApplications = allApplications.filter(application => {
+                const gender = document.getElementById('gender').value;
+                const membershipType = document.getElementById('membershipType').value;
+                const ageRange = document.getElementById('age').value;
+                const search = document.querySelector('.search-box input').value.trim().toLowerCase();
+
+                // Gender filter
+                if (gender && application.gender !== gender) {
+                    return false;
+                }
+
+                // Membership type filter
+                if (membershipType && application.membershipType !== membershipType) {
+                    return false;
+                }
+
+                // Age filter
+                if (ageRange && application.dateOfBirth) {
+                    const age = calculateAge(application.dateOfBirth);
+                    const applicationAgeRange = getAgeRange(age);
+                    if (applicationAgeRange !== ageRange) {
+                        return false;
+                    }
+                }
+
+                // Search filter
+                if (search) {
+                    const searchFields = [
+                        application.fullName,
+                        application.email,
+                        application.contact,
+                        application.applicationId
+                    ];
+                    return searchFields.some(field => 
+                        field && field.toLowerCase().includes(search)
+                    );
+                }
+
+                return true;
+            });
+
+            if (filteredApplications.length === 0) {
+                toast('No application data to download', 'error');
+                return;
+            }
+
+            // Create CSV content
+            const headers = ['S.N', 'Application ID', 'Full Name', 'Email', 'Contact', 'Starting Date', 'Status'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredApplications.map((application, index) => [
+                    index + 1,
+                    application.applicationId,
+                    application.fullName,
+                    application.email,
+                    application.contact,
+                    formatDate(application.startDate),
+                    application.applicationStatus.charAt(0).toUpperCase() + application.applicationStatus.slice(1)
+                ].join(','))
+            ].join('\n');
+
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const date = new Date().toISOString().split('T')[0];
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `applications_list_${date}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Add print button event listener
+        document.getElementById('printApplications').addEventListener('click', () => {
+            // Get the filtered applications
+            const filteredApplications = allApplications.filter(application => {
+                const gender = document.getElementById('gender').value;
+                const membershipType = document.getElementById('membershipType').value;
+                const ageRange = document.getElementById('age').value;
+                const search = document.querySelector('.search-box input').value.trim().toLowerCase();
+
+                // Gender filter
+                if (gender && application.gender !== gender) {
+                    return false;
+                }
+
+                // Membership type filter
+                if (membershipType && application.membershipType !== membershipType) {
+                    return false;
+                }
+
+                // Age filter
+                if (ageRange && application.dateOfBirth) {
+                    const age = calculateAge(application.dateOfBirth);
+                    const applicationAgeRange = getAgeRange(age);
+                    if (applicationAgeRange !== ageRange) {
+                        return false;
+                    }
+                }
+
+                // Search filter
+                if (search) {
+                    const searchFields = [
+                        application.fullName,
+                        application.email,
+                        application.contact,
+                        application.applicationId
+                    ];
+                    return searchFields.some(field => 
+                        field && field.toLowerCase().includes(search)
+                    );
+                }
+
+                return true;
+            });
+
+            if (filteredApplications.length === 0) {
+                toast('No application data to print', 'error');
+                return;
+            }
+
+            // Create print window
+            const printWindow = window.open('', '_blank');
+
+            // Create print content
+            const printContent = `
+                <html>
+                <head>
+                    <title>Applications Report</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f5f5f5; }
+                        h1 { text-align: center; }
+                        .header { margin-bottom: 20px; }
+                        .footer { margin-top: 20px; text-align: center; font-size: 12px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Applications Report</h1>
+                        <p>Generated on: ${new Date().toLocaleString()}</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>S.N</th>
+                                <th>Application ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Contact</th>
+                                <th>Starting Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredApplications.map((application, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${application.applicationId}</td>
+                                    <td>${application.fullName}</td>
+                                    <td>${application.email}</td>
+                                    <td>${application.contact}</td>
+                                    <td>${formatDate(application.startDate)}</td>
+                                    <td>${application.applicationStatus.charAt(0).toUpperCase() + application.applicationStatus.slice(1)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>© ${new Date().getFullYear()} Knox Barbell - Applications Report</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            // Write content to print window
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+
+            // Wait for content to load then print
+            printWindow.onload = function () {
+                printWindow.print();
+                printWindow.close();
+            };
+
+            toast('Printing applications records...', 'success');
+        });
+
+        // Helper function to format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
     </script>
 
     <script src="/js/main.js"></script>

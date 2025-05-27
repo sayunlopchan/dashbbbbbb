@@ -275,7 +275,7 @@
                             <td>loading...</td>
                             <td>loading...</td>
                             <td>loading...</td>
-                            <td><span class="">loading...</span></td>
+                            <td>loading...</td>
                             <td>loading...</td>
                         </tr>
 
@@ -327,13 +327,36 @@
             async function updateDashboardInfoBoxes() {
                 try {
                     // Fetch members data
-                    const membersResponse = await fetch(`${baseUrl}/members`);
-                    const membersData = await membersResponse.json();
-                    const totalMembers = membersData.data.length;
+                    const membersResponse = await fetch(`${baseUrl}/api/members`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                    
+                    const membersText = await membersResponse.text();
+                    let membersData;
+                    try {
+                        membersData = JSON.parse(membersText);
+                    } catch (parseError) {
+                        throw new Error('Invalid members data format');
+                    }
+
+                    const totalMembers = membersData.data?.length || 0;
 
                     // Fetch revenue stats
-                    const revenueResponse = await fetch(`${baseUrl}/payments/stats`);
-                    const revenueData = await revenueResponse.json();
+                    const revenueResponse = await fetch(`${baseUrl}/api/payments/stats`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                    
+                    const revenueText = await revenueResponse.text();
+                    let revenueData;
+                    try {
+                        revenueData = JSON.parse(revenueText);
+                    } catch (parseError) {
+                        throw new Error('Invalid revenue data format');
+                    }
 
                     // Update Revenue info box
                     const revenueBox = document.querySelector('.info-box:nth-child(3)');
@@ -342,7 +365,6 @@
                         const revenueText = revenueBox.querySelector('.info-box-text');
 
                         if (revenueNumber) {
-                            // Format the monthly revenue with commas
                             const formattedRevenue = revenueData.data.monthlyRevenue.toLocaleString('en-IN', {
                                 style: 'currency',
                                 currency: 'NPR',
@@ -356,8 +378,19 @@
                     }
 
                     // Fetch attendance data
-                    const attendancesResponse = await fetch(`${baseUrl}/attendances`);
-                    const attendancesData = await attendancesResponse.json();
+                    const attendancesResponse = await fetch(`${baseUrl}/api/attendances`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                    
+                    const attendancesText = await attendancesResponse.text();
+                    let attendancesData;
+                    try {
+                        attendancesData = JSON.parse(attendancesText);
+                    } catch (parseError) {
+                        throw new Error('Invalid attendance data format');
+                    }
 
                     // Get today's date in YYYY-MM-DD format
                     const today = new Date();
@@ -372,18 +405,70 @@
                                 const attendanceDate = new Date(attendance.date).toISOString().split('T')[0];
                                 return attendanceDate === todayStr;
                             } catch (error) {
-                                console.error('Error processing attendance date:', error);
                                 return false;
                             }
                         }).length;
                     }
 
-                    // Update info boxes
-                    document.querySelector('.info-box:nth-child(1) .info-box-number').textContent = totalMembers;
-                    document.querySelector('.info-box:nth-child(2) .info-box-number').textContent = todayCheckInsCount;
+                    // Fetch events data
+                    const eventsResponse = await fetch(`${baseUrl}/api/events`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                    
+                    const eventsText = await eventsResponse.text();
+                    let eventsData;
+                    try {
+                        eventsData = JSON.parse(eventsText);
+                    } catch (parseError) {
+                        throw new Error('Invalid events data format');
+                    }
+                    
+                    // Count upcoming events
+                    let upcomingEventsCount = 0;
+                    if (eventsData && eventsData.docs && Array.isArray(eventsData.docs)) {
+                        const currentDate = new Date();
+                        upcomingEventsCount = eventsData.docs.filter(event => {
+                            try {
+                                if (!event.startTime) return false;
+                                const eventDate = new Date(event.startTime);
+                                return eventDate > currentDate;
+                            } catch (error) {
+                                return false;
+                            }
+                        }).length;
+                    }
+
+                    // Update all info boxes
+                    const membersBox = document.querySelector('.info-box:nth-child(1)');
+                    const attendanceBox = document.querySelector('.info-box:nth-child(2)');
+                    const eventsBox = document.querySelector('.info-box:nth-child(4)');
+
+                    if (membersBox) {
+                        const membersNumber = membersBox.querySelector('.info-box-number');
+                        const membersText = membersBox.querySelector('.info-box-text');
+                        if (membersNumber) membersNumber.textContent = totalMembers;
+                        if (membersText) membersText.textContent = `Active Members: ${totalMembers}`;
+                    }
+
+                    if (attendanceBox) {
+                        const attendanceNumber = attendanceBox.querySelector('.info-box-number');
+                        if (attendanceNumber) attendanceNumber.textContent = todayCheckInsCount;
+                    }
+
+                    if (eventsBox) {
+                        const eventsNumber = eventsBox.querySelector('.info-box-number');
+                        if (eventsNumber) eventsNumber.textContent = upcomingEventsCount;
+                    }
 
                 } catch (error) {
-                    console.error('Error updating dashboard info boxes:', error);
+                    // Show error state in info boxes
+                    const infoBoxes = document.querySelectorAll('.info-box');
+                    infoBoxes.forEach(box => {
+                        const number = box.querySelector('.info-box-number');
+                        if (number) number.textContent = '0';
+                    });
                 }
             }
 
@@ -396,33 +481,30 @@
             // Add this function to the existing script block
             async function fetchMembersExpiringWithin7Days() {
                 try {
-                    console.log('Starting fetchMembersExpiringWithin7Days function');
-
-                    const response = await fetch(`${baseUrl}/members`, {
+                    const response = await fetch(`${baseUrl}/api/members`, {
                         method: 'GET',
-                        credentials: 'include',
                         headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     });
 
-                    console.log('Fetch response:', response);
-
                     if (!response.ok) {
                         const errorText = await response.text();
-                        console.error('Fetch error response:', errorText);
                         throw new Error(`Failed to fetch members. Status: ${response.status}, ${errorText}`);
                     }
 
-                    const membersData = await response.json();
-                    console.log('Full Members Data:', membersData);
+                    const membersText = await response.text();
+                    let membersData;
+                    try {
+                        membersData = JSON.parse(membersText);
+                    } catch (parseError) {
+                        throw new Error('Invalid members data format');
+                    }
 
                     const expiryAlertTableBody = document.getElementById('expiryAlertTableBody');
 
                     // Validate expiryAlertTableBody exists
                     if (!expiryAlertTableBody) {
-                        console.error('Expiry alert table body not found');
                         return;
                     }
 
@@ -431,26 +513,22 @@
 
                     // Current date
                     const currentDate = new Date();
-                    console.log('Current Date:', currentDate);
 
                     // Extract the actual members array
                     const membersArray = membersData.data || [];
-                    console.log('Members Array:', membersArray);
 
                     if (!Array.isArray(membersArray)) {
-                        console.error('Invalid members data structure', membersData);
                         expiryAlertTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="text-center">Unable to load members data</td>
-                        </tr>
-                    `;
+                            <tr>
+                                <td colspan="5" class="text-center">Unable to load members data</td>
+                            </tr>
+                        `;
                         return;
                     }
 
                     // Filter and populate expiring members
                     const expiringMembers = membersArray.filter(member => {
                         if (!member.endDate) {
-                            console.warn('Member without end date:', member);
                             return false;
                         }
 
@@ -466,15 +544,13 @@
                         return Math.abs(aEndDate - currentDate) - Math.abs(bEndDate - currentDate);
                     });
 
-                    console.log('Expiring Members:', expiringMembers);
-
                     // Populate table with expiring members
                     if (expiringMembers.length === 0) {
                         expiryAlertTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="text-center">No members expiring within 7 days</td>
-                        </tr>
-                    `;
+                            <tr>
+                                <td colspan="5" class="text-center">No members expiring within 7 days</td>
+                            </tr>
+                        `;
                         return;
                     }
 
@@ -484,16 +560,16 @@
 
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                        <td>${member.memberId || 'N/A'}</td>
-                        <td>${member.fullName || 'Unknown'}</td>
-                        <td>${member.email || 'N/A'}</td>
-                        <td>
-                            <span class="status ${daysDifference < 0 ? 'expired' : 'expiring'}">
-                                ${daysDifference < 0 ? 'Expired' : 'Expiring'}
-                            </span>
-                        </td>
-                        <td>${daysDifference < 0 ? `${Math.abs(daysDifference)} days ago` : `In ${daysDifference} days`}</td>
-                    `;
+                            <td>${member.memberId || 'N/A'}</td>
+                            <td>${member.fullName || 'Unknown'}</td>
+                            <td>${member.email || 'N/A'}</td>
+                            <td>
+                                <span class="status ${daysDifference < 0 ? 'expired' : 'expiring'}">
+                                    ${daysDifference < 0 ? 'Expired' : 'Expiring'}
+                                </span>
+                            </td>
+                            <td>${daysDifference < 0 ? `${Math.abs(daysDifference)} days ago` : `In ${daysDifference} days`}</td>
+                        `;
                         expiryAlertTableBody.appendChild(row);
                     });
 
@@ -506,17 +582,15 @@
                     }
 
                 } catch (error) {
-                    console.error('FULL Error in fetchMembersExpiringWithin7Days:', error);
-
                     const expiryAlertTableBody = document.getElementById('expiryAlertTableBody');
                     if (expiryAlertTableBody) {
                         expiryAlertTableBody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="text-center">
-                                Error loading expiring members: ${error.message}
-                            </td>
-                        </tr>
-                    `;
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    Error loading expiring members: ${error.message}
+                                </td>
+                            </tr>
+                        `;
                     }
                 }
             }
@@ -527,62 +601,40 @@
         // Function to fetch and update upcoming event count
         async function updateUpcomingEventCount() {
             try {
-                const response = await fetch(`${baseUrl}/events`);
+                const response = await fetch(`${baseUrl}/api/events`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const rawText = await response.text();
+                
+                // Try to parse the JSON
+                let data;
+                try {
+                    data = JSON.parse(rawText);
+                } catch (parseError) {
+                    throw new Error('Invalid JSON response from server');
+                }
+                
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
-                const data = await response.json();
-                console.log('API Response:', {
-                    success: data.success,
-                    totalEvents: data.pagination.total,
-                    currentPage: data.pagination.page,
-                    eventsPerPage: data.pagination.limit
-                });
                 
                 // Get current date
                 const currentDate = new Date();
-                console.log('Current Date:', currentDate.toISOString());
                 
-                // Filter upcoming events (events that haven't started yet)
+                // Filter upcoming events
                 const upcomingEvents = data.docs.filter(event => {
                     const eventDate = new Date(event.startTime);
-                    console.log('Processing Event:', {
-                        eventId: event.eventId,
-                        title: event.title,
-                        startTime: event.startTime,
-                        endTime: event.endTime,
-                        location: event.location,
-                        parsedDate: eventDate.toISOString(),
-                        isUpcoming: eventDate > currentDate,
-                        participantCount: event.participantCount,
-                        tags: event.tags
-                    });
                     return eventDate > currentDate;
-                });
-                
-                console.log('Upcoming Events Summary:', {
-                    totalEvents: data.docs.length,
-                    upcomingCount: upcomingEvents.length,
-                    upcomingEvents: upcomingEvents.map(event => ({
-                        eventId: event.eventId,
-                        title: event.title,
-                        startTime: event.startTime,
-                        endTime: event.endTime,
-                        location: event.location,
-                        participantCount: event.participantCount
-                    }))
                 });
                 
                 // Update the count in the events info box
                 const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
                 if (eventCountElement) {
-                    console.log('Updating event count to:', upcomingEvents.length);
                     eventCountElement.textContent = upcomingEvents.length;
-                } else {
-                    console.error('Could not find event count element');
                 }
             } catch (error) {
-                console.error('Error fetching upcoming events:', error);
                 const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
                 if (eventCountElement) {
                     eventCountElement.textContent = '0';
@@ -590,31 +642,59 @@
             }
         }
 
-        // Call the function when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM Content Loaded - Calling updateUpcomingEventCount');
-            updateUpcomingEventCount();
-        });
-
         // Function to fetch and display events and announcements
         async function updateEventsAndAnnouncements() {
             try {
+                console.log('Starting to fetch events and announcements...');
+
                 // Fetch events
-                const eventsResponse = await fetch(`${baseUrl}/events`);
-                if (!eventsResponse.ok) {
-                    throw new Error('Failed to fetch events');
+                console.log('Fetching events from:', `${baseUrl}/api/events`);
+                const eventsResponse = await fetch(`${baseUrl}/api/events`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                console.log('Events Response Status:', eventsResponse.status);
+                
+                const eventsText = await eventsResponse.text();
+                console.log('Events Raw Response:', eventsText);
+                
+                let eventsData;
+                try {
+                    eventsData = JSON.parse(eventsText);
+                    console.log('Events Parsed Data:', eventsData);
+                } catch (parseError) {
+                    console.error('Error parsing events data:', parseError);
+                    throw new Error('Invalid events data format');
                 }
-                const eventsData = await eventsResponse.json();
-                console.log('Events Data:', eventsData);
+
+                if (!eventsData.success) {
+                    console.error('Events API Error:', eventsData.message);
+                    throw new Error(eventsData.message || 'Failed to fetch events');
+                }
 
                 // Get current date
                 const currentDate = new Date();
+                console.log('Current date for filtering events:', currentDate);
                 
                 // Filter and sort upcoming events
                 const upcomingEvents = eventsData.docs
-                    .filter(event => new Date(event.startTime) > currentDate)
+                    .filter(event => {
+                        try {
+                            if (!event.startTime) return false;
+                            const eventDate = new Date(event.startTime);
+                            const isUpcoming = eventDate > currentDate;
+                            console.log('Event:', event.title, 'Date:', eventDate, 'Is Upcoming:', isUpcoming);
+                            return isUpcoming;
+                        } catch (error) {
+                            console.error('Error processing event date:', error);
+                            return false;
+                        }
+                    })
                     .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
                     .slice(0, 2); // Get only 2 most recent upcoming events
+
+                console.log('Filtered Upcoming Events:', upcomingEvents);
 
                 // Update events container
                 const eventsContainer = document.querySelector('.events-container');
@@ -623,43 +703,88 @@
                     eventCards.forEach((card, index) => {
                         if (upcomingEvents[index]) {
                             const event = upcomingEvents[index];
+                            card.style.display = 'block';
                             card.querySelector('.event-title').textContent = event.title;
-                            card.querySelector('.event-description').textContent = 
-                                event.description.join(' ').substring(0, 100) + '...';
+                            
+                            // Handle description which is an array of strings
+                            let descriptionText = 'No description available';
+                            if (event.description && Array.isArray(event.description)) {
+                                descriptionText = event.description.join(' ');
+                                if (descriptionText.length > 100) {
+                                    descriptionText = descriptionText.substring(0, 100) + '...';
+                                }
+                            }
+                            card.querySelector('.event-description').textContent = descriptionText;
+                            
+                            console.log('Updated event card:', index, 'with event:', event.title);
                         } else {
                             card.style.display = 'none';
+                            console.log('Hiding event card:', index, 'no event data available');
                         }
                     });
                 }
 
                 // Fetch announcements
-                const announcementsResponse = await fetch(`${baseUrl}/announcements`);
-                if (!announcementsResponse.ok) {
-                    throw new Error('Failed to fetch announcements');
+                console.log('Fetching announcements from:', `${baseUrl}/api/announcements`);
+                const announcementsResponse = await fetch(`${baseUrl}/api/announcements`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                console.log('Announcements Response Status:', announcementsResponse.status);
+                
+                const announcementsText = await announcementsResponse.text();
+                console.log('Announcements Raw Response:', announcementsText);
+                
+                let announcementsData;
+                try {
+                    announcementsData = JSON.parse(announcementsText);
+                    console.log('Announcements Parsed Data:', announcementsData);
+                } catch (parseError) {
+                    console.error('Error parsing announcements data:', parseError);
+                    throw new Error('Invalid announcements data format');
                 }
-                const announcementsData = await announcementsResponse.json();
-                console.log('Announcements Data:', announcementsData);
+
+                if (!announcementsData.success) {
+                    console.error('Announcements API Error:', announcementsData.message);
+                    throw new Error(announcementsData.message || 'Failed to fetch announcements');
+                }
 
                 // Get most recent announcement
                 const recentAnnouncement = announcementsData.docs[0];
+                console.log('Recent Announcement:', recentAnnouncement);
 
                 // Update announcements container
                 const announcementsContainer = document.querySelector('.announcements-container');
-                if (announcementsContainer && recentAnnouncement) {
+                if (announcementsContainer) {
                     const announcementItem = announcementsContainer.querySelector('.announcement-item');
                     if (announcementItem) {
-                        announcementItem.querySelector('.announcement-title').textContent = recentAnnouncement.title;
-                        announcementItem.querySelector('.announcement-description').textContent = 
-                            recentAnnouncement.description.substring(0, 150) + '...';
-                        announcementItem.querySelector('.announcement-meta span:first-child').textContent = 
-                            `by ${recentAnnouncement.authorName}`;
-                        announcementItem.querySelector('.announcement-meta span:last-child').textContent = 
-                            new Date(recentAnnouncement.createdAt).toLocaleDateString();
+                        if (recentAnnouncement) {
+                            announcementItem.style.display = 'block';
+                            announcementItem.querySelector('.announcement-title').textContent = recentAnnouncement.title;
+                            announcementItem.querySelector('.announcement-description').textContent = 
+                                recentAnnouncement.description ? recentAnnouncement.description.substring(0, 150) + '...' : 'No description available';
+                            announcementItem.querySelector('.announcement-meta span:first-child').textContent = 
+                                `by ${recentAnnouncement.authorName || 'Unknown'}`;
+                            announcementItem.querySelector('.announcement-meta span:last-child').textContent = 
+                                new Date(recentAnnouncement.createdAt).toLocaleDateString();
+                            console.log('Updated announcement with:', recentAnnouncement.title);
+                        } else {
+                            announcementItem.style.display = 'none';
+                            console.log('No announcements available to display');
+                        }
                     }
                 }
 
+                console.log('Events and announcements update completed successfully');
+
             } catch (error) {
                 console.error('Error updating events and announcements:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+                
                 // Show error state in UI
                 const eventsContainer = document.querySelector('.events-container');
                 const announcementsContainer = document.querySelector('.announcements-container');
@@ -667,6 +792,7 @@
                 if (eventsContainer) {
                     const eventCards = eventsContainer.querySelectorAll('.event-card');
                     eventCards.forEach(card => {
+                        card.style.display = 'block';
                         card.querySelector('.event-title').textContent = 'Error loading events';
                         card.querySelector('.event-description').textContent = 'Please try again later';
                     });
@@ -675,6 +801,7 @@
                 if (announcementsContainer) {
                     const announcementItem = announcementsContainer.querySelector('.announcement-item');
                     if (announcementItem) {
+                        announcementItem.style.display = 'block';
                         announcementItem.querySelector('.announcement-title').textContent = 'Error loading announcement';
                         announcementItem.querySelector('.announcement-description').textContent = 'Please try again later';
                         announcementItem.querySelector('.announcement-meta').innerHTML = '<span>Error</span>';
@@ -685,7 +812,6 @@
 
         // Call both functions when the page loads
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM Content Loaded - Initializing dashboard data');
             updateUpcomingEventCount();
             updateEventsAndAnnouncements();
         });

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/events.css">
+  
 </head>
 
 <body>
@@ -235,10 +236,25 @@
                 <button class="modal-close" id="closeEventModal">&times;</button>
             </div>
             <form id="addEventForm">
-                <div class="form-grid">
+                <div class="form-grid form-grid-event">
                     <div class="form-group">
                         <label for="eventTitle">Event Title</label>
                         <input type="text" id="eventTitle" name="title" required placeholder="Enter event title">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventOrganizer">Organizer</label>
+                        <input type="text" id="eventOrganizer" name="organizer" required placeholder="Enter event organizer">
+                    </div>
+                    <div class="form-group">
+                        <label for="eventCategory">Category</label>
+                        <select id="eventCategory" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="fitness">Fitness</option>
+                            <option value="competition">Competition</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="social">Social</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="eventLocation">Location</label>
@@ -278,6 +294,35 @@
         </div>
     </div>
 
+    <!-- Add Announcement Modal -->
+    <div class="modal-overlay" id="addAnnouncementModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Add New Announcement</h2>
+                    <p>Create a new announcement for Knox Barbell</p>
+                </div>
+                <button class="modal-close" id="closeAnnouncementModal">&times;</button>
+            </div>
+            <form id="addAnnouncementForm">
+                <div class="form-grid form-grid-announcement">
+                    <div class="form-group">
+                        <label for="announcementTitle">Announcement Title</label>
+                        <input type="text" id="announcementTitle" name="title" required placeholder="Enter announcement title">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="announcementDescription">Description</label>
+                        <textarea id="announcementDescription" name="description" rows="4" required placeholder="Enter announcement description"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAnnouncementModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Function to format date
         function formatDate(dateString) {
@@ -297,13 +342,36 @@
             const eventsContainer = document.getElementById('events');
             eventsContainer.innerHTML = ''; // Clear existing events
 
+            if (!events || events.length === 0) {
+                const noEventsCard = document.createElement('div');
+                noEventsCard.classList.add('card', 'no-events');
+                noEventsCard.innerHTML = `
+                    <div class="no-events-content">
+                        <i class="fas fa-calendar-times"></i>
+                        <h3>No Events Found</h3>
+                        <p>There are no events scheduled at the moment.</p>
+                        <button class="btn btn-primary" id="addFirstEvent">
+                            <i class="fas fa-plus"></i> Create Your First Event
+                        </button>
+                    </div>
+                `;
+                eventsContainer.appendChild(noEventsCard);
+
+                // Add event listener to the "Create Your First Event" button
+                document.getElementById('addFirstEvent').addEventListener('click', () => {
+                    addEventModal.classList.add('active');
+                });
+
+                return;
+            }
+
             events.forEach(event => {
                 const eventCard = document.createElement('div');
                 eventCard.classList.add('card');
                 eventCard.innerHTML = `
                     <h3>${event.title}</h3>
                     <small>${formatDate(event.startTime)}</small>
-                    <p>${event.description.join(' ')}</p>
+                    <p>${event.description}</p>
                     <p class="participants">👥 ${event.participantCount || 0} participants <br> 
                         <span class="instructor">with ${event.authorName}</span>
                     </p>
@@ -334,7 +402,7 @@
                 renderEvents(data.docs || []); // Assuming mongoose-paginate returns docs
             } catch (error) {
                 console.error('Error fetching events:', error);
-                window.showNotification('Failed to load events', 'error');
+                window.toast('Failed to load events', 'error');
             }
         }
 
@@ -348,28 +416,37 @@
         // Handle delete event
         async function handleDeleteEvent(event) {
             const eventId = event.currentTarget.dataset.eventId;
+            
+            const confirmed = await window.confirmDialog({
+                title: 'Delete Event',
+                message: 'Are you sure you want to delete this event? This action cannot be undone.',
+                type: 'delete'
+            });
+
+            if (!confirmed) return;
+
             try {
                 const response = await fetch(`/api/events/${eventId}`, {
                     method: 'DELETE'
                 });
 
                 if (response.ok) {
-                    window.showNotification('Event deleted successfully', 'success');
+                    window.toast('Event deleted successfully', 'success');
                     fetchEvents(); // Refresh events list
                 } else {
                     const errorData = await response.json();
-                    window.showNotification(errorData.message || 'Failed to delete event', 'error');
+                    window.toast(errorData.message || 'Failed to delete event', 'error');
                 }
             } catch (error) {
                 console.error('Error deleting event:', error);
-                window.showNotification('An error occurred while deleting the event', 'error');
+                window.toast('An error occurred while deleting the event', 'error');
             }
         }
 
         // Open edit event modal (to be implemented)
         function openEditEventModal(eventId) {
             // TODO: Implement edit event modal functionality
-            window.showNotification('Edit functionality coming soon', 'info');
+            window.toast('Edit functionality coming soon', 'info');
         }
 
         // Fetch events when page loads
@@ -403,6 +480,69 @@
         // Store uploaded images
         let uploadedImages = [];
 
+        // Modify form submission to use fetchEvents for immediate update
+        addEventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Create FormData object
+            const formData = new FormData();
+            
+            // Add text fields
+            formData.append('title', document.getElementById('eventTitle').value);
+            formData.append('organizer', document.getElementById('eventOrganizer').value);
+            formData.append('category', document.getElementById('eventCategory').value);
+            formData.append('location', document.getElementById('eventLocation').value);
+            formData.append('startTime', new Date(document.getElementById('eventStartTime').value).toISOString());
+            formData.append('endTime', new Date(document.getElementById('eventEndTime').value).toISOString());
+            
+            // Handle description as a single string
+            const description = document.getElementById('eventDescription').value;
+            formData.append('description', description);
+            
+            // Add tags if provided
+            const tags = document.getElementById('eventTags').value;
+            if (tags) {
+                formData.append('tags', tags);
+            }
+
+            // Add images if selected
+            if (imageUpload.files.length > 0) {
+                for (let i = 0; i < imageUpload.files.length; i++) {
+                    formData.append('images', imageUpload.files[i]);
+                }
+            }
+
+            try {
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    body: formData // FormData will automatically set the correct Content-Type
+                });
+
+                if (response.status === 401) {
+                    // Token expired, redirect to login
+                    window.location.href = '/login';
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Show success notification
+                    window.toast('Event created successfully!', 'success');
+
+                    // Close modal and refresh events
+                    closeEventModal();
+                    fetchEvents(); // Refresh events list
+                } else {
+                    // Show error notification
+                    window.toast(result.message || 'Failed to create event', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating event:', error);
+                window.toast('An error occurred while creating the event', 'error');
+            }
+        });
+
         // Image Upload Handling
         imageUpload.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
@@ -413,7 +553,7 @@
 
             // Limit to 3 images total
             if (currentImageCount + files.length > 3) {
-                window.showNotification('You can only upload a maximum of 3 images', 'error');
+                window.toast('You can only upload a maximum of 3 images', 'error');
                 // Reset file input
                 e.target.value = '';
                 return;
@@ -422,92 +562,49 @@
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    // Create an image element to compress
-                    const img = new Image();
-                    img.src = event.target.result;
+                    const imagePreview = document.createElement('div');
+                    imagePreview.classList.add('image-preview');
 
-                    img.onload = () => {
-                        // Create a canvas to compress the image
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
+                    const previewImg = document.createElement('img');
+                    previewImg.src = event.target.result;
+                    previewImg.classList.add('preview-image');
 
-                        // Set maximum dimensions
-                        const MAX_WIDTH = 800;
-                        const MAX_HEIGHT = 600;
-                        let width = img.width;
-                        let height = img.height;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.innerHTML = '×';
+                    removeBtn.classList.add('remove-image');
+                    removeBtn.style.position = 'absolute';
+                    removeBtn.style.top = '5px';
+                    removeBtn.style.right = '5px';
+                    removeBtn.style.background = 'rgba(255,0,0,0.7)';
+                    removeBtn.style.color = 'white';
+                    removeBtn.style.border = 'none';
+                    removeBtn.style.borderRadius = '50%';
+                    removeBtn.style.width = '15px';
+                    removeBtn.style.height = '15px';
+                    removeBtn.style.fontSize = '10px';
+                    removeBtn.style.display = 'flex';
+                    removeBtn.style.justifyContent = 'center';
+                    removeBtn.style.alignItems = 'center';
+                    removeBtn.style.cursor = 'pointer';
 
-                        // Scale down if needed
-                        if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height *= MAX_WIDTH / width;
-                                width = MAX_WIDTH;
-                            }
-                        } else {
-                            if (height > MAX_HEIGHT) {
-                                width *= MAX_HEIGHT / height;
-                                height = MAX_HEIGHT;
-                            }
-                        }
+                    removeBtn.addEventListener('click', () => {
+                        imagePreviewContainer.removeChild(imagePreview);
+                        // Re-enable file input if it was disabled
+                        imageUpload.disabled = false;
+                    });
 
-                        canvas.width = width;
-                        canvas.height = height;
+                    imagePreview.appendChild(previewImg);
+                    imagePreview.appendChild(removeBtn);
+                    imagePreview.style.position = 'relative';
 
-                        // Draw the image with new dimensions
-                        ctx.drawImage(img, 0, 0, width, height);
+                    imagePreviewContainer.appendChild(imagePreview);
 
-                        // Convert to compressed base64
-                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-                        const imagePreview = document.createElement('div');
-                        imagePreview.classList.add('image-preview');
-
-                        const previewImg = document.createElement('img');
-                        previewImg.src = compressedDataUrl;
-                        previewImg.classList.add('image-preview');
-
-                        const removeBtn = document.createElement('button');
-                        removeBtn.innerHTML = '×';
-                        removeBtn.classList.add('remove-image');
-                        removeBtn.style.position = 'absolute';
-                        removeBtn.style.top = '5px';
-                        removeBtn.style.right = '5px';
-                        removeBtn.style.background = 'rgba(255,0,0,0.7)';
-                        removeBtn.style.color = 'white';
-                        removeBtn.style.border = 'none';
-                        removeBtn.style.borderRadius = '50%';
-                        removeBtn.style.width = '15px';
-                        removeBtn.style.height = '15px';
-                        removeBtn.style.fontSize = '10px';
-                        removeBtn.style.display = 'flex';
-                        removeBtn.style.justifyContent = 'center';
-                        removeBtn.style.alignItems = 'center';
-                        removeBtn.style.cursor = 'pointer';
-
-                        removeBtn.addEventListener('click', () => {
-                            imagePreviewContainer.removeChild(imagePreview);
-                            uploadedImages = uploadedImages.filter(i => i !== compressedDataUrl);
-
-                            // Re-enable file input if it was disabled
-                            imageUpload.disabled = false;
-                        });
-
-                        imagePreview.appendChild(previewImg);
-                        imagePreview.appendChild(removeBtn);
-                        imagePreview.style.position = 'relative';
-
-                        imagePreviewContainer.appendChild(imagePreview);
-
-                        // Store compressed image
-                        uploadedImages.push(compressedDataUrl);
-
-                        // Check if we've reached the maximum number of images
-                        const updatedImageCount = imagePreviewContainer.querySelectorAll('.image-preview').length;
-                        if (updatedImageCount >= 3) {
-                            imageUpload.disabled = true;
-                            window.showNotification('Maximum of 3 images reached', 'info');
-                        }
-                    };
+                    // Check if we've reached the maximum number of images
+                    const updatedImageCount = imagePreviewContainer.querySelectorAll('.image-preview').length;
+                    if (updatedImageCount >= 3) {
+                        imageUpload.disabled = true;
+                        window.toast('Maximum of 3 images reached', 'info');
+                    }
                 };
                 reader.readAsDataURL(file);
             });
@@ -519,29 +616,19 @@
         // Open Modal
         addEventBtn.addEventListener('click', () => {
             addEventModal.classList.add('active');
-            // Reset uploaded images
-            uploadedImages = [];
-            const existingPreviews = imageUploadContainer.querySelectorAll('.image-preview');
-            existingPreviews.forEach(preview => {
-                if (preview !== imageUpload.parentElement) {
-                    imageUploadContainer.removeChild(preview);
-                }
-            });
-
-            // Clear the image-preview-container
+            // Reset form and previews
+            addEventForm.reset();
             const imagePreviewContainer = document.querySelector('.image-preview-container');
             imagePreviewContainer.innerHTML = '';
+            imageUpload.disabled = false;
         });
 
         // Close Modal Functions
         function closeEventModal() {
             addEventModal.classList.remove('active');
             addEventForm.reset();
-            uploadedImages = [];
             const imagePreviewContainer = document.querySelector('.image-preview-container');
             imagePreviewContainer.innerHTML = '';
-
-            // Re-enable file input
             imageUpload.disabled = false;
         }
 
@@ -552,51 +639,6 @@
         addEventModal.addEventListener('click', (e) => {
             if (e.target === addEventModal) {
                 closeEventModal();
-            }
-        });
-
-        // Modify form submission to use fetchEvents for immediate update
-        addEventForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            // Collect form data
-            const formData = {
-                title: document.getElementById('eventTitle').value,
-                location: document.getElementById('eventLocation').value,
-                startTime: new Date(document.getElementById('eventStartTime').value).toISOString(),
-                endTime: new Date(document.getElementById('eventEndTime').value).toISOString(),
-                description: document.getElementById('eventDescription').value.split('\n'),
-                tags: document.getElementById('eventTags').value
-                    ? document.getElementById('eventTags').value.split(',').map(tag => tag.trim())
-                    : [],
-                images: uploadedImages
-            };
-
-            try {
-                const response = await fetch('/api/events', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    // Show success notification
-                    window.showNotification('Event created successfully!', 'success');
-
-                    // Close modal and refresh events
-                    closeEventModal();
-                    fetchEvents(); // Refresh events list
-                } else {
-                    // Show error notification
-                    window.showNotification(result.message || 'Failed to create event', 'error');
-                }
-            } catch (error) {
-                console.error('Error creating event:', error);
-                window.showNotification('An error occurred while creating the event', 'error');
             }
         });
 
@@ -611,7 +653,7 @@
                 renderAnnouncements(data.docs || []); // Assuming mongoose-paginate returns docs
             } catch (error) {
                 console.error('Error fetching announcements:', error);
-                window.showNotification('Failed to load announcements', 'error');
+                window.toast('Failed to load announcements', 'error');
             }
         }
 
@@ -619,6 +661,29 @@
         function renderAnnouncements(announcements) {
             const announcementsContainer = document.getElementById('announcements');
             announcementsContainer.innerHTML = ''; // Clear existing announcements
+
+            if (!announcements || announcements.length === 0) {
+                const noAnnouncementsCard = document.createElement('div');
+                noAnnouncementsCard.classList.add('card', 'no-events');
+                noAnnouncementsCard.innerHTML = `
+                    <div class="no-events-content">
+                        <i class="fas fa-bullhorn"></i>
+                        <h3>No Announcements Found</h3>
+                        <p>There are no announcements at the moment.</p>
+                        <button class="btn btn-primary" id="addFirstAnnouncement">
+                            <i class="fas fa-plus"></i> Create Your First Announcement
+                        </button>
+                    </div>
+                `;
+                announcementsContainer.appendChild(noAnnouncementsCard);
+
+                // Add event listener to the "Create Your First Announcement" button
+                document.getElementById('addFirstAnnouncement').addEventListener('click', () => {
+                    addAnnouncementModal.classList.add('active');
+                });
+
+                return;
+            }
 
             announcements.forEach(announcement => {
                 const announcementCard = document.createElement('div');
@@ -647,63 +712,45 @@
         function handleEditAnnouncement(event) {
             const announcementId = event.currentTarget.dataset.announcementId;
             // TODO: Implement edit announcement modal functionality
-            window.showNotification('Edit announcement functionality coming soon', 'info');
+            window.toast('Edit announcement functionality coming soon', 'info');
         }
 
         // Handle delete announcement
         async function handleDeleteAnnouncement(event) {
             const announcementId = event.currentTarget.dataset.announcementId;
+            
+            const confirmed = await window.confirmDialog({
+                title: 'Delete Announcement',
+                message: 'Are you sure you want to delete this announcement? This action cannot be undone.',
+                type: 'delete'
+            });
+
+            if (!confirmed) return;
+
             try {
                 const response = await fetch(`/api/announcements/${announcementId}`, {
                     method: 'DELETE'
                 });
 
                 if (response.ok) {
-                    window.showNotification('Announcement deleted successfully', 'success');
+                    window.toast('Announcement deleted successfully', 'success');
                     fetchAnnouncements(); // Refresh announcements list
                 } else {
                     const errorData = await response.json();
-                    window.showNotification(errorData.message || 'Failed to delete announcement', 'error');
+                    window.toast(errorData.message || 'Failed to delete announcement', 'error');
                 }
             } catch (error) {
                 console.error('Error deleting announcement:', error);
-                window.showNotification('An error occurred while deleting the announcement', 'error');
+                window.toast('An error occurred while deleting the announcement', 'error');
             }
         }
 
         // Add Announcement Modal Functionality
         const addAnnouncementBtn = document.querySelector('#announcementSearch .add-btn');
-        const addAnnouncementModal = document.createElement('div');
-        addAnnouncementModal.classList.add('modal-overlay');
-        addAnnouncementModal.id = 'addAnnouncementModal';
-        addAnnouncementModal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div>
-                        <h2>Add New Announcement</h2>
-                        <p>Create a new announcement for Knox Barbell</p>
-                    </div>
-                    <button class="modal-close" id="closeAnnouncementModal">&times;</button>
-                </div>
-                <form id="addAnnouncementForm">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="announcementTitle">Announcement Title</label>
-                            <input type="text" id="announcementTitle" name="title" required placeholder="Enter announcement title">
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="announcementDescription">Description</label>
-                            <textarea id="announcementDescription" name="description" rows="4" required placeholder="Enter announcement description"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" id="cancelAnnouncementModal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Create Announcement</button>
-                    </div>
-                </form>
-            </div>
-        `;
-        document.body.appendChild(addAnnouncementModal);
+        const addAnnouncementModal = document.getElementById('addAnnouncementModal');
+        const closeAnnouncementModalBtn = document.getElementById('closeAnnouncementModal');
+        const cancelAnnouncementModalBtn = document.getElementById('cancelAnnouncementModal');
+        const addAnnouncementForm = document.getElementById('addAnnouncementForm');
 
         // Open Announcement Modal
         addAnnouncementBtn.addEventListener('click', () => {
@@ -711,10 +758,6 @@
         });
 
         // Close Announcement Modal Functions
-        const closeAnnouncementModalBtn = document.getElementById('closeAnnouncementModal');
-        const cancelAnnouncementModalBtn = document.getElementById('cancelAnnouncementModal');
-        const addAnnouncementForm = document.getElementById('addAnnouncementForm');
-
         function closeAnnouncementModal() {
             addAnnouncementModal.classList.remove('active');
             addAnnouncementForm.reset();
@@ -754,18 +797,18 @@
 
                 if (response.ok) {
                     // Show success notification
-                    window.showNotification('Announcement created successfully!', 'success');
+                    window.toast('Announcement created successfully!', 'success');
 
                     // Close modal and refresh announcements
                     closeAnnouncementModal();
                     fetchAnnouncements(); // Refresh announcements list
                 } else {
                     // Show error notification
-                    window.showNotification(result.message || 'Failed to create announcement', 'error');
+                    window.toast(result.message || 'Failed to create announcement', 'error');
                 }
             } catch (error) {
                 console.error('Error creating announcement:', error);
-                window.showNotification('An error occurred while creating the announcement', 'error');
+                window.toast('An error occurred while creating the announcement', 'error');
             }
         });
 

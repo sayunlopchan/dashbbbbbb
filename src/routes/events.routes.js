@@ -7,6 +7,7 @@ import {
   deleteEvent,
 } from "../controllers/event.controller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
+import upload from "../middlewares/upload.middleware.js";
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router
   .get(getAllEvents)
 
   // Create a new event
-  .post(authenticate, createEvent);
+  .post(authenticate, upload.array('images', 3), createEvent);
 
 router
   .route("/:eventId")
@@ -25,7 +26,7 @@ router
   .get(authenticate, getEventById)
 
   // Update event
-  .put(authenticate, updateEvent)
+  .put(authenticate, upload.array('images', 3), updateEvent)
 
   // Delete event
   .delete(authenticate, deleteEvent);

@@ -147,13 +147,11 @@
         <div class="notification" data-type="all">
           <div class="notification-card">
             <div class="notification-title">
-              <h4>Notification Title</h4>
-              <span class="tag">Notification Tag</span>
+              <h4>loading...</h4>
+              <span class="tag">loading...</span>
             </div>
-            <div class="date-time">09/02/2025, 5:56 AM</div>
-            <div class="content">
-              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
-              voro adaug
+            <div class="date-time">loading...</div>
+            <div class="content">loading...
             </div>
             <div class="actions">
               
@@ -181,14 +179,11 @@
         <div class="notification" data-type="unread">
           <div class="notification-card new">
             <div class="notification-title">
-              <h4>Notification Title <span class="new-tag">New</span></h4>
-              <span class="tag">Notification Tag</span>
+              <h4>loading...<span class="new-tag">loading...</span></h4>
+              <span class="tag">loading...</span>
             </div>
-            <div class="date-time">09/02/2025, 5:56 AM</div>
-            <div class="content">
-              Upcoming Event Notification voro adaugeo valens trepide cotidie tubineus aer.Upcoming Event Notification
-              voro adaug
-            </div>
+            <div class="date-time">loading...</div>
+            <div class="content">loading...</div>
             <div class="actions">
               <span class="mark-read"><i class="fa-solid fa-check-double"></i> Mark as read</span>
               <button class="reminder-btn"><i class="fa-solid fa-envelope"></i> Send Remainder</button>
@@ -286,7 +281,38 @@
           return;
         }
 
-        notifications.forEach(notification => {
+        // Sort notifications: newest first, then by type
+        const sortedNotifications = [...notifications].sort((a, b) => {
+          // First sort by date (newest first)
+          const dateA = new Date(a.createdAt).getTime();
+          const dateB = new Date(b.createdAt).getTime();
+          
+          if (dateA !== dateB) {
+            return dateB - dateA; // Newest first
+          }
+
+          // If dates are equal, prioritize unread applications
+          if (a.type === 'application' && a.status === 'unread' && 
+              !(b.type === 'application' && b.status === 'unread')) {
+            return -1;
+          }
+          if (b.type === 'application' && b.status === 'unread' && 
+              !(a.type === 'application' && a.status === 'unread')) {
+            return 1;
+          }
+
+          // Then prioritize other unread notifications
+          if (a.status === 'unread' && b.status !== 'unread') return -1;
+          if (b.status === 'unread' && a.status !== 'unread') return 1;
+
+          // Finally prioritize applications
+          if (a.type === 'application' && b.type !== 'application') return -1;
+          if (b.type === 'application' && a.type !== 'application') return 1;
+
+          return 0;
+        });
+
+        sortedNotifications.forEach(notification => {
           const notificationCard = this.createNotificationCard(notification);
           
           // Determine which container to add the notification to
@@ -321,9 +347,11 @@
                 <i class="fa-solid fa-check-double"></i> Mark as read
               </span>
             ` : ''}
-            <button class="reminder-btn" data-id="${notification._id}">
-              <i class="fa-solid fa-envelope"></i> Send Reminder
-            </button>
+            ${notification.type !== 'application' ? `
+              <button class="reminder-btn" data-id="${notification._id}">
+                <i class="fa-solid fa-envelope"></i> Send Reminder
+              </button>
+            ` : ''}
           </div>
         `;
 
@@ -334,7 +362,9 @@
         }
 
         const reminderBtn = card.querySelector('.reminder-btn');
-        reminderBtn.addEventListener('click', () => this.sendReminder(notification));
+        if (reminderBtn) {
+          reminderBtn.addEventListener('click', () => this.sendReminder(notification));
+        }
 
         return card;
       }
@@ -361,7 +391,7 @@
         // Implement reminder logic based on notification type
         console.log('Sending reminder for notification:', notification);
         // You might want to add specific reminder logic here
-        this.showNotification('Reminder sent successfully', 'success');
+        this.toast('Reminder sent successfully', 'success');
       }
 
       updateTabCounts(notifications) {
@@ -407,7 +437,7 @@
         }
       }
 
-      showNotification(message, type = 'success') {
+      toast(message, type = 'success') {
         const notification = document.createElement('div');
         notification.classList.add('notification-popup', type);
         notification.textContent = message;
@@ -422,7 +452,7 @@
       }
 
       showErrorNotification(message) {
-        this.showNotification(message, 'error');
+        this.toast(message, 'error');
       }
 
       getNotificationType(notification) {

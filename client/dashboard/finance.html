@@ -170,7 +170,7 @@
                     <div class="info-box-header">
                         <span class="info-box-title">Membership Revenue</span>
                         <div class="info-box-icon membership">
-                            <i class="fas fa-id-card"></i>
+                            <i class="fas fa-users"></i>
                         </div>
                     </div>
                     <div class="info-box-content">
@@ -183,7 +183,7 @@
                     <div class="info-box-header">
                         <span class="info-box-title">Product Revenue</span>
                         <div class="info-box-icon product">
-                            <i class="fas fa-box"></i>
+                            <i class="fas fa-shopping-cart"></i>
                         </div>
                     </div>
                     <div class="info-box-content">
@@ -282,6 +282,7 @@
 
 
             <!-- Finance Table -->
+             
             <div class="table-container">
                 <table class="members-table">
                     <thead>
@@ -424,6 +425,7 @@
         let currentPage = 1;
         let totalPages = 1;
         const itemsPerPage = 10;
+        let allPayments = [];
 
         // Function to update pagination controls
         function updatePaginationControls(pagination) {
@@ -492,8 +494,8 @@
                 }
 
                 // Add method and type filters
-                if (methodFilter) params.append('methodFilter', methodFilter);
-                if (typeFilter) params.append('typeFilter', typeFilter);
+                if (methodFilter) params.append('method', methodFilter);
+                if (typeFilter) params.append('type', typeFilter);
 
                 // Show loading state
                 const tbody = document.querySelector('.members-table tbody');
@@ -520,6 +522,10 @@
 
                 if (data.success) {
                     const { payments, pagination } = data.data;
+                    
+                    // Store all payments for download/print functionality
+                    allPayments = payments;
+                    
                     tbody.innerHTML = ''; // Clear loading state
 
                     if (payments.length === 0) {
@@ -560,7 +566,7 @@
                 }
             } catch (error) {
                 console.error('Error applying filters:', error);
-                showNotification('Failed to apply filters', 'error');
+                toast('Failed to apply filters', 'error');
                 
                 // Show error state in table
                 const tbody = document.querySelector('.members-table tbody');
@@ -616,6 +622,7 @@
                 document.getElementById('filterMethod').value = '';
                 document.getElementById('filterType').value = '';
                 applyFilters(1);
+                toast('Filters have been reset', 'info');
             });
 
             // Pagination controls
@@ -633,7 +640,7 @@
         });
 
         // Function to show notification
-        function showNotification(message, type = 'error') {
+        function toast(message, type = 'error') {
             const notification = document.createElement('div');
             notification.className = `notification-popup ${type}`;
             notification.innerHTML = `
@@ -667,7 +674,7 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    showNotification('Payment deleted successfully', 'success');
+                    toast('Payment deleted successfully', 'success');
                     // Refresh the payments table and revenue stats
                     applyFilters();
                     fetchRevenueStats();
@@ -676,7 +683,7 @@
                 }
             } catch (error) {
                 console.error('Error deleting payment:', error);
-                showNotification(error.message || 'Failed to delete payment', 'error');
+                toast(error.message || 'Failed to delete payment', 'error');
             }
         }
 
@@ -688,8 +695,14 @@
             const paymentId = deleteBtn.dataset.paymentId;
             if (!paymentId) return;
 
-            // Show confirmation dialog
-            if (confirm('Are you sure you want to delete this payment record? This action cannot be undone.')) {
+            // Show confirmation dialog using global confirmDialog
+            const confirmed = await window.confirmDialog({
+                title: 'Delete Payment',
+                message: 'Are you sure you want to delete this payment record? This action cannot be undone.',
+                type: 'delete'
+            });
+
+            if (confirmed) {
                 await deletePayment(paymentId);
             }
         });
@@ -743,7 +756,7 @@
                 }
             } catch (error) {
                 console.error('Error fetching revenue stats:', error);
-                showNotification('Failed to load revenue statistics', 'error');
+                toast('Failed to load revenue statistics', 'error');
             }
         }
 
@@ -858,7 +871,7 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    showNotification(`Payment ${mode === 'add' ? 'added' : 'updated'} successfully!`, 'success');
+                    toast(`Payment ${mode === 'add' ? 'added' : 'updated'} successfully!`, 'success');
                     // Refresh the page after a short delay to show the notification
                     setTimeout(() => {
                         window.location.reload();
@@ -868,7 +881,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showNotification(error.message, 'error');
+                toast(error.message, 'error');
             } finally {
                 // Reset button state
                 const submitBtn = recordForm.querySelector('button[type="submit"]');
@@ -963,8 +976,256 @@
                 }
             } catch (error) {
                 console.error('Error fetching payment details:', error);
-                showNotification('Failed to load payment details', 'error');
+                toast('Failed to load payment details', 'error');
             }
+        });
+
+        // Add download button event listener
+        document.getElementById('download').addEventListener('click', () => {
+            // Get the filtered payments
+            const filteredPayments = allPayments.filter(payment => {
+                const dateFilter = document.getElementById('filterDay').value;
+                const methodFilter = document.getElementById('filterMethod').value;
+                const typeFilter = document.getElementById('filterType').value;
+                const searchQuery = document.querySelector('.search-box input').value.toLowerCase();
+
+                // Apply date filter
+                if (dateFilter && dateFilter !== 'all') {
+                    const paymentDate = new Date(payment.paymentDate);
+                    const now = new Date();
+                    let startDate;
+                    switch (dateFilter) {
+                        case 'today':
+                            startDate = new Date(now.setHours(0, 0, 0, 0));
+                            break;
+                        case '7':
+                            startDate = new Date(now.setDate(now.getDate() - 7));
+                            break;
+                        case '30':
+                            startDate = new Date(now.setDate(now.getDate() - 30));
+                            break;
+                        case '90':
+                            startDate = new Date(now.setDate(now.getDate() - 90));
+                            break;
+                        case '180':
+                            startDate = new Date(now.setDate(now.getDate() - 180));
+                            break;
+                        case '365':
+                            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                            break;
+                    }
+                    if (startDate && paymentDate < startDate) {
+                        return false;
+                    }
+                }
+
+                // Apply method filter
+                if (methodFilter && payment.paymentMethod !== methodFilter) {
+                    return false;
+                }
+
+                // Apply type filter
+                if (typeFilter && payment.paymentType !== typeFilter) {
+                    return false;
+                }
+
+                // Apply search filter
+                if (searchQuery) {
+                    const searchFields = [
+                        payment.memberId,
+                        payment.fullName,
+                        payment.amount.toString(),
+                        formatDate(payment.paymentDate)
+                    ];
+                    if (!searchFields.some(field => field.toLowerCase().includes(searchQuery))) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (filteredPayments.length === 0) {
+                window.toast('No payment data to download', 'error');
+                return;
+            }
+
+            // Create CSV content
+            const headers = ['S.N', 'Member ID', 'Full Name', 'Amount', 'Date', 'Type', 'Method'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredPayments.map((payment, index) => [
+                    index + 1,
+                    payment.memberId,
+                    payment.fullName,
+                    formatCurrency(payment.amount),
+                    formatDate(payment.paymentDate),
+                    payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1),
+                    payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1)
+                ].join(','))
+            ].join('\n');
+
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            const date = new Date().toISOString().split('T')[0];
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `payments_list_${date}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            window.toast('Payment records downloaded successfully', 'success');
+        });
+
+        // Add print button event listener
+        document.getElementById('print').addEventListener('click', () => {
+            // Get the filtered payments
+            const filteredPayments = allPayments.filter(payment => {
+                const dateFilter = document.getElementById('filterDay').value;
+                const methodFilter = document.getElementById('filterMethod').value;
+                const typeFilter = document.getElementById('filterType').value;
+                const searchQuery = document.querySelector('.search-box input').value.toLowerCase();
+
+                // Apply date filter
+                if (dateFilter && dateFilter !== 'all') {
+                    const paymentDate = new Date(payment.paymentDate);
+                    const now = new Date();
+                    let startDate;
+                    switch (dateFilter) {
+                        case 'today':
+                            startDate = new Date(now.setHours(0, 0, 0, 0));
+                            break;
+                        case '7':
+                            startDate = new Date(now.setDate(now.getDate() - 7));
+                            break;
+                        case '30':
+                            startDate = new Date(now.setDate(now.getDate() - 30));
+                            break;
+                        case '90':
+                            startDate = new Date(now.setDate(now.getDate() - 90));
+                            break;
+                        case '180':
+                            startDate = new Date(now.setDate(now.getDate() - 180));
+                            break;
+                        case '365':
+                            startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                            break;
+                    }
+                    if (startDate && paymentDate < startDate) {
+                        return false;
+                    }
+                }
+
+                // Apply method filter
+                if (methodFilter && payment.paymentMethod !== methodFilter) {
+                    return false;
+                }
+
+                // Apply type filter
+                if (typeFilter && payment.paymentType !== typeFilter) {
+                    return false;
+                }
+
+                // Apply search filter
+                if (searchQuery) {
+                    const searchFields = [
+                        payment.memberId,
+                        payment.fullName,
+                        payment.amount.toString(),
+                        formatDate(payment.paymentDate)
+                    ];
+                    if (!searchFields.some(field => field.toLowerCase().includes(searchQuery))) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (filteredPayments.length === 0) {
+                window.toast('No payment data to print', 'error');
+                return;
+            }
+
+            // Create print window
+            const printWindow = window.open('', '_blank');
+
+            // Create print content
+            const printContent = `
+                <html>
+                    <head>
+                        <title>Payments Report</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; }
+                            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background-color: #f5f5f5; }
+                            h1 { text-align: center; }
+                            .header { margin-bottom: 20px; }
+                            .footer { margin-top: 20px; text-align: center; font-size: 12px; }
+                            .summary { margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px; }
+                            .summary-item { margin: 5px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>Payments Report</h1>
+                            <p>Generated on: ${new Date().toLocaleString()}</p>
+                        </div>
+                        <div class="summary">
+                            <div class="summary-item"><strong>Total Records:</strong> ${filteredPayments.length}</div>
+                            <div class="summary-item"><strong>Total Amount:</strong> ${formatCurrency(filteredPayments.reduce((sum, payment) => sum + payment.amount, 0))}</div>
+                            <div class="summary-item"><strong>Date Range:</strong> ${document.getElementById('filterDay').value === 'all' ? 'All Time' : document.getElementById('filterDay').options[document.getElementById('filterDay').selectedIndex].text}</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>S.N</th>
+                                    <th>Member ID</th>
+                                    <th>Full Name</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filteredPayments.map((payment, index) => `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${payment.memberId}</td>
+                                        <td>${payment.fullName}</td>
+                                        <td>${formatCurrency(payment.amount)}</td>
+                                        <td>${formatDate(payment.paymentDate)}</td>
+                                        <td>${payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1)}</td>
+                                        <td>${payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <div class="footer">
+                            <p>© ${new Date().getFullYear()} Knox Barbell - Payments Report</p>
+                        </div>
+                    </body>
+                </html>
+            `;
+
+            // Write content to print window
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.close();
+            };
+
+            window.toast('Printing payment records...', 'success');
         });
     </script>
 
@@ -972,6 +1233,70 @@
     <script src="/js/main.js"></script>
     <script src="./js/logout.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Function to format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'NPR',
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Function to update info boxes
+            async function updateInfoBoxes() {
+                try {
+                    // Fetch revenue data
+                    const response = await fetch('http://localhost:4000/api/payments/stats', {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const stats = data.data;
+                        
+                        // Update Total Revenue
+                        const totalRevenueElement = document.querySelector('.info-box:nth-child(1) .info-box-number');
+                        if (totalRevenueElement) {
+                            totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
+                        }
+
+                        // Update Monthly Revenue
+                        const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2) .info-box-number');
+                        if (monthlyRevenueElement) {
+                            monthlyRevenueElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
+                        }
+
+                        // Update Membership Revenue
+                        const membershipRevenueElement = document.querySelector('.info-box:nth-child(3) .info-box-number');
+                        if (membershipRevenueElement) {
+                            membershipRevenueElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
+                        }
+
+                        // Update Product Revenue
+                        const productRevenueElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
+                        if (productRevenueElement) {
+                            productRevenueElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
+                        }
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch revenue data');
+                    }
+                } catch (error) {
+                    console.error('Error fetching revenue data:', error);
+                    window.toast('Failed to load revenue data', 'error');
+                }
+            }
+
+            // Initial update
+            await updateInfoBoxes();
+
+            // Update every 5 minutes
+            setInterval(updateInfoBoxes, 300000);
+        });
+    </script>
 
 </body>
 
