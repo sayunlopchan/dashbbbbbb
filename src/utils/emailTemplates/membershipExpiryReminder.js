@@ -1,49 +1,154 @@
 export const membershipExpiryReminderTemplate = ({
-  fullName,
-  memberId,
-  membershipType,
-  expiryDate,
-  reminderCount,
-  daysUntilExpiry,
-  customMessage
+  fullName = 'Member',
+  memberId = 'N/A',
+  membershipType = 'Standard',
+  expiryDate = 'N/A',
+  reminderCount = 1,
+  daysUntilExpiry = 0,
+  customMessage = 'Your membership is about to expire.'
 }) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Membership Expiry Reminder</title>
+  <style>
+    /* Base styles */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Header */
+    .header {
+      background-color: #f4f4f4;
+      padding: 20px;
+      text-align: center;
+      border-radius: 5px 5px 0 0;
+    }
+    
+    /* Content */
+    .content {
+      background-color: #ffffff;
+      padding: 20px;
+      border: 1px solid #f4f4f4;
+    }
+    
+    /* Alert box */
+    .alert {
+      background-color: #f9f9f9;
+      border-left: 4px solid #007bff;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 0 5px 5px 0;
+    }
+    
+    /* Details box */
+    .details {
+      background-color: #f4f4f4;
+      border-radius: 5px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    
+    .details ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .details li {
+      margin-bottom: 10px;
+    }
+    
+    /* Button */
+    .button {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 0.8em;
+      color: #666;
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f4f4f4;
+      border-radius: 0 0 5px 5px;
+    }
+    
+    /* Responsive styles */
+    @media only screen and (max-width: 600px) {
+      .container {
+        width: 100% !important;
+        padding: 10px !important;
+      }
+      
+      .content {
+        padding: 15px !important;
+      }
+      
+      .button {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <header style="background-color: #f4f4f4; padding: 10px; text-align: center;">
-    <h1>Membership Status Update</h1>
-  </header>
-  
-  <main>
-    <p>Dear ${fullName},</p>
-    
-    <div style="background-color: #f9f9f9; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0;">
-      <p style="margin: 0; color: #333;">${customMessage}</p>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0; color: #333;">Membership Status Update</h1>
     </div>
     
-    <div style="background-color: #f4f4f4; border-radius: 5px; padding: 15px; margin: 20px 0;">
-      <h2 style="margin-top: 0; color: #333;">Membership Details</h2>
-      <ul style="list-style-type: none; padding: 0;">
-        <li><strong>Member ID:</strong> ${memberId}</li>
-        <li><strong>Membership Type:</strong> ${membershipType}</li>
-        <li><strong>Expiry Date:</strong> ${expiryDate}</li>
-        ${daysUntilExpiry > 0 ? `<li><strong>Days Remaining:</strong> ${daysUntilExpiry}</li>` : ''}
-      </ul>
+    <div class="content">
+      <p>Dear ${fullName},</p>
+      
+      <div class="alert">
+        <p style="margin: 0; color: #333;">${customMessage}</p>
+      </div>
+      
+      <div class="details">
+        <h2 style="margin-top: 0; color: #333;">Membership Details</h2>
+        <ul>
+          <li><strong>Member ID:</strong> ${memberId}</li>
+          <li><strong>Membership Type:</strong> ${membershipType}</li>
+          <li><strong>Expiry Date:</strong> ${expiryDate}</li>
+          ${daysUntilExpiry > 0 ? `<li><strong>Days Remaining:</strong> ${daysUntilExpiry}</li>` : ''}
+        </ul>
+      </div>
+      
+      <div style="text-align: center;">
+        <a href="#" class="button">Renew Membership</a>
+      </div>
     </div>
     
-    <div style="text-align: center; margin-top: 20px;">
-      <a href="#" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Renew Membership</a>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} Your Organization. All rights reserved.</p>
+      <p>Reminder ${reminderCount} of 3</p>
     </div>
-  </main>
-  
-  <footer style="margin-top: 20px; text-align: center; font-size: 0.8em; color: #666;">
-    <p>© ${new Date().getFullYear()} Your Organization. All rights reserved.</p>
-    <p>Reminder ${reminderCount} of 3</p>
-  </footer>
+  </div>
 </body>
 </html>
 `; 

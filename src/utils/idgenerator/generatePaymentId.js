@@ -1,4 +1,4 @@
-import Counter from '../../models/Counter.model.js';
+import Counter from '../../models/counter.model.js';
 
 const generatePaymentId = async () => {
   try {
@@ -23,7 +23,7 @@ const generatePaymentId = async () => {
     const paddedSequence = counter.count.toString().padStart(4, '0');
 
     // Generate payment ID with KBP prefix
-    return `KBP${paddedSequence}`;
+    return `KB-PAY${paddedSequence}`;
   } catch (error) {
     throw new Error(`Failed to generate payment ID: ${error.message}`);
   }

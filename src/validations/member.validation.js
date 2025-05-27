@@ -22,7 +22,7 @@ export const validateMember = (req, res, next) => {
       .valid("silver", "gold", "diamond", "platinum")
       .optional(),
     memberStatus: Joi.string()
-      .valid("active", "inactive", "pending")
+      .valid("active", "inactive", "pending", "cancelled", "expiring", "expired")
       .optional()
       .default("pending"),
   }).unknown(true); // Allow additional fields

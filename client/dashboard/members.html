@@ -741,7 +741,7 @@
                     }
                 } else if (currentAction === 'delete_payment' && currentMemberId) {
                     try {
-                        const response = await fetch(`http://localhost:4000/api/payments/${currentMemberId}`, {
+                        const response = await fetch(`${baseUrl}/api/payments/${currentMemberId}`, {
                             method: 'DELETE',
                             headers: {
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -1148,7 +1148,7 @@
                 // MemberStatus
                 const statusInput = memberDetailModal.querySelector('.memberStatus');
                 if (statusInput && member.memberStatus) {
-                    const validStatuses = ['pending', 'active', 'inactive', 'cancelled'];
+                    const validStatuses = ['pending', 'active', 'inactive', 'cancelled', 'expiring', 'expired'];
                     if (validStatuses.includes(member.memberStatus)) {
                         statusInput.value = member.memberStatus;
                     } else {
@@ -1174,7 +1174,7 @@
 
                 // Fetch attendance for current month
                 try {
-                    const attendanceResponse = await fetch(`http://localhost:4000/api/attendances/member/${member.memberId}`);
+                    const attendanceResponse = await fetch(`${baseUrl}/api/attendances/member/${member.memberId}`);
                     const attendanceData = await attendanceResponse.json();
 
                     if (attendanceData.success) {
@@ -2249,7 +2249,7 @@
             // Fetch unread count
             async function fetchUnreadCount() {
                 try {
-                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
                     const data = await response.json();
                     if (data.success) {
                         notificationBadge.textContent = data.data.unreadCount;
@@ -2270,7 +2270,7 @@
                         </div>
                     `;
 
-                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const response = await fetch(`${baseUrl}/api/notifications`);
                     const data = await response.json();
 
                     if (data.success) {
@@ -2306,7 +2306,7 @@
                                 const notificationId = item.dataset.notificationId;
                                 if (item.classList.contains('unread')) {
                                     try {
-                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
                                             method: 'PATCH',
                                             credentials: 'include'
                                         });
@@ -2358,8 +2358,7 @@
             setInterval(fetchUnreadCount, 30000); // Every 30 seconds
         });
     </script>
-    <script src="./js/logout.js"></script>
-    
+    <script src="./js/logout.js"></script>  
 </body>
 
 </html>

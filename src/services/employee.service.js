@@ -1,4 +1,4 @@
-import Employee from "../models/Employee.model.js";
+import Employee from "../models/employee.model.js";
 import { generateEmployeeId } from "../utils/idgenerator/generateEmployeeId.js";
 
 /**

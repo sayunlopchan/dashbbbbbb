@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         async function createFinanceBarChart() {
             try {
                 // Fetch payment data for the current year
-                const response = await fetch(`http://localhost:4000/api/payments?year=${currentYear}`, {
+                const response = await fetch(`${baseUrl}/api/payments?year=${currentYear}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 console.log('Creating finance pie chart...');
                 // Fetch payment data
-                const response = await fetch('http://localhost:4000/api/payments/stats', {
+                const response = await fetch(`${baseUrl}/api/payments/stats`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }

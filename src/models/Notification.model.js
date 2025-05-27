@@ -10,6 +10,7 @@ const notificationSchema = new mongoose.Schema(
         "membershipExpiry",
         "MEMBER_START_PENDING",
         "MEMBERSHIP_EXPIRING",
+        "MEMBERSHIP_EXPIRED",
         "MEMBERSHIP_CANCELLED",
       ],
       required: true,

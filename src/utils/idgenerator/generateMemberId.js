@@ -1,9 +1,9 @@
 // utils/generateMemberId.js
-import Counter from "../../models/Counter.model.js";
+import Counter from "../../models/counter.model.js";
 
 /**
- * Generate a new unique member ID with prefix "KB"
- * e.g., KB01, KB02, ...,
+ * Generate a new unique member ID with prefix "KB-M"
+ * e.g., KB-M01, KB-M02, ...,
  */
 export const generateMemberId = async () => {
   try {
@@ -18,7 +18,7 @@ export const generateMemberId = async () => {
     }
 
     const paddedSeq = counter.count.toString().padStart(2, "0");
-    return `KB${paddedSeq}`;
+    return `KB-M${paddedSeq}`;
   } catch (error) {
     console.error('Error generating member ID:', error);
     throw new Error('Failed to generate member ID');

@@ -1,4 +1,4 @@
-import Announcement from "../models/Announcement.model.js";
+import Announcement from "../models/announcement.model.js";
 import generateAnnouncementId from "../utils/idgenerator/generateAnnouncementId.js";
 import mongoose from "mongoose";
 

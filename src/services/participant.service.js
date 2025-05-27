@@ -1,5 +1,5 @@
-import Participant from "../models/Participant.model.js";
-import Event from "../models/Event.model.js";
+import Participant from "../models/participant.model.js";
+import Event from "../models/event.model.js";
 
 export const addParticipantService = async (eventId, participantInfo) => {
   // Check if event exists

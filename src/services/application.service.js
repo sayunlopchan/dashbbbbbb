@@ -1,5 +1,5 @@
-import Application from "../models/Application.model.js";
-import Member from "../models/Member.model.js";
+import Application from "../models/application.model.js";
+import Member from "../models/member.model.js";
 import * as memberService from "./member.service.js";
 import * as applicationHistoryService from "./applicationHistory.service.js";
 import { generateMemberId } from "../utils/idgenerator/generateMemberId.js";

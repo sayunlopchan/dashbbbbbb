@@ -1,4 +1,4 @@
-import ApplicationHistory from "../models/ApplicationHistory.model.js";
+import ApplicationHistory from "../models/applicationHistory.model.js";
 
 // Get all application history
 export const getAllApplicationHistoryService = async () => {

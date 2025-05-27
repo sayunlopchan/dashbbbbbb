@@ -77,7 +77,7 @@ const MemberSchema = new mongoose.Schema(
     },
     memberStatus: {
       type: String,
-      enum: ["active", "inactive", "pending", "cancelled"],
+      enum: ["active", "inactive", "pending", "cancelled", "expiring", "expired"],
       default: "pending",
     },
     payments: [

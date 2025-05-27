@@ -1,5 +1,5 @@
 // services/trainer.service.js
-import Trainer from "../models/Trainer.model.js";
+import Trainer from "../models/trainer.model.js";
 import { generateTrainerId } from "../utils/idgenerator/generateTrainerId.js";
 
 // Custom error class for service-level errors

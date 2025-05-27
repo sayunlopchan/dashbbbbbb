@@ -508,7 +508,7 @@
                     </tr>
                 `;
 
-                const response = await fetch(`http://localhost:4000/api/payments?${params}`, {
+                const response = await fetch(`${baseUrl}/api/payments?${params}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -660,7 +660,7 @@
         // Function to delete payment
         async function deletePayment(paymentId) {
             try {
-                const response = await fetch(`http://localhost:4000/api/payments/${paymentId}`, {
+                const response = await fetch(`${baseUrl}/api/payments/${paymentId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -712,7 +712,7 @@
         // Function to fetch and update revenue stats
         async function fetchRevenueStats() {
             try {
-                const response = await fetch('http://localhost:4000/api/payments/stats', {
+                const response = await fetch(`${baseUrl}/api/payments/stats`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -848,8 +848,8 @@
                 }
 
                 const url = mode === 'add'
-                    ? `http://localhost:4000/api/payments/member/${memberId}`
-                    : `http://localhost:4000/api/payments/${recordForm.dataset.paymentId}`;
+                    ? `${baseUrl}/api/payments/member/${memberId}`
+                    : `${baseUrl}/api/payments/${recordForm.dataset.paymentId}`;
 
                 const method = mode === 'add' ? 'POST' : 'PUT';
 
@@ -903,7 +903,7 @@
 
             searchTimeout = setTimeout(async () => {
                 try {
-                    const response = await fetch(`http://localhost:4000/api/members?search=${encodeURIComponent(query)}`, {
+                    const response = await fetch(`${baseUrl}/api/members?search=${encodeURIComponent(query)}`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
@@ -961,7 +961,7 @@
             if (!paymentId) return;
 
             try {
-                const response = await fetch(`http://localhost:4000/api/payments/${paymentId}`, {
+                const response = await fetch(`${baseUrl}/api/payments/${paymentId}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
@@ -1248,7 +1248,7 @@
             async function updateInfoBoxes() {
                 try {
                     // Fetch revenue data
-                    const response = await fetch('http://localhost:4000/api/payments/stats', {
+                    const response = await fetch(`${baseUrl}/api/payments/stats`, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }

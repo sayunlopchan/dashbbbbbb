@@ -1,20 +1,89 @@
 const baseUrl = 'http://localhost:4000';
 
 
-// Toggle sidebar
+// token verification
+document.addEventListener('DOMContentLoaded', async () => {
+    // Function to check authentication status
+    async function checkAuthStatus() {
+        try {
+            const response = await fetch('/api/auth/verify', {
+                method: 'GET',
+                credentials: 'include', // Important for sending cookies
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                // Token is invalid or expired
+                redirectToLogin();
+            }
+        } catch (error) {
+            console.error('Authentication check failed:', error);
+            redirectToLogin();
+        }
+    }
+
+    // Function to redirect to login page
+    function redirectToLogin() {
+        // Clear any stored tokens or user data
+        localStorage.removeItem('rememberedEmail');
+        
+        // Redirect to login page
+        window.location.href = '/unauthorized';
+    }
+
+    // Check authentication status on page load
+    await checkAuthStatus();
+
+    // Optional: Add a periodic check for token validity
+    setInterval(checkAuthStatus, 5 * 60 * 1000); // Check every 5 minutes
+});
+
+
+// Elements
 const toggleSidebar = document.getElementById('toggleSidebar');
 const sidebar = document.querySelector('.sidebar');
 const mobileToggle = document.getElementById('mobileToggle');
 
-toggleSidebar.addEventListener('click', function() {
-    sidebar.classList.toggle('collapsed');
-    sidebar.classList.remove('active');
+// Restore sidebar state on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const isCollapsed = localStorage.getItem('sidebarCollapsed');
+    const isActive = localStorage.getItem('sidebarActive') === 'true';
+
+    // Default to collapsed if no value is stored
+    if (isCollapsed === null || isCollapsed === 'true') {
+        sidebar.classList.add('collapsed');
+    } else {
+        sidebar.classList.remove('collapsed');
+    }
+
+    if (isActive) {
+        sidebar.classList.add('active');
+    } else {
+        sidebar.classList.remove('active');
+    }
 });
 
-mobileToggle.addEventListener('click', function() {
-  sidebar.classList.remove('collapsed');
-  sidebar.classList.toggle('active');
+// Desktop toggle
+toggleSidebar.addEventListener('click', function () {
+    const isCollapsed = sidebar.classList.toggle('collapsed');
+    sidebar.classList.remove('active');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
+    localStorage.setItem('sidebarActive', false);
 });
+
+// Mobile toggle
+mobileToggle.addEventListener('click', function () {
+    sidebar.classList.remove('collapsed');
+    const isActive = sidebar.classList.toggle('active');
+    localStorage.setItem('sidebarCollapsed', false);
+    localStorage.setItem('sidebarActive', isActive);
+});
+
+
 
 // Global Confirmation Dialog Function
 if (typeof window.confirmDialog !== 'function') {
@@ -138,5 +207,3 @@ if (typeof window.toast !== 'function') {
         }, 3000);
     };
 }
-
-

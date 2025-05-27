@@ -1,4 +1,4 @@
-import Event from "../models/Event.model.js";
+import Event from "../models/event.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import generateEventId from "../utils/idgenerator/generateEventId.js";
 import fs from 'fs';

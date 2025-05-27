@@ -37,23 +37,37 @@ body {
 
 
 
-/* Sidebar Styles */
+/* Sidebar base styles */
 .sidebar {
   width: var(--sidebar-width);
   background-color: var(--primary-color);
   color: white;
   transition: all 0.3s ease;
-  position: sticky;
   height: 100vh;
+  overflow-y: auto;
+  overflow-x: visible;
+  position: sticky;
   top: 0;
   left: 0;
-  overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
 }
 
+.sidebar::-webkit-scrollbar {
+  display: none;
+  /* Safari and Chrome */
+}
+
+/* Collapsed sidebar */
 .sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
+  overflow-y: hidden;
+  /* Remove scroll when collapsed */
 }
 
+/* Sidebar header */
 .sidebar-header {
   padding: 20px;
   display: flex;
@@ -71,6 +85,7 @@ body {
   display: none;
 }
 
+/* Toggle button */
 .toggle-btn {
   background: none;
   border: none;
@@ -79,6 +94,7 @@ body {
   cursor: pointer;
 }
 
+/* Menu list */
 .sidebar-menu {
   padding: 20px 0;
 }
@@ -95,6 +111,7 @@ body {
   color: white;
   text-decoration: none;
   transition: all 0.3s;
+  position: relative;
 }
 
 .sidebar-menu li a.active {
@@ -112,6 +129,7 @@ body {
   text-align: center;
 }
 
+/* Collapse text label */
 .sidebar.collapsed .sidebar-menu li a span {
   display: none;
 }
@@ -125,32 +143,26 @@ body {
   margin-right: 0;
 }
 
-.sidebar-menu li a .tooltip {
-  display: none;
+/* Tooltip styles (used by JS) */
+.tooltip {
   position: absolute;
-  left: calc(100% + 15px);
+  left: 100%;
   top: 50%;
   transform: translateY(-50%);
   background-color: var(--secondary-color);
   color: white;
-  padding: 8px 15px;
+  padding: 6px 12px;
   border-radius: 4px;
   white-space: nowrap;
   z-index: 1100;
-  /* Higher than sidebar z-index */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  margin-left: 10px;
   opacity: 0;
-  transition: opacity 0.3s, transform 0.3s;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
 }
 
-.sidebar.collapsed .sidebar-menu li:hover .tooltip {
-  display: block;
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-}
-
-.sidebar.collapsed .sidebar-menu li a .tooltip::before {
+.tooltip::before {
   content: '';
   position: absolute;
   left: -5px;
@@ -162,6 +174,12 @@ body {
   border-bottom: 5px solid transparent;
   border-right: 5px solid var(--secondary-color);
 }
+
+.tooltip.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 
 
 /* Topbar Styles */
@@ -566,9 +584,11 @@ body {
   gap: 15px;
   margin-bottom: 15px;
 }
+
 .form-grid-event {
   grid-template-columns: 1fr 1fr;
 }
+
 .form-grid-announcement {
   grid-template-columns: 1fr;
 }
@@ -596,7 +616,7 @@ body {
   grid-column: span 2;
 }
 
-textarea{
+textarea {
   width: 100%;
 }
 
@@ -813,6 +833,8 @@ textarea{
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
+    overflow-y: auto;
+    max-height: 60vh;
   }
 
   .form-group.full-width {
@@ -1130,4 +1152,10 @@ textarea{
   padding: 20px;
   text-align: center;
   color: #666;
+}
+
+
+/* event modal preview-image */
+.preview-image {
+  width: 100px;
 }

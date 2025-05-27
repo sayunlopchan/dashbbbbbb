@@ -1,5 +1,5 @@
-import Payment from "../models/Payment.model.js";
-import Member from "../models/Member.model.js";
+import Payment from "../models/payment.model.js";
+import Member from "../models/member.model.js";
 import generatePaymentId from "../utils/idgenerator/generatePaymentId.js";
 import mongoose from "mongoose";
 

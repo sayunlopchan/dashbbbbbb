@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knox Barbell - Admin Dashboard</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/dash.css">
@@ -124,7 +125,7 @@
                 <div class="notification">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">0</span>
-                    
+
                     <!-- Notification Modal -->
                     <div class="notification-modal">
                         <div class="notification-header">
@@ -195,7 +196,7 @@
                     <div class="info-box-header">
                         <span class="info-box-title">Revenue</span>
                         <div class="info-box-icon revenue">
-                            <i class="fas fa-rupee-sign"></i>
+                            <i class="fas fa-dollar-sign"></i>
                         </div>
                     </div>
                     <div class="info-box-content">
@@ -321,7 +322,9 @@
 
     <script src="/js/main.js"></script>
     <script src="./js/logout.js"></script>
+    <script src="./js/dashboardChart.js"></script>
     <script>
+        // dashboard logic
         document.addEventListener('DOMContentLoaded', async () => {
             // Fetch and update dashboard info boxes
             async function updateDashboardInfoBoxes() {
@@ -332,7 +335,7 @@
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     });
-                    
+
                     const membersText = await membersResponse.text();
                     let membersData;
                     try {
@@ -349,7 +352,7 @@
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     });
-                    
+
                     const revenueText = await revenueResponse.text();
                     let revenueData;
                     try {
@@ -383,7 +386,7 @@
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     });
-                    
+
                     const attendancesText = await attendancesResponse.text();
                     let attendancesData;
                     try {
@@ -416,7 +419,7 @@
                             'Authorization': `Bearer ${localStorage.getItem('token')}`
                         }
                     });
-                    
+
                     const eventsText = await eventsResponse.text();
                     let eventsData;
                     try {
@@ -424,7 +427,7 @@
                     } catch (parseError) {
                         throw new Error('Invalid events data format');
                     }
-                    
+
                     // Count upcoming events
                     let upcomingEventsCount = 0;
                     if (eventsData && eventsData.docs && Array.isArray(eventsData.docs)) {
@@ -598,6 +601,7 @@
             // Call the function when the dashboard loads
             await fetchMembersExpiringWithin7Days();
         });
+
         // Function to fetch and update upcoming event count
         async function updateUpcomingEventCount() {
             try {
@@ -607,7 +611,7 @@
                     }
                 });
                 const rawText = await response.text();
-                
+
                 // Try to parse the JSON
                 let data;
                 try {
@@ -615,20 +619,20 @@
                 } catch (parseError) {
                     throw new Error('Invalid JSON response from server');
                 }
-                
+
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
-                
+
                 // Get current date
                 const currentDate = new Date();
-                
+
                 // Filter upcoming events
                 const upcomingEvents = data.docs.filter(event => {
                     const eventDate = new Date(event.startTime);
                     return eventDate > currentDate;
                 });
-                
+
                 // Update the count in the events info box
                 const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
                 if (eventCountElement) {
@@ -645,38 +649,32 @@
         // Function to fetch and display events and announcements
         async function updateEventsAndAnnouncements() {
             try {
-                console.log('Starting to fetch events and announcements...');
+    
 
                 // Fetch events
-                console.log('Fetching events from:', `${baseUrl}/api/events`);
                 const eventsResponse = await fetch(`${baseUrl}/api/events`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                console.log('Events Response Status:', eventsResponse.status);
-                
+
                 const eventsText = await eventsResponse.text();
-                console.log('Events Raw Response:', eventsText);
-                
+    
                 let eventsData;
                 try {
                     eventsData = JSON.parse(eventsText);
-                    console.log('Events Parsed Data:', eventsData);
+            
                 } catch (parseError) {
-                    console.error('Error parsing events data:', parseError);
                     throw new Error('Invalid events data format');
                 }
 
                 if (!eventsData.success) {
-                    console.error('Events API Error:', eventsData.message);
                     throw new Error(eventsData.message || 'Failed to fetch events');
                 }
 
                 // Get current date
                 const currentDate = new Date();
-                console.log('Current date for filtering events:', currentDate);
-                
+
                 // Filter and sort upcoming events
                 const upcomingEvents = eventsData.docs
                     .filter(event => {
@@ -684,17 +682,14 @@
                             if (!event.startTime) return false;
                             const eventDate = new Date(event.startTime);
                             const isUpcoming = eventDate > currentDate;
-                            console.log('Event:', event.title, 'Date:', eventDate, 'Is Upcoming:', isUpcoming);
                             return isUpcoming;
                         } catch (error) {
-                            console.error('Error processing event date:', error);
                             return false;
                         }
                     })
                     .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
                     .slice(0, 2); // Get only 2 most recent upcoming events
 
-                console.log('Filtered Upcoming Events:', upcomingEvents);
 
                 // Update events container
                 const eventsContainer = document.querySelector('.events-container');
@@ -705,7 +700,7 @@
                             const event = upcomingEvents[index];
                             card.style.display = 'block';
                             card.querySelector('.event-title').textContent = event.title;
-                            
+
                             // Handle description which is an array of strings
                             let descriptionText = 'No description available';
                             if (event.description && Array.isArray(event.description)) {
@@ -715,44 +710,35 @@
                                 }
                             }
                             card.querySelector('.event-description').textContent = descriptionText;
-                            
-                            console.log('Updated event card:', index, 'with event:', event.title);
+
                         } else {
                             card.style.display = 'none';
-                            console.log('Hiding event card:', index, 'no event data available');
                         }
                     });
                 }
 
                 // Fetch announcements
-                console.log('Fetching announcements from:', `${baseUrl}/api/announcements`);
                 const announcementsResponse = await fetch(`${baseUrl}/api/announcements`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                console.log('Announcements Response Status:', announcementsResponse.status);
-                
+
                 const announcementsText = await announcementsResponse.text();
-                console.log('Announcements Raw Response:', announcementsText);
-                
+
                 let announcementsData;
                 try {
                     announcementsData = JSON.parse(announcementsText);
-                    console.log('Announcements Parsed Data:', announcementsData);
                 } catch (parseError) {
-                    console.error('Error parsing announcements data:', parseError);
                     throw new Error('Invalid announcements data format');
                 }
 
-                if (!announcementsData.success) {
-                    console.error('Announcements API Error:', announcementsData.message);
+                if (!announcementsData.success) { 
                     throw new Error(announcementsData.message || 'Failed to fetch announcements');
                 }
 
                 // Get most recent announcement
                 const recentAnnouncement = announcementsData.docs[0];
-                console.log('Recent Announcement:', recentAnnouncement);
 
                 // Update announcements container
                 const announcementsContainer = document.querySelector('.announcements-container');
@@ -762,33 +748,24 @@
                         if (recentAnnouncement) {
                             announcementItem.style.display = 'block';
                             announcementItem.querySelector('.announcement-title').textContent = recentAnnouncement.title;
-                            announcementItem.querySelector('.announcement-description').textContent = 
+                            announcementItem.querySelector('.announcement-description').textContent =
                                 recentAnnouncement.description ? recentAnnouncement.description.substring(0, 150) + '...' : 'No description available';
-                            announcementItem.querySelector('.announcement-meta span:first-child').textContent = 
+                            announcementItem.querySelector('.announcement-meta span:first-child').textContent =
                                 `by ${recentAnnouncement.authorName || 'Unknown'}`;
-                            announcementItem.querySelector('.announcement-meta span:last-child').textContent = 
+                            announcementItem.querySelector('.announcement-meta span:last-child').textContent =
                                 new Date(recentAnnouncement.createdAt).toLocaleDateString();
-                            console.log('Updated announcement with:', recentAnnouncement.title);
                         } else {
                             announcementItem.style.display = 'none';
-                            console.log('No announcements available to display');
                         }
                     }
                 }
 
-                console.log('Events and announcements update completed successfully');
 
             } catch (error) {
-                console.error('Error updating events and announcements:', error);
-                console.error('Error details:', {
-                    message: error.message,
-                    stack: error.stack
-                });
-                
                 // Show error state in UI
                 const eventsContainer = document.querySelector('.events-container');
                 const announcementsContainer = document.querySelector('.announcements-container');
-                
+
                 if (eventsContainer) {
                     const eventCards = eventsContainer.querySelectorAll('.event-card');
                     eventCards.forEach(card => {
@@ -797,7 +774,7 @@
                         card.querySelector('.event-description').textContent = 'Please try again later';
                     });
                 }
-                
+
                 if (announcementsContainer) {
                     const announcementItem = announcementsContainer.querySelector('.announcement-item');
                     if (announcementItem) {
@@ -815,12 +792,9 @@
             updateUpcomingEventCount();
             updateEventsAndAnnouncements();
         });
-    </script>
-    <script src="./js/dashboard.js"></script>
-    <script src="./js/dashboardChart.js"></script>
-    <script>
-        // Notification Modal Logic
-        document.addEventListener('DOMContentLoaded', function() {
+
+
+        document.addEventListener('DOMContentLoaded', function () {
             const notificationIcon = document.querySelector('.notification');
             const notificationModal = document.querySelector('.notification-modal');
             const closeNotifications = document.querySelector('.close-notifications');
@@ -828,7 +802,7 @@
             const notificationBadge = document.querySelector('.notification-badge');
 
             // Toggle notification modal
-            notificationIcon.addEventListener('click', function(e) {
+            notificationIcon.addEventListener('click', function (e) {
                 e.stopPropagation();
                 notificationModal.classList.toggle('active');
                 if (notificationModal.classList.contains('active')) {
@@ -837,13 +811,13 @@
             });
 
             // Close notification modal
-            closeNotifications.addEventListener('click', function(e) {
+            closeNotifications.addEventListener('click', function (e) {
                 e.stopPropagation();
                 notificationModal.classList.remove('active');
             });
 
             // Close modal when clicking outside
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
                     notificationModal.classList.remove('active');
                 }
@@ -852,16 +826,14 @@
             // Fetch unread count
             async function fetchUnreadCount() {
                 try {
-                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
                     const data = await response.json();
                     if (data.success) {
                         notificationBadge.textContent = data.data.unreadCount;
                         // Show/hide badge based on count
                         notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
                     }
-                } catch (error) {
-                    console.error('Error fetching unread count:', error);
-                }
+                } catch (error) {}
             }
 
             // Fetch notifications from API
@@ -873,12 +845,12 @@
                         </div>
                     `;
 
-                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const response = await fetch(`${baseUrl}/api/notifications`);
                     const data = await response.json();
 
                     if (data.success) {
                         const notifications = data.data;
-                        
+
                         if (notifications.length === 0) {
                             notificationList.innerHTML = `
                                 <div class="notification-empty">
@@ -909,22 +881,21 @@
                                 const notificationId = item.dataset.notificationId;
                                 if (item.classList.contains('unread')) {
                                     try {
-                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
                                             method: 'PATCH',
                                             credentials: 'include'
                                         });
-                                        
+
                                         if (response.ok) {
                                             // Update UI
                                             item.classList.remove('unread');
                                             const unreadDot = item.querySelector('.unread-dot');
                                             if (unreadDot) unreadDot.remove();
-                                            
+
                                             // Update unread count
                                             await fetchUnreadCount();
                                         }
                                     } catch (error) {
-                                        console.error('Error marking notification as read:', error);
                                     }
                                 }
 
@@ -939,7 +910,6 @@
                         throw new Error(data.message || 'Failed to fetch notifications');
                     }
                 } catch (error) {
-                    console.error('Error fetching notifications:', error);
                     notificationList.innerHTML = `
                         <div class="notification-empty">
                             <i class="fas fa-exclamation-circle"></i>
@@ -957,40 +927,6 @@
             setInterval(fetchUnreadCount, 30000); // Every 30 seconds
         });
     </script>
-    <style>
-        .unread-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--danger-color);
-            border-radius: 50%;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        .notification-badge {
-            display: none; /* Hidden by default, shown only when there are unread notifications */
-        }
-
-        .notification-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .view-all-link {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .view-all-link:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-    </style>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-import Counter from '../../models/Counter.model.js';
+import Counter from '../../models/counter.model.js';
 
 const generateApplicationId = async () => {
   const COUNTER_NAME = 'application_counter';
@@ -19,7 +19,7 @@ const generateApplicationId = async () => {
     const paddedSequence = (counter.count || 1).toString().padStart(2, '0');
 
     // Generate the application ID with KBA prefix
-    return `KBA${paddedSequence}`;
+    return `KB-APP${paddedSequence}`;
   } catch (error) {
     console.error('Error generating application ID:', error);
     

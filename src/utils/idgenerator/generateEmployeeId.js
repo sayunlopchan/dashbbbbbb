@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Counter from "../../models/Counter.model.js";
+import Counter from "../../models/counter.model.js";
 
 /**
  * Generate a new unique employee ID with prefix "EMP"

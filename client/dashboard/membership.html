@@ -261,7 +261,7 @@
             // Fetch unread count
             async function fetchUnreadCount() {
                 try {
-                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
                     const data = await response.json();
                     if (data.success) {
                         notificationBadge.textContent = data.data.unreadCount;
@@ -282,7 +282,7 @@
                         </div>
                     `;
 
-                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const response = await fetch(`${baseUrl}/api/notifications`);
                     const data = await response.json();
 
                     if (data.success) {
@@ -318,7 +318,7 @@
                                 const notificationId = item.dataset.notificationId;
                                 if (item.classList.contains('unread')) {
                                     try {
-                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
                                             method: 'PATCH',
                                             credentials: 'include'
                                         });

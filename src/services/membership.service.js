@@ -1,4 +1,4 @@
-import Membership from "../models/Membership.model.js";
+import Membership from "../models/membership.model.js";
 
 /**
  * Create a new membership

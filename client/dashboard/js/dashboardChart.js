@@ -381,7 +381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function fetchMembershipData() {
         try {
-            const response = await fetch('http://localhost:4000/api/members', {
+            const response = await fetch(`${baseUrl}/api/members`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }

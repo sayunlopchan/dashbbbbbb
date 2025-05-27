@@ -1,6 +1,6 @@
 import * as memberService from "../services/member.service.js";
 import { generateMemberId } from "../utils/idgenerator/generateMemberId.js";
-import Member from "../models/Member.model.js";
+import Member from "../models/member.model.js";
 
 // Create Member
 export const createMember = async (req, res) => {

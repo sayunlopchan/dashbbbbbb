@@ -34,6 +34,13 @@
         </a>
       </li>
       <li>
+        <a href="/application">
+          <i class="fas fa-user"></i>
+          <span>Application</span>
+          <div class="tooltip">Application</div>
+        </a>
+      </li>
+      <li>
         <a href="/membership">
           <i class="fas fa-id-card"></i>
           <span>Membership</span>
@@ -91,159 +98,161 @@
       </li>
       <li class="logout-item">
         <a href="#" id="logoutButton">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-            <div class="tooltip">Logout</div>
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+          <div class="tooltip">Logout</div>
         </a>
-    </li>
+      </li>
     </ul>
   </div>
 
-     <!-- Main Content -->
-     <div class="main-content">
-      <!-- Topbar -->
-      <div class="topbar">
-          <div class="topbar-left">
-              <button class="mobile-toggle" id="mobileToggle">
-                  <i class="fas fa-bars"></i>
-              </button>
-              <h3>Products</h3>
-          </div>
-          <div class="topbar-right">
-              <!-- notification  -->
-              <div class="notification">
-                  <i class="fas fa-bell"></i>
-                  <span class="notification-badge">0</span>
-                  
-                  <!-- Notification Modal -->
-                  <div class="notification-modal">
-                      <div class="notification-header">
-                          <h3>Notifications</h3>
-                          <div class="notification-actions">
-                              <a href="/notifications" class="view-all-link">View All</a>
-                              <button class="close-notifications">
-                                  <i class="fas fa-times"></i>
-                              </button>
-                          </div>
-                      </div>
-                      <div class="notification-list">
-                          <!-- Notifications will be populated here -->
-                          <div class="notification-loading">
-                              <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-                          </div>
-                      </div>
-                  </div>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-toggle" id="mobileToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h3>Products</h3>
+      </div>
+      <div class="topbar-right">
+        <!-- notification  -->
+        <div class="notification">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">0</span>
+
+          <!-- Notification Modal -->
+          <div class="notification-modal">
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <div class="notification-actions">
+                <a href="/notifications" class="view-all-link">View All</a>
+                <button class="close-notifications">
+                  <i class="fas fa-times"></i>
+                </button>
               </div>
-              <div class="user-greeting">
-                  <img src="/img/Knox Logo-01.png" alt="User">
-                  <span>Hello, Knox Barbell</span>
+            </div>
+            <div class="notification-list">
+              <!-- Notifications will be populated here -->
+              <div class="notification-loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
               </div>
+            </div>
           </div>
+        </div>
+        <div class="user-greeting">
+          <img src="/img/Knox Logo-01.png" alt="User">
+          <span>Hello, Knox Barbell</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Content Header -->
+      <div class="content-header">
+        <h1>Product Management</h1>
+        <div class="header-actions">
+          <button id="downloadProducts" title="Download CSV">
+            <i class="fa-solid fa-download"></i>
+          </button>
+          <button id="printProducts" title="Print">
+            <i class="fa-solid fa-print"></i>
+          </button>
+          <button id="addProductBtn">
+            <span>+</span>
+            <p>Add Product</p>
+          </button>
+        </div>
       </div>
 
-      <!-- Content -->
-      <div class="content">
-          <!-- Content Header -->
-          <div class="content-header">
-              <h1>Product Management</h1>
-              <div class="header-actions">
-                  <select id="categoryFilter">
-                      <option value="">All Categories</option>
-                      <option value="supplements">Supplements</option>
-                      <option value="equipment">Equipment</option>
-                      <option value="clothing">Clothing</option>
-                      <option value="accessories">Accessories</option>
-                  </select>
-                  <button id="resetProductFilters" title="Reset Filters">
-                      <i class="fa-solid fa-rotate"></i>
-                  </button>
-                  <button id="downloadProducts" title="Download CSV">
-                      <i class="fa-solid fa-download"></i>
-                  </button>
-                  <button id="printProducts" title="Print">
-                      <i class="fa-solid fa-print"></i>
-                  </button>
-                  <button id="addProductBtn">
-                      <span>+</span>
-                      <p>Add Product</p>
-                  </button>
-              </div>
-          </div>
-
-          <!-- Filters Section -->
-          <div class="filters">
-              <!-- search filter -->
-              <div class="filter-group search-box">
-                  <i class="fas fa-search"></i>
-                  <input type="text" id="productSearch" placeholder="Search products..." autocomplete="off">
-              </div>
-              <!-- stock filter -->
-              <div class="filter-group">
-                  <label for="stockStatus">Stock Status:</label>
-                  <select id="stockStatus">
-                      <option value="">All</option>
-                      <option value="in-stock">In Stock</option>
-                      <option value="low-stock">Low Stock</option>
-                      <option value="out-of-stock">Out of Stock</option>
-                  </select>
-              </div>
-              <!-- price range filter -->
-              <div class="filter-group">
-                  <label for="priceRange">Price Range:</label>
-                  <select id="priceRange">
-                      <option value="">All</option>
-                      <option value="0-50">$0 - $50</option>
-                      <option value="51-100">$51 - $100</option>
-                      <option value="101-200">$101 - $200</option>
-                      <option value="201+">$201+</option>
-                  </select>
-              </div>
-          </div>
-
-          <!-- Products Table -->
-          <div class="table-container">
-              <table class="members-table">
-                  <thead>
-                      <tr>
-                          <th>S.N</th>
-                          <th>Product ID</th>
-                          <th>Name</th>
-                          <th>Category</th>
-                          <th>Price</th>
-                          <th>Stock</th>
-                          <th>Status</th>
-                          <th>Action</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr>
-                          <td>1</td>
-                          <td>loading...</td>
-                          <td>loading...</td>
-                          <td>loading...</td>
-                          <td>loading...</td>
-                          <td>loading...</td>
-                          <td><span class="status">loading...</span></td>
-                          <td>
-                              <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                              <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                          </td>
-                      </tr>
-                  </tbody>
-              </table>
-          </div>
-
-          <!-- Pagination Controls -->
-          <div class="pagination-controls">
-              <button id="prevPage" class="pagination-btn" disabled>
-                  <i class="fas fa-chevron-left"></i> Previous
-              </button>
-              <span id="pageInfo">Page 1</span>
-              <button id="nextPage" class="pagination-btn" disabled>
-                  Next <i class="fas fa-chevron-right"></i>
-              </button>
-          </div>
+      <!-- Filters Section -->
+      <div class="filters">
+        <!-- search filter -->
+        <div class="filter-group search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="productSearch" placeholder="Search products..." autocomplete="off">
+        </div>
+        <!-- stock filter -->
+        <div class="filter-group">
+          <label for="stockStatus">Stock Status:</label>
+          <select id="stockStatus">
+            <option value="">All</option>
+            <option value="in-stock">In Stock</option>
+            <option value="low-stock">Low Stock</option>
+            <option value="out-of-stock">Out of Stock</option>
+          </select>
+        </div>
+        <!-- price range filter -->
+        <div class="filter-group">
+          <label for="priceRange">Price Range:</label>
+          <select id="priceRange">
+            <option value="">All</option>
+            <option value="0-50">$0 - $50</option>
+            <option value="51-100">$51 - $100</option>
+            <option value="101-200">$101 - $200</option>
+            <option value="201+">$201+</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select id="categoryFilter">
+            <option value="">All Categories</option>
+            <option value="supplements">Supplements</option>
+            <option value="equipment">Equipment</option>
+            <option value="clothing">Clothing</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+        <button id="resetProductFilters" title="Reset Filters">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
       </div>
+
+      <!-- Products Table -->
+      <div class="table-container">
+        <table class="members-table">
+          <thead>
+            <tr>
+              <th>S.N</th>
+              <th>Product ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>loading...</td>
+              <td>loading...</td>
+              <td>loading...</td>
+              <td>loading...</td>
+              <td>loading...</td>
+              <td><span class="status">loading...</span></td>
+              <td>
+                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-controls">
+        <button id="prevPage" class="pagination-btn" disabled>
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <span id="pageInfo">Page 1</span>
+        <button id="nextPage" class="pagination-btn" disabled>
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
 
   </div>
 
@@ -251,12 +260,14 @@
   <div class="modal-overlay" id="addProductModal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Add New Product</h2>
-        <p>Fill in the details to add a new product.</p>
+        <div>
+          <h2>Add New Product</h2>
+          <p>Fill in the details to add a new product.</p>
+        </div>
       </div>
       <form id="productForm">
         <div class="form-grid">
-          <div class="form-group full-width">
+          <div class="form-group">
             <label for="productName">Product Name</label>
             <input type="text" id="productName" required>
           </div>
@@ -278,22 +289,9 @@
             <label for="productStock">Stock Quantity</label>
             <input type="number" id="productStock" min="0" required>
           </div>
-          <div class="form-group">
+          <div class="form-group full-width">
             <label for="productDescription">Description</label>
             <textarea id="productDescription" rows="3" required></textarea>
-          </div>
-          <div class="form-group">
-            <label>Status</label>
-            <div class="radio-group">
-              <div class="radio-option">
-                <input type="radio" id="statusActive" name="status" value="active" checked>
-                <label for="statusActive">Active</label>
-              </div>
-              <div class="radio-option">
-                <input type="radio" id="statusInactive" name="status" value="inactive">
-                <label for="statusInactive">Inactive</label>
-              </div>
-            </div>
           </div>
         </div>
         <div class="form-actions">
@@ -305,8 +303,8 @@
   </div>
 
   <script>
-    // DOM Elements
-    const addProductBtn = document.getElementById('addProductBtn');
+   // DOM Elements
+   const addProductBtn = document.getElementById('addProductBtn');
     const addProductModal = document.getElementById('addProductModal');
     const cancelBtn = document.getElementById('cancelBtn');
     const productForm = document.getElementById('productForm');
@@ -320,10 +318,26 @@
     let totalPages = 1;
     const itemsPerPage = 10;
     let allProducts = []; // Store all products
+    let filteredProducts = []; // Store filtered products
 
     // Utility Functions
     const toast = (message, type = 'success') => {
-      window.toast(message, type);
+      // Simple toast implementation
+      const toastEl = document.createElement('div');
+      toastEl.className = `toast toast-${type}`;
+      toastEl.textContent = message;
+      toastEl.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 4px;
+        color: white;
+        z-index: 10000;
+        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
+      `;
+      document.body.appendChild(toastEl);
+      setTimeout(() => document.body.removeChild(toastEl), 3000);
     };
 
     const validateForm = (formData) => {
@@ -341,12 +355,8 @@
         errors.push('Please enter a valid price');
       }
 
-      if (!formData.stock || formData.stock < 0) {
+      if (formData.stock === undefined || formData.stock < 0) {
         errors.push('Please enter a valid stock quantity');
-      }
-
-      if (!formData.description || formData.description.trim().length < 10) {
-        errors.push('Please enter a description (minimum 10 characters)');
       }
 
       return errors;
@@ -360,43 +370,95 @@
       delete productForm.dataset.productId;
     };
 
+    // Apply filters to products
+    function applyFilters(products) {
+      const categoryFilter = document.getElementById('categoryFilter').value;
+      const stockStatus = document.getElementById('stockStatus').value;
+      const priceRange = document.getElementById('priceRange').value;
+      const searchQuery = document.getElementById('productSearch').value.toLowerCase();
+
+      return products.filter(product => {
+        // Category filter
+        if (categoryFilter && product.category !== categoryFilter) {
+          return false;
+        }
+
+        // Stock status filter
+        if (stockStatus) {
+          if (stockStatus === 'in-stock' && product.stock <= 0) return false;
+          if (stockStatus === 'out-of-stock' && product.stock > 0) return false;
+          if (stockStatus === 'low-stock' && (product.stock > 10 || product.stock <= 0)) return false;
+        }
+
+        // Price range filter
+        if (priceRange) {
+          const price = product.price;
+          if (priceRange === '0-50' && (price < 0 || price > 50)) return false;
+          if (priceRange === '51-100' && (price < 51 || price > 100)) return false;
+          if (priceRange === '101-200' && (price < 101 || price > 200)) return false;
+          if (priceRange === '201+' && price < 201) return false;
+        }
+
+        // Search filter
+        if (searchQuery) {
+          const searchFields = [
+            product.name?.toLowerCase() || '',
+            product.category?.toLowerCase() || '',
+            product.description?.toLowerCase() || ''
+          ];
+          if (!searchFields.some(field => field.includes(searchQuery))) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
     // Fetch and Display Products
     async function fetchProducts(page = 1) {
       try {
-        const categoryFilter = document.getElementById('categoryFilter').value;
-        const stockStatus = document.getElementById('stockStatus').value;
-        const priceRange = document.getElementById('priceRange').value;
-        const searchQuery = document.getElementById('productSearch').value;
-
-        let query = [];
-        if (categoryFilter) query.push(`category=${categoryFilter}`);
-        if (stockStatus) query.push(`stockStatus=${stockStatus}`);
-        if (priceRange) query.push(`priceRange=${priceRange}`);
-        if (searchQuery) query.push(`search=${searchQuery}`);
-        const queryString = query.length ? "?" + query.join("&") : "";
-
-        const response = await fetch(`/api/products${queryString}`);
-        const result = await response.json();
+        // Use the correct API endpoint based on your route setup
+        // Adjust this URL to match your backend route configuration
+        const response = await fetch('/api/products');
         
-        if (result.success) {
-          allProducts = result.data;
-          const startIndex = (page - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
-          const paginatedProducts = allProducts.slice(startIndex, endIndex);
-          totalPages = Math.ceil(allProducts.length / itemsPerPage);
-
-          displayProducts(paginatedProducts);
-          updatePagination({
-            currentPage: page,
-            totalPages: totalPages,
-            total: allProducts.length
-          });
-        } else {
-          throw new Error(result.message || 'Failed to fetch products');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+
+        const products = await response.json();
+        
+        // Handle different response formats
+        let productData;
+        if (Array.isArray(products)) {
+          productData = products;
+        } else if (products.data && Array.isArray(products.data)) {
+          productData = products.data;
+        } else if (products.products && Array.isArray(products.products)) {
+          productData = products.products;
+        } else {
+          throw new Error('Invalid response format');
+        }
+
+        allProducts = productData;
+        filteredProducts = applyFilters(allProducts);
+        
+        // Pagination
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+        totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+        displayProducts(paginatedProducts);
+        updatePagination({
+          currentPage: page,
+          totalPages: totalPages,
+          total: filteredProducts.length
+        });
+
       } catch (error) {
         console.error('Error fetching products:', error);
-        productTableBody.innerHTML = `<tr><td colspan="8" class="text-center">Error loading products. Please try again.</td></tr>`;
+        productTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: red;">Error loading products: ${error.message}</td></tr>`;
         updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
       }
     }
@@ -422,25 +484,43 @@
       products.forEach((product, index) => {
         const tr = document.createElement("tr");
         const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+        
+        // Use MongoDB _id as product ID
+        const productId = product._id || 'N/A';
+        
+        // Determine stock status
+        let stockStatus = 'Out of Stock';
+        let stockClass = 'inactive';
+        let stockIcon = 'xmark';
+        
+        if (product.stock > 10) {
+          stockStatus = 'In Stock';
+          stockClass = 'active';
+          stockIcon = 'circle-check';
+        } else if (product.stock > 0) {
+          stockStatus = 'Low Stock';
+          stockClass = 'warning';
+          stockIcon = 'triangle-exclamation';
+        }
 
         tr.innerHTML = `
           <td>${rowNumber}</td>
-          <td>${product.productId || 'N/A'}</td>
+          <td title="${productId}">${productId.substring(0, 8)}...</td>
           <td>${product.name || 'N/A'}</td>
           <td>${product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : 'N/A'}</td>
-          <td>$${product.price ? product.price.toFixed(2) : 'N/A'}</td>
-          <td>${product.stock || 'N/A'}</td>
+          <td>$${product.price ? product.price.toFixed(2) : '0.00'}</td>
+          <td>${product.stock || 0}</td>
           <td>
-            <span class="status ${product.stock > 0 ? 'active' : 'inactive'}">
-              <i class="fa-solid fa-${product.stock > 0 ? 'circle-check' : 'xmark'}"></i>
-              ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+            <span class="status ${stockClass}">
+              <i class="fa-solid fa-${stockIcon}"></i>
+              ${stockStatus}
             </span>
           </td>
           <td>
-            <button class="action-btn edit" data-product-id="${product.productId || ''}" ${!product.productId ? 'disabled' : ''}>
+            <button class="action-btn edit" data-product-id="${productId}" title="Edit Product">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button class="action-btn delete" data-product-id="${product.productId || ''}" ${!product.productId ? 'disabled' : ''}>
+            <button class="action-btn delete" data-product-id="${productId}" title="Delete Product">
               <i class="fa-solid fa-trash"></i>
             </button>
           </td>
@@ -449,6 +529,82 @@
       });
 
       attachActionListeners();
+    }
+
+    // Attach event listeners to action buttons
+    function attachActionListeners() {
+      // Edit buttons
+      document.querySelectorAll('.action-btn.edit').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const productId = e.currentTarget.dataset.productId;
+          await editProduct(productId);
+        });
+      });
+
+      // Delete buttons
+      document.querySelectorAll('.action-btn.delete').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const productId = e.currentTarget.dataset.productId;
+          await deleteProduct(productId);
+        });
+      });
+    }
+
+    // Edit product function
+    async function editProduct(productId) {
+      try {
+        const response = await fetch(`/api/products/${productId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch product details');
+        }
+        
+        const product = await response.json();
+        
+        // Populate form with product data
+        document.getElementById('productName').value = product.name || '';
+        document.getElementById('productCategory').value = product.category || '';
+        document.getElementById('productPrice').value = product.price || '';
+        document.getElementById('productStock').value = product.stock || '';
+        document.getElementById('productDescription').value = product.description || '';
+        
+        // Update modal for editing
+        document.querySelector('#addProductModal .modal-header h2').textContent = 'Edit Product';
+        document.querySelector('#productForm button[type="submit"]').textContent = 'Update Product';
+        productForm.dataset.mode = 'edit';
+        productForm.dataset.productId = productId;
+        
+        // Show modal
+        addProductModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+      } catch (error) {
+        console.error('Error fetching product for edit:', error);
+        toast('Failed to load product for editing', 'error');
+      }
+    }
+
+    // Delete product function
+    async function deleteProduct(productId) {
+      if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/products/${productId}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete product');
+        }
+
+        toast('Product deleted successfully!');
+        fetchProducts(currentPage);
+
+      } catch (error) {
+        console.error('Error deleting product:', error);
+        toast('Failed to delete product', 'error');
+      }
     }
 
     // Event Listeners
@@ -464,6 +620,7 @@
       }
     });
 
+    // Filter event listeners
     document.getElementById('categoryFilter').addEventListener('change', () => {
       currentPage = 1;
       fetchProducts(currentPage);
@@ -499,12 +656,11 @@
       e.preventDefault();
       
       const formData = {
-        name: document.getElementById('productName').value,
+        name: document.getElementById('productName').value.trim(),
         category: document.getElementById('productCategory').value,
         price: parseFloat(document.getElementById('productPrice').value),
         stock: parseInt(document.getElementById('productStock').value),
-        description: document.getElementById('productDescription').value,
-        status: document.querySelector('input[name="status"]:checked').value
+        description: document.getElementById('productDescription').value.trim()
       };
 
       const validationErrors = validateForm(formData);
@@ -529,19 +685,22 @@
           body: JSON.stringify(formData)
         });
 
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to ${mode} product`);
+        }
+
         const result = await response.json();
 
-        if (response.ok) {
-          addProductModal.classList.remove('active');
-          document.body.style.overflow = '';
-          
-          resetModal();
-          fetchProducts();
+        // Close modal and refresh
+        addProductModal.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        resetModal();
+        fetchProducts(currentPage);
 
-          toast(`Product ${mode === 'add' ? 'added' : 'updated'} successfully!`);
-        } else {
-          throw new Error(result.message || `Failed to ${mode} product`);
-        }
+        toast(`Product ${mode === 'add' ? 'added' : 'updated'} successfully!`);
+
       } catch (error) {
         console.error('Error:', error);
         toast(error.message, 'error');

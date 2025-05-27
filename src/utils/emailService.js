@@ -9,15 +9,68 @@ import dayjs from 'dayjs';
 
 // Create a transporter using the default SMTP transport
 const createTransporter = () => {
-  return nodemailer.createTransport({
+  // Validate email configuration
+  const requiredEnvVars = ['EMAIL_HOST', 'EMAIL_USER', 'EMAIL_PASS'];
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required email configuration: ${missingVars.join(', ')}`);
+  }
+
+  // For Gmail SMTP with SSL (port 465)
+  const config = {
     host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT || '587'),
-    secure: process.env.EMAIL_SECURE === 'true',
+    port: parseInt(process.env.EMAIL_PORT || '465'),
+    secure: true, // true for port 465
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false // Only use this in development
+    }
+  };
+
+  console.log('📧 Email Configuration:', {
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    user: config.auth.user
   });
+
+  return nodemailer.createTransport(config);
+};
+
+/**
+ * Validate email parameters
+ * @param {string} email - Email address to validate
+ * @param {string} name - Name to validate
+ * @param {Object} options - Additional options to validate
+ * @throws {Error} If validation fails
+ */
+const validateEmailParams = (email, name, options = {}) => {
+  if (!email || typeof email !== 'string') {
+    throw new Error('Invalid email address');
+  }
+
+  if (!name || typeof name !== 'string') {
+    throw new Error('Invalid recipient name');
+  }
+
+  // Basic email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new Error('Invalid email format');
+  }
+
+  // Validate required options if present
+  if (options.subject && typeof options.subject !== 'string') {
+    throw new Error('Invalid email subject');
+  }
+
+  if (options.html && typeof options.html !== 'string') {
+    throw new Error('Invalid email HTML content');
+  }
 };
 
 /**
@@ -36,6 +89,9 @@ export const sendEmail = async (to, name, options = {}) => {
   });
 
   try {
+    // Validate parameters
+    validateEmailParams(to, name, options);
+
     const transporter = createTransporter();
 
     const defaultOptions = {
@@ -122,22 +178,12 @@ export const sendMembershipAcceptanceEmail = async (memberDetails) => {
  * @returns {Promise<void>}
  */
 export const sendExpiryEmail = async (email, name) => {
-  try {
-    const transporter = createTransporter();
-
-    const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: email,
-      subject: 'Membership Expiry Notice',
-      html: membershipExpiryTemplate({ name })
-    };
-
-    await transporter.sendMail(mailOptions);
-    console.log(`📧 Expiry email sent to ${email}`);
-  } catch (error) {
-    console.error('❌ Error sending expiry email:', error);
-    throw error;
-  }
+  console.log(`⏰ Preparing expiry email for: ${email}`);
+  
+  return sendEmail(email, name, {
+    subject: 'Membership Expiry Notice',
+    html: membershipExpiryTemplate({ name })
+  });
 };
 
 // Add a new function for sending pending membership payment reminder
@@ -155,9 +201,22 @@ export const sendPendingMembershipPaymentReminder = async (memberDetails) => {
   });
 };
 
-// Add a new function for sending membership expiry reminder
+/**
+ * Send membership expiry reminder
+ * @param {Object} memberDetails - Member's details
+ * @returns {Promise<void>}
+ */
 export const sendMembershipExpiryReminder = async (memberDetails) => {
   console.log(`⏳ Preparing membership expiry reminder email for: ${memberDetails.email}`);
+
+  // Validate required member details
+  if (!memberDetails || typeof memberDetails !== 'object') {
+    throw new Error('Invalid member details');
+  }
+
+  if (!memberDetails.email || !memberDetails.fullName) {
+    throw new Error('Missing required member details: email and fullName are required');
+  }
 
   // Ensure daysUntilExpiry is a number, default to 0 if not provided
   const daysUntilExpiry = Number.isInteger(memberDetails.daysUntilExpiry) 

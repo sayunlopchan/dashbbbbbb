@@ -1,4 +1,4 @@
-import Counter from '../../models/Counter.model.js';
+import Counter from '../../models/counter.model.js';
 
 const generateAnnouncementId = async () => {
   const COUNTER_NAME = 'announcement_counter';
@@ -35,7 +35,7 @@ const generateAnnouncementId = async () => {
         { upsert: true }
       );
 
-      return `ANN${newValue.toString().padStart(2, '0')}`;
+      return `KB-ANN${newValue.toString().padStart(2, '0')}`;
     } catch (fallbackError) {
       console.error('Fallback ID generation failed:', fallbackError);
       throw new Error('Failed to generate announcement ID');

@@ -1,4 +1,4 @@
-import Counter from "../../models/Counter.model.js";
+import Counter from "../../models/counter.model.js";
 
 /**
  * Generate a new unique trainer ID with prefix "KBT"
@@ -12,5 +12,5 @@ export const generateTrainerId = async () => {
   );
 
   const paddedSeq = counter.count.toString().padStart(2, "0");
-  return `KBT${paddedSeq}`;
+  return `KB-TRN${paddedSeq}`;
 };

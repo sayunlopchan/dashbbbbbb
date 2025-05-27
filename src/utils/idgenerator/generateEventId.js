@@ -1,4 +1,4 @@
-import Counter from '../../models/Counter.model.js';
+import Counter from '../../models/counter.model.js';
 
 const generateEventId = async () => {
   try {
@@ -26,7 +26,7 @@ const generateEventId = async () => {
     const paddedSequence = counter.count.toString().padStart(3, '0');
 
     // Generate event ID with random letter prefix
-    return `KBE${randomLetter}${paddedSequence}`;
+    return `KB-EVT${randomLetter}${paddedSequence}`;
   } catch (error) {
     console.error('Error in generateEventId:', error);
     throw new Error(`Failed to generate event ID: ${error.message}`);

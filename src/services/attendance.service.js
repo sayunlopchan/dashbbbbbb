@@ -1,5 +1,5 @@
-import Attendance from "../models/Attendance.model.js";
-import Member from "../models/Member.model.js";
+import Attendance from "../models/attendance.model.js";
+import Member from "../models/member.model.js";
 
 /**
  * Check-in a member

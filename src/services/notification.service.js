@@ -1,4 +1,4 @@
-import Notification from "../models/Notification.model.js";
+import Notification from "../models/notification.model.js";
 
 // Create a new notification
 export const createNotificationService = async (notificationData) => {
@@ -141,6 +141,14 @@ export const createMembershipNotificationService = async (memberData, type) => {
             ? ` due to: ${memberData.cancellationReason}`
             : " due to non-payment"
         }.`;
+        break;
+      case "MEMBERSHIP_EXPIRING":
+        title = "Membership Expiring Soon";
+        message = `Your membership will expire in ${Math.ceil((new Date(memberData.endDate) - new Date()) / (1000 * 60 * 60 * 24))} days. Please renew to continue accessing our services.`;
+        break;
+      case "MEMBERSHIP_EXPIRED":
+        title = "Membership Expired";
+        message = "Your membership has expired. Please renew to continue accessing our services.";
         break;
       default:
         title = `Membership ${type.replace("MEMBERSHIP_", "").toLowerCase()}`;

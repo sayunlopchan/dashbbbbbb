@@ -26,6 +26,7 @@ import attendanceRoutes from "./routes/attendance.routes.js";
 import membershipRoutes from "./routes/membership.routes.js";
 import applicationHistoryRoutes from "./routes/applicationHistory.routes.js";
 import paymentRoutes from "./routes/payments.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 // Load env and connect DB
 loadEnv();
@@ -53,6 +54,7 @@ app.use(cookieParser());
 
 // Serve static files from client directory
 app.use(express.static(clientPath));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes without .html extension
 const htmlPages = [
@@ -62,7 +64,7 @@ const htmlPages = [
 ];
 
 // Unprotected pages
-const unprotectedPages = ['login', 'unauthorized', 'spinner'];
+const unprotectedPages = ['login', 'unauthorized'];
 
 // Apply routes with protection
 htmlPages.forEach(page => {
@@ -98,6 +100,7 @@ app.use("/api/attendances", attendanceRoutes);
 app.use("/api/memberships", membershipRoutes);
 app.use("/api/application-history", applicationHistoryRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use('/api/products', productRoutes);
 
 // Debug route for authentication
 app.get('/debug-auth', (req, res) => {

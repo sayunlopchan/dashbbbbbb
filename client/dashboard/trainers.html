@@ -219,12 +219,14 @@
     </div>
 
 
-    <!-- Add Member Modal -->
+    <!-- Add Trainers Modal -->
     <div class="modal-overlay" id="addTrainerModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Add New Trainer</h2>
-                <p>Fill in the details to add a new trainer.</p>
+                <div>
+                    <h2>Add New Trainer</h2>
+                    <p>Fill in the details to add a new trainer.</p>
+                </div>
             </div>
             <form id="trainerForm">
                 <div class="form-grid">
@@ -241,7 +243,7 @@
                         <input type="tel" id="contact" required>
                     </div>
                     <div class="form-group">
-                        <label for="date">Joined Date</label>
+                        <label for="date">Start Date</label>
                         <input type="date" id="date" required>
                     </div>
                     <div class="form-group">
@@ -266,7 +268,10 @@
         </div>
     </div>
 
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
     <script>
+
         // DOM Elements
         const addTrainerBtn = document.getElementById('addTrainerBtn');
         const addTrainerModal = document.getElementById('addTrainerModal');
@@ -417,27 +422,27 @@
                     new Date(trainer.joinDate).toLocaleDateString() : 'N/A';
 
                 tr.innerHTML = `
-                    <td>${rowNumber}</td>
-                    <td>${trainer.trainerId || 'N/A'}</td>
-                    <td>${trainer.fullName || 'N/A'}</td>
-                    <td>${trainer.email || 'N/A'}</td>
-                    <td>${trainer.contact || 'N/A'}</td>
-                    <td>${joinDate}</td>
-                    <td>
-                        <span class="status ${trainer.status || 'active'}">
-                            <i class="fa-solid fa-${trainer.status === 'inactive' ? 'xmark' : 'circle-check'}"></i> 
-                            ${trainer.status ? trainer.status.charAt(0).toUpperCase() + trainer.status.slice(1) : 'Active'}
-                        </span>
-                    </td>
-                    <td>
-                        <button class="action-btn edit" data-trainer-id="${trainer.trainerId || ''}" ${!trainer.trainerId ? 'disabled' : ''}>
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
-                        <button class="action-btn delete" data-trainer-id="${trainer.trainerId || ''}" ${!trainer.trainerId ? 'disabled' : ''}>
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </td>
-                `;
+            <td>${rowNumber}</td>
+            <td>${trainer.trainerId || 'N/A'}</td>
+            <td>${trainer.fullName || 'N/A'}</td>
+            <td>${trainer.email || 'N/A'}</td>
+            <td>${trainer.contact || 'N/A'}</td>
+            <td>${joinDate}</td>
+            <td>
+                <span class="status ${trainer.status || 'active'}">
+                    <i class="fa-solid fa-${trainer.status === 'inactive' ? 'xmark' : 'circle-check'}"></i> 
+                    ${trainer.status ? trainer.status.charAt(0).toUpperCase() + trainer.status.slice(1) : 'Active'}
+                </span>
+            </td>
+            <td>
+                <button class="action-btn edit" data-trainer-id="${trainer.trainerId || ''}" ${!trainer.trainerId ? 'disabled' : ''}>
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+                <button class="action-btn delete" data-trainer-id="${trainer.trainerId || ''}" ${!trainer.trainerId ? 'disabled' : ''}>
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        `;
                 trainerTableBody.appendChild(tr);
             });
 
@@ -717,56 +722,56 @@
 
             // Create print content
             const printContent = `
-                <html>
-                <head>
-                    <title>Trainers Report</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background-color: #f5f5f5; }
-                        h1 { text-align: center; }
-                        .header { margin-bottom: 20px; }
-                        .footer { margin-top: 20px; text-align: center; font-size: 12px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>Trainers Report</h1>
-                        <p>Generated on: ${new Date().toLocaleString()}</p>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>S.N</th>
-                                <th>Trainer ID</th>
-                                <th>Full Name</th>
-                                <th>Email</th>
-                                <th>Contact</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filteredTrainers.map((trainer, index) => `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td>${trainer.trainerId}</td>
-                                    <td>${trainer.fullName}</td>
-                                    <td>${trainer.email}</td>
-                                    <td>${trainer.contact}</td>
-                                    <td>${formatDate(trainer.joinDate)}</td>
-                                    <td>${trainer.status.charAt(0).toUpperCase() + trainer.status.slice(1)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <div class="footer">
-                        <p>© ${new Date().getFullYear()} Knox Barbell - Trainers Report</p>
-                    </div>
-                </body>
-                </html>
-            `;
+        <html>
+        <head>
+            <title>Trainers Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f5f5f5; }
+                h1 { text-align: center; }
+                .header { margin-bottom: 20px; }
+                .footer { margin-top: 20px; text-align: center; font-size: 12px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>Trainers Report</h1>
+                <p>Generated on: ${new Date().toLocaleString()}</p>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.N</th>
+                        <th>Trainer ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Contact</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filteredTrainers.map((trainer, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${trainer.trainerId}</td>
+                            <td>${trainer.fullName}</td>
+                            <td>${trainer.email}</td>
+                            <td>${trainer.contact}</td>
+                            <td>${formatDate(trainer.joinDate)}</td>
+                            <td>${trainer.status.charAt(0).toUpperCase() + trainer.status.slice(1)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div class="footer">
+                <p>© ${new Date().getFullYear()} Knox Barbell - Trainers Report</p>
+            </div>
+        </body>
+        </html>
+    `;
 
             // Write content to print window
             printWindow.document.write(printContent);
@@ -790,11 +795,6 @@
                 day: '2-digit'
             });
         }
-    </script>
-
-    <script src="/js/main.js"></script>
-    <script src="./js/logout.js"></script>
-    <script>
         // Notification Modal Logic
         document.addEventListener('DOMContentLoaded', function () {
             const notificationIcon = document.querySelector('.notification');
@@ -828,7 +828,7 @@
             // Fetch unread count
             async function fetchUnreadCount() {
                 try {
-                    const response = await fetch('http://localhost:4000/api/notifications/unread-count');
+                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
                     const data = await response.json();
                     if (data.success) {
                         notificationBadge.textContent = data.data.unreadCount;
@@ -849,7 +849,7 @@
                         </div>
                     `;
 
-                    const response = await fetch('http://localhost:4000/api/notifications');
+                    const response = await fetch(`${baseUrl}/api/notifications`);
                     const data = await response.json();
 
                     if (data.success) {
@@ -885,7 +885,7 @@
                                 const notificationId = item.dataset.notificationId;
                                 if (item.classList.contains('unread')) {
                                     try {
-                                        const response = await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
+                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
                                             method: 'PATCH',
                                             credentials: 'include'
                                         });
@@ -933,41 +933,6 @@
             setInterval(fetchUnreadCount, 30000); // Every 30 seconds
         });
     </script>
-    <style>
-        .notification-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .view-all-link {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .view-all-link:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-
-        .unread-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--danger-color);
-            border-radius: 50%;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        .notification-badge {
-            display: none;
-            /* Hidden by default, shown only when there are unread notifications */
-        }
-    </style>
 </body>
 
 </html>

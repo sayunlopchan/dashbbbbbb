@@ -1,4 +1,4 @@
-import Member from "../models/Member.model.js";
+import Member from "../models/member.model.js";
 import dayjs from "dayjs";
 import { sendMembershipExpiryReminder } from "../utils/emailService.js";
 import { createPaymentService } from "./payment.service.js";
@@ -447,33 +447,52 @@ export const checkMembershipStatusService = async (memberId) => {
   }
 
   const currentDate = new Date();
+  const endDate = new Date(member.endDate);
+  const daysUntilExpiry = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
 
   // Check if membership has expired
-  if (currentDate > member.endDate) {
-    member.memberStatus = "inactive";
-    await member.save();
+  if (currentDate > endDate) {
+    member.memberStatus = "expired";
+  }
+  // Check if membership is expiring soon (within 10 days)
+  else if (daysUntilExpiry <= 10 && daysUntilExpiry > 0) {
+    member.memberStatus = "expiring";
+  }
+  // If not expired and not expiring soon, set to active
+  else if (currentDate >= new Date(member.startDate) && currentDate <= endDate) {
+    member.memberStatus = "active";
   }
 
+  await member.save();
   return member;
 };
 
-// Periodic status check method (can be used in a cron job)
+// Update all membership statuses
 export const updateAllMembershipStatusesService = async () => {
   const currentDate = new Date();
-
-  // Find all active or pending members
   const members = await Member.find({
-    memberStatus: { $in: ["active", "pending"] },
+    memberStatus: { $in: ["active", "expiring"] }
   });
 
+  const expiredMembers = [];
+
   for (const member of members) {
-    if (currentDate > member.endDate) {
-      member.memberStatus = "inactive";
-      await member.save();
+    const endDate = new Date(member.endDate);
+    const daysUntilExpiry = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+
+    if (currentDate > endDate) {
+      member.memberStatus = "expired";
+      expiredMembers.push(member);
+    } else if (daysUntilExpiry <= 10 && daysUntilExpiry > 0) {
+      member.memberStatus = "expiring";
+    } else if (currentDate >= new Date(member.startDate) && currentDate <= endDate) {
+      member.memberStatus = "active";
     }
+
+    await member.save();
   }
 
-  return members.filter((member) => member.memberStatus === "inactive");
+  return expiredMembers;
 };
 
 // Cancel Member Membership
