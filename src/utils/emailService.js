@@ -175,14 +175,18 @@ export const sendMembershipAcceptanceEmail = async (memberDetails) => {
  * Send membership expiry email
  * @param {string} email - Recipient's email address
  * @param {string} name - Member's name
+ * @param {Object} memberDetails - Member's details including expiry date
  * @returns {Promise<void>}
  */
-export const sendExpiryEmail = async (email, name) => {
+export const sendExpiryEmail = async (email, name, memberDetails = {}) => {
   console.log(`⏰ Preparing expiry email for: ${email}`);
   
   return sendEmail(email, name, {
     subject: 'Membership Expiry Notice',
-    html: membershipExpiryTemplate({ name })
+    html: membershipExpiryTemplate({ 
+      name,
+      expiryDate: memberDetails.endDate || memberDetails.expiryDate
+    })
   });
 };
 
@@ -247,7 +251,7 @@ export const sendMembershipExpiryReminder = async (memberDetails) => {
       fullName: memberDetails.fullName,
       memberId: memberDetails.memberId,
       membershipType: memberDetails.membershipType,
-      expiryDate: memberDetails.membershipExpiry ? dayjs(memberDetails.membershipExpiry).format('YYYY-MM-DD') : 'N/A',
+      expiryDate: memberDetails.expiryDate || memberDetails.endDate,
       reminderCount: memberDetails.expiryReminderCount || 1,
       daysUntilExpiry: daysUntilExpiry,
       customMessage: customMessage

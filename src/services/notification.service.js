@@ -151,17 +151,13 @@ export const createMembershipNotificationService = async (memberData, type) => {
         message = "Your membership has expired. Please renew to continue accessing our services.";
         break;
       default:
-        title = `Membership ${type.replace("MEMBERSHIP_", "").toLowerCase()}`;
-        message = `Your membership status has been updated: ${type
-          .replace("MEMBERSHIP_", "")
-          .toLowerCase()}`;
-        break;
+        throw new Error(`Invalid membership notification type: ${type}`);
     }
 
     const notificationData = {
-      type: "membership",
+      type: "membershipExpiry",
       relatedId: memberData._id,
-      relatedModel: "Membership",
+      relatedModel: "Member",
       title: title,
       message: message,
       additionalContext: memberData,
@@ -204,6 +200,10 @@ export const createMemberStatusNotificationService = async (
       case "MEMBERSHIP_EXPIRING":
         title = "Membership Expiring Soon";
         message = `Your membership is about to expire. Please renew to continue enjoying our services.`;
+        break;
+      case "MEMBERSHIP_EXPIRED":
+        title = "Membership Expired";
+        message = "Your membership has expired. Please renew to continue accessing our services.";
         break;
       default:
         throw new Error("Invalid notification type");

@@ -8,86 +8,10 @@ import {
   sendMembershipExpiryReminder,
   sendMembershipCancellationEmail,
 } from "../utils/emailService.js";
-import { createMemberStatusNotificationService } from "../services/notification.service.js";
+import { createMemberStatusNotificationService, createMembershipNotificationService } from "../services/notification.service.js";
 
 // Extend dayjs with UTC plugin
 dayjs.extend(utc);
-
-// Utility function to log countdown
-const logCountdown = (jobName, schedule) => {
-  const parseSchedule = (scheduleStr) => {
-    const [minute, hour, day, month, dayOfWeek] = scheduleStr.split(" ");
-    return { minute, hour, day, month, dayOfWeek };
-  };
-
-  const parsedSchedule = parseSchedule(schedule);
-
-  const getNextRunTime = () => {
-    const now = dayjs.utc();
-    let nextRun = now.clone();
-
-    // Set next run based on schedule
-    if (parsedSchedule.minute !== "*") {
-      nextRun = nextRun.minute(parseInt(parsedSchedule.minute));
-    }
-    if (parsedSchedule.hour !== "*") {
-      nextRun = nextRun.hour(parseInt(parsedSchedule.hour));
-    }
-
-    // Ensure the time is in the future
-    if (nextRun.isBefore(now)) {
-      nextRun = nextRun.add(1, "day");
-    }
-
-    return nextRun;
-  };
-
-  const startCountdown = () => {
-    const nextRun = getNextRunTime();
-
-    console.log(`🕒 Countdown Started for ${jobName}`);
-    console.log(
-      `📅 Next Scheduled Run: ${nextRun.format("YYYY-MM-DD HH:mm:ss")} UTC`
-    );
-    console.log(
-      `⏳ Current Time: ${dayjs.utc().format("YYYY-MM-DD HH:mm:ss")} UTC`
-    );
-
-    const updateCountdown = () => {
-      const now = dayjs.utc();
-      const duration = nextRun.diff(now);
-
-      if (duration <= 0) {
-        console.log(`🚀 ${jobName} Cron Job Starting Now (UTC)!`);
-        console.log(
-          `⏰ Exact Start Time: ${nextRun.format("YYYY-MM-DD HH:mm:ss")} UTC`
-        );
-        return;
-      }
-
-      const hours = Math.floor(duration / (1000 * 60 * 60));
-      const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((duration % (1000 * 60)) / 1000);
-
-      // Log countdown at 5 minutes before job start
-      if (hours === 0 && minutes === 5 && seconds === 0) {
-        console.log(`⏰ ${jobName} Cron Job Starting in 5 minutes (UTC)!`);
-        console.log(
-          `📅 Scheduled Start Time: ${nextRun.format(
-            "YYYY-MM-DD HH:mm:ss"
-          )} UTC`
-        );
-      }
-
-      // Check every minute
-      setTimeout(updateCountdown, 1000);
-    };
-
-    updateCountdown();
-  };
-
-  startCountdown();
-};
 
 // Utility function to track and send reminder emails
 const sendReminderSequence = async (member) => {
@@ -134,6 +58,7 @@ const sendReminderSequence = async (member) => {
 export const checkMemberStatusNotifications = async () => {
   try {
     const today = new Date();
+    console.log('🔍 Starting member status notification check at:', today.toISOString());
 
     // Find members with pending status about to start
     const pendingMembers = await Member.find({
@@ -141,11 +66,25 @@ export const checkMemberStatusNotifications = async () => {
       startDate: { $lte: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) }, // Within next 7 days
     });
 
+    console.log(`📊 Found ${pendingMembers.length} pending members about to start`);
+
     for (const member of pendingMembers) {
-      await createMemberStatusNotificationService(
-        member,
-        "MEMBER_START_PENDING"
-      );
+      try {
+        // Create notification for pending member
+        await createMemberStatusNotificationService(
+          member,
+          "MEMBER_START_PENDING"
+        );
+        
+        // Send email to pending member
+        await sendPendingMembershipPaymentReminder(member, {
+          additionalMessage: "Your membership is about to start. Please complete any remaining steps."
+        });
+        
+        console.log(`✅ Created notification and sent email for pending member ${member.fullName}`);
+      } catch (error) {
+        console.error(`❌ Error creating notification for pending member ${member.fullName}:`, error);
+      }
     }
 
     // Find members whose membership is about to expire
@@ -157,26 +96,92 @@ export const checkMemberStatusNotifications = async () => {
       },
     });
 
+    console.log(`📊 Found ${expiringMembers.length} members about to expire`);
+
     for (const member of expiringMembers) {
-      // Create notification
-      await createMemberStatusNotificationService(
-        member,
-        "MEMBERSHIP_EXPIRING"
-      );
+      try {
+        console.log(`📝 Processing expiring member: ${member.fullName} (ID: ${member._id})`);
+        console.log(`📅 Member's end date: ${member.endDate}`);
+        
+        // Calculate days until expiry
+        const daysUntilExpiry = Math.ceil((new Date(member.endDate) - today) / (1000 * 60 * 60 * 24));
+        
+        // Create notification for expiring member
+        const notification = await createMemberStatusNotificationService(
+          member,
+          "MEMBERSHIP_EXPIRING"
+        );
+        console.log(`✅ Created notification for ${member.fullName}:`, {
+          notificationId: notification._id,
+          type: notification.type,
+          message: notification.message
+        });
 
-      // Send expiry reminder email
-      await sendMembershipExpiryReminder({
-        ...member.toObject(),
-        reminderType: "EXPIRING_SOON",
-        message: `Your membership is expiring soon. Please renew to maintain uninterrupted access. Expiry Date: ${member.endDate.toDateString()}`,
-      });
+        // Send expiry reminder email
+        await sendMembershipExpiryReminder({
+          ...member.toObject(),
+          reminderType: "EXPIRING_SOON",
+          message: `Your membership is expiring soon. Please renew to maintain uninterrupted access.`,
+          expiryDate: member.endDate,
+          daysUntilExpiry: daysUntilExpiry
+        });
 
-      console.log(`📧 Expiry Reminder Email sent to ${member.fullName}`);
+        console.log(`📧 Expiry Reminder Email sent to ${member.fullName}`);
+      } catch (error) {
+        console.error(`❌ Error processing member ${member.fullName}:`, error);
+      }
     }
 
-    console.log("Member status notification and email check completed");
+    console.log("✅ Member status notification and email check completed");
   } catch (error) {
-    console.error("Error in checkMemberStatusNotifications:", error);
+    console.error("❌ Error in checkMemberStatusNotifications:", error);
+  }
+};
+
+// Function to handle expired membership notifications and emails
+export const handleExpiredMemberships = async () => {
+  try {
+    console.log("🔍 Checking for expired memberships...");
+    const today = dayjs.utc().startOf("day");
+
+    // Find members whose membership has expired (current date > endDate)
+    const expiredMembers = await Member.find({
+      memberStatus: "active",
+      endDate: { $lt: today.toDate() }  // Changed to $lt to check if endDate is before today
+    });
+
+    console.log(`📊 Found ${expiredMembers.length} expired memberships`);
+
+    for (const member of expiredMembers) {
+      try {
+        console.log(`📝 Processing expired member: ${member.fullName} (ID: ${member._id})`);
+        console.log(`📅 Member's end date: ${member.endDate}, Today: ${today.format('YYYY-MM-DD')}`);
+
+        // 1. Send expiry email to member
+        await sendExpiryEmail(member.email, member.fullName, member);
+        console.log(`📧 Expiry email sent to ${member.fullName}`);
+
+        // 2. Create notification for expired member
+        await createMemberStatusNotificationService(
+          member,
+          "MEMBERSHIP_EXPIRED"
+        );
+        console.log(`🔔 Created expiry notification for ${member.fullName}`);
+
+        // 3. Update member status
+        member.memberStatus = "expired";
+        member.expiryDate = today.toDate();
+        await member.save();
+        console.log(`✅ Updated status to expired for ${member.fullName}`);
+
+      } catch (error) {
+        console.error(`❌ Error processing expired member ${member.fullName}:`, error);
+      }
+    }
+
+    console.log("✅ Expired membership check completed");
+  } catch (error) {
+    console.error("❌ Error in handleExpiredMemberships:", error);
   }
 };
 
@@ -190,12 +195,6 @@ export const startAllCronJobs = () => {
   // Log the cron schedule
   console.log(`🕰️ CRON_DAILY_SCHEDULE: ${DAILY_CRON_SCHEDULE}`);
   console.log(`🌍 Current Timezone: ${process.env.TZ}`);
-
-  // Log countdowns for each job
-  logCountdown("Membership Expiry", DAILY_CRON_SCHEDULE);
-  logCountdown("Pending Membership Reminder", DAILY_CRON_SCHEDULE);
-  logCountdown("Membership Expiry Reminder", DAILY_CRON_SCHEDULE);
-  logCountdown("Member Status Notification", DAILY_CRON_SCHEDULE);
 
   // ⏰ Runs every day at midnight UTC (configurable via env)
   cron.schedule(DAILY_CRON_SCHEDULE, async () => {
@@ -215,14 +214,23 @@ export const startAllCronJobs = () => {
       );
 
       for (const member of expiringToday) {
-        // Send email & update status
-        await sendExpiryEmail(member.email, member.name);
-        member.status = "expired";
-        await member.save();
+        try {
+          // Send email to member
+          await sendExpiryEmail(member.email, member.name);
+          
+          // Update member status
+          member.status = "expired";
+          await member.save();
 
-        console.log(
-          `🔔 Membership expired for ${member.name} (${member.email}) (UTC)`
-        );
+          // Create notification for admin
+          await createMembershipNotificationService(member, "MEMBERSHIP_EXPIRED");
+
+          console.log(
+            `🔔 Membership expired for ${member.name} (${member.email}) (UTC)`
+          );
+        } catch (error) {
+          console.error(`❌ Error processing expired member ${member.name}:`, error);
+        }
       }
     } catch (err) {
       console.error("❌ Membership Expiry Cron Job Error:", err.message);
@@ -468,33 +476,13 @@ export const startAllCronJobs = () => {
   // New Cron Job for Member Status Notifications
   cron.schedule(DAILY_CRON_SCHEDULE, checkMemberStatusNotifications);
 
+  // Add expired membership check to daily cron
+  cron.schedule(DAILY_CRON_SCHEDULE, async () => {
+    console.log("📅 Running daily cron job for expired memberships (UTC)");
+    await handleExpiredMemberships();
+  });
+
   console.log("✅ All cron jobs scheduled");
-};
-
-// Optional: Add a function to manually trigger the job for testing
-export const triggerPendingMembershipReminders = async () => {
-  console.log("🔍 Manually triggering pending membership payment reminders");
-
-  try {
-    const today = dayjs();
-    const sevenDaysFromNow = today.add(7, "day");
-
-    const pendingMembers = await Member.find({
-      memberStatus: "pending",
-      startDate: {
-        $gte: today.toDate(),
-        $lte: sevenDaysFromNow.toDate(),
-      },
-    });
-
-    console.log(
-      `🔔 Found ${pendingMembers.length} pending members within 7 days`
-    );
-    return pendingMembers;
-  } catch (err) {
-    console.error("❌ Error in manual trigger:", err);
-    throw err;
-  }
 };
 
 export const triggerMembershipExpiryReminders = async () => {
@@ -513,11 +501,50 @@ export const triggerMembershipExpiryReminders = async () => {
     });
 
     console.log(
-      `🔔 Found ${expiringMembers.length} members expiring within 10 days`
+      `🔍 Found ${expiringMembers.length} members expiring within 10 days (UTC)`
     );
-    return expiringMembers;
-  } catch (err) {
-    console.error("❌ Error in manual trigger:", err);
-    throw err;
+
+    for (const member of expiringMembers) {
+      try {
+        console.log(`📝 Processing expiring member: ${member.fullName} (ID: ${member._id})`);
+        console.log(`📅 Member's end date: ${member.endDate}`);
+        
+        // Calculate days until expiry
+        const daysUntilExpiry = Math.ceil((new Date(member.endDate) - today.toDate()) / (1000 * 60 * 60 * 24));
+        
+        // Create notification for expiring member
+        const notification = await createMemberStatusNotificationService(
+          member,
+          "MEMBERSHIP_EXPIRING"
+        );
+        console.log(`✅ Created notification for ${member.fullName}:`, {
+          notificationId: notification._id,
+          type: notification.type,
+          message: notification.message
+        });
+
+        // Send expiry reminder email
+        await sendMembershipExpiryReminder({
+          ...member.toObject(),
+          reminderType: "EXPIRING_SOON",
+          message: `Your membership is expiring soon. Please renew to maintain uninterrupted access.`,
+          expiryDate: member.endDate,
+          daysUntilExpiry: daysUntilExpiry
+        });
+
+        console.log(`📧 Expiry Reminder Email sent to ${member.fullName}`);
+      } catch (error) {
+        console.error(`❌ Error processing member ${member.fullName}:`, error);
+      }
+    }
+
+    console.log("✅ Expired membership check completed");
+  } catch (error) {
+    console.error("❌ Error in triggerMembershipExpiryReminders:", error);
   }
 };
+
+// For testing
+// checkMemberStatusNotifications()
+// triggerMembershipExpiryReminders()
+// handleExpiredMemberships()

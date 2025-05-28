@@ -6,7 +6,17 @@ export const membershipExpiryReminderTemplate = ({
   reminderCount = 1,
   daysUntilExpiry = 0,
   customMessage = 'Your membership is about to expire.'
-}) => `
+}) => {
+  // Format the expiry date if it's a Date object or string
+  const formattedExpiryDate = expiryDate 
+    ? new Date(expiryDate).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })
+    : 'N/A';
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,7 +129,7 @@ export const membershipExpiryReminderTemplate = ({
 <body>
   <div class="container">
     <div class="header">
-      <h1 style="margin: 0; color: #333;">Membership Status Update</h1>
+      <h1 style="margin: 0; color: #333;">Membership Expiring Soon!</h1>
     </div>
     
     <div class="content">
@@ -134,7 +144,7 @@ export const membershipExpiryReminderTemplate = ({
         <ul>
           <li><strong>Member ID:</strong> ${memberId}</li>
           <li><strong>Membership Type:</strong> ${membershipType}</li>
-          <li><strong>Expiry Date:</strong> ${expiryDate}</li>
+          <li><strong>Expiry Date:</strong> ${formattedExpiryDate}</li>
           ${daysUntilExpiry > 0 ? `<li><strong>Days Remaining:</strong> ${daysUntilExpiry}</li>` : ''}
         </ul>
       </div>
@@ -151,4 +161,5 @@ export const membershipExpiryReminderTemplate = ({
   </div>
 </body>
 </html>
-`; 
+`;
+}; 

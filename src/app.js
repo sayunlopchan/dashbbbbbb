@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { loadEnv } from "./config/env.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
+import { startAllCronJobs } from "./cron/index.js";
 
 // Middlewares
 import { notFound } from "./middlewares/notFound.middleware.js";
@@ -31,6 +32,10 @@ import productRoutes from "./routes/product.routes.js";
 // Load env and connect DB
 loadEnv();
 connectDB();
+
+// Start cron jobs
+startAllCronJobs();
+console.log('🕒 Cron jobs initialized');
 
 dotenv.config();
 

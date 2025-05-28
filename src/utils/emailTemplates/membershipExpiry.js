@@ -2,7 +2,17 @@ export const membershipExpiryTemplate = ({
   name = 'Member',
   expiryDate = 'N/A',
   renewalLink = '#'
-}) => `
+}) => {
+  // Format the expiry date if it's a Date object or string
+  const formattedExpiryDate = expiryDate 
+    ? new Date(expiryDate).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })
+    : 'N/A';
+
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,7 +114,7 @@ export const membershipExpiryTemplate = ({
             <p>Dear ${name},</p>
             
             <div class="alert">
-                <p style="margin: 0;">Your membership has expired on ${expiryDate}. Please renew to continue accessing our services.</p>
+                <p style="margin: 0;">Your membership has expired on ${formattedExpiryDate}. Please renew to continue accessing our services.</p>
             </div>
             
             <div style="text-align: center;">
@@ -122,5 +132,6 @@ export const membershipExpiryTemplate = ({
 </body>
 </html>
 `;
+};
 
 export default membershipExpiryTemplate; 
