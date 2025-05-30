@@ -303,8 +303,8 @@
   </div>
 
   <script>
-   // DOM Elements
-   const addProductBtn = document.getElementById('addProductBtn');
+    // DOM Elements
+    const addProductBtn = document.getElementById('addProductBtn');
     const addProductModal = document.getElementById('addProductModal');
     const cancelBtn = document.getElementById('cancelBtn');
     const productForm = document.getElementById('productForm');
@@ -421,13 +421,13 @@
         // Use the correct API endpoint based on your route setup
         // Adjust this URL to match your backend route configuration
         const response = await fetch('/api/products');
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const products = await response.json();
-        
+
         // Handle different response formats
         let productData;
         if (Array.isArray(products)) {
@@ -442,7 +442,7 @@
 
         allProducts = productData;
         filteredProducts = applyFilters(allProducts);
-        
+
         // Pagination
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
@@ -484,15 +484,15 @@
       products.forEach((product, index) => {
         const tr = document.createElement("tr");
         const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
-        
+
         // Use MongoDB _id as product ID
         const productId = product._id || 'N/A';
-        
+
         // Determine stock status
         let stockStatus = 'Out of Stock';
         let stockClass = 'inactive';
         let stockIcon = 'xmark';
-        
+
         if (product.stock > 10) {
           stockStatus = 'In Stock';
           stockClass = 'active';
@@ -557,26 +557,26 @@
         if (!response.ok) {
           throw new Error('Failed to fetch product details');
         }
-        
+
         const product = await response.json();
-        
+
         // Populate form with product data
         document.getElementById('productName').value = product.name || '';
         document.getElementById('productCategory').value = product.category || '';
         document.getElementById('productPrice').value = product.price || '';
         document.getElementById('productStock').value = product.stock || '';
         document.getElementById('productDescription').value = product.description || '';
-        
+
         // Update modal for editing
         document.querySelector('#addProductModal .modal-header h2').textContent = 'Edit Product';
         document.querySelector('#productForm button[type="submit"]').textContent = 'Update Product';
         productForm.dataset.mode = 'edit';
         productForm.dataset.productId = productId;
-        
+
         // Show modal
         addProductModal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        
+
       } catch (error) {
         console.error('Error fetching product for edit:', error);
         toast('Failed to load product for editing', 'error');
@@ -652,9 +652,9 @@
     });
 
     // Form Submission
-    productForm.addEventListener('submit', async function(e) {
+    productForm.addEventListener('submit', async function (e) {
       e.preventDefault();
-      
+
       const formData = {
         name: document.getElementById('productName').value.trim(),
         category: document.getElementById('productCategory').value,
@@ -671,10 +671,10 @@
 
       try {
         const mode = productForm.dataset.mode || 'add';
-        const url = mode === 'add' 
-          ? '/api/products' 
+        const url = mode === 'add'
+          ? '/api/products'
           : `/api/products/${productForm.dataset.productId}`;
-        
+
         const method = mode === 'add' ? 'POST' : 'PUT';
 
         const response = await fetch(url, {
@@ -695,7 +695,7 @@
         // Close modal and refresh
         addProductModal.classList.remove('active');
         document.body.style.overflow = '';
-        
+
         resetModal();
         fetchProducts(currentPage);
 
@@ -708,18 +708,18 @@
     });
 
     // Modal Handling
-    addProductBtn.addEventListener('click', function() {
+    addProductBtn.addEventListener('click', function () {
       resetModal();
       addProductModal.classList.add('active');
       document.body.style.overflow = 'hidden';
     });
 
-    cancelBtn.addEventListener('click', function() {
+    cancelBtn.addEventListener('click', function () {
       addProductModal.classList.remove('active');
       document.body.style.overflow = '';
     });
 
-    addProductModal.addEventListener('click', function(e) {
+    addProductModal.addEventListener('click', function (e) {
       if (e.target === addProductModal) {
         addProductModal.classList.remove('active');
         document.body.style.overflow = '';
@@ -741,6 +741,146 @@
 
     // Initial fetch
     fetchProducts(1);
+
+
+            // Notification Modal Logic
+            document.addEventListener('DOMContentLoaded', function() {
+            const notificationIcon = document.querySelector('.notification');
+            const notificationModal = document.querySelector('.notification-modal');
+            const closeNotifications = document.querySelector('.close-notifications');
+            const notificationList = document.querySelector('.notification-list');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Toggle notification modal
+            notificationIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.toggle('active');
+                if (notificationModal.classList.contains('active')) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close notification modal
+            closeNotifications.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                    notificationModal.classList.remove('active');
+                }
+            });
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
+                    const data = await response.json();
+                    if (data.success) {
+                        notificationBadge.textContent = data.data.unreadCount;
+                        // Show/hide badge based on count
+                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Fetch notifications from API
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+                    const response = await fetch(`${baseUrl}/api/notifications`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notifications = data.data;
+                        
+                        if (notifications.length === 0) {
+                            notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Render notifications
+                        notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+                        // Add click handler to mark notifications as read
+                        const notificationItems = document.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const notificationId = item.dataset.notificationId;
+                                if (item.classList.contains('unread')) {
+                                    try {
+                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+                                            method: 'PATCH',
+                                            credentials: 'include'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            // Update UI
+                                            item.classList.remove('unread');
+                                            const unreadDot = item.querySelector('.unread-dot');
+                                            if (unreadDot) unreadDot.remove();
+                                            
+                                            // Update unread count
+                                            await fetchUnreadCount();
+                                        }
+                                    } catch (error) {
+                                        console.error('Error marking notification as read:', error);
+                                    }
+                                }
+
+                                // Close notification modal
+                                notificationModal.classList.remove('active');
+
+                                // Redirect to application page
+                                window.location.href = '/application';
+                            });
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch notifications');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial fetch of notifications and unread count
+            fetchNotifications();
+            fetchUnreadCount();
+
+            // Refresh unread count periodically
+            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        });
+    
   </script>
 
   <script src="/js/main.js"></script>

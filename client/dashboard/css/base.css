@@ -371,6 +371,31 @@ body {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
+/* Action buttons and icons */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-icon.checked {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--success-color);
+  font-size: 1.2rem;
+  margin-right: 8px;
+  cursor: default;
+}
+
+.action-icon.checked i {
+  transition: transform 0.2s ease;
+}
+
+.action-icon.checked:hover i {
+  transform: scale(1.1);
+}
+
 .members-table {
   min-width: 1000px;
   width: 100%;
@@ -933,7 +958,7 @@ textarea {
   font-size: 0.9rem;
   color: #666;
 }
-
+/* 
 /* Notification Modal Styles */
 .notification {
   position: relative;
@@ -1026,7 +1051,7 @@ textarea {
   padding: 20px;
   text-align: center;
   color: #666;
-}
+} */
 
 /* global pop notification */
 
@@ -1064,96 +1089,6 @@ textarea {
   display: none;
   /* Hidden by default, shown only when there are unread notifications */
 }
-
-.notification-modal {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 350px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: none;
-  z-index: 1000;
-  margin-top: 10px;
-}
-
-.notification-modal.active {
-  display: block;
-}
-
-.notification-header {
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.notification-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: var(--dark-color);
-}
-
-.close-notifications {
-  background: none;
-  border: none;
-  color: #666;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 5px;
-}
-
-.notification-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.notification-item {
-  padding: 12px 15px;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.notification-item:hover {
-  background-color: #f8f9fa;
-}
-
-.notification-item.unread {
-  background-color: #f0f7ff;
-}
-
-.notification-item .notification-title {
-  font-weight: 500;
-  margin-bottom: 5px;
-  color: var(--dark-color);
-}
-
-.notification-item .notification-message {
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.notification-item .notification-time {
-  font-size: 0.8rem;
-  color: #999;
-}
-
-.notification-loading {
-  padding: 20px;
-  text-align: center;
-  color: #666;
-}
-
-.notification-empty {
-  padding: 20px;
-  text-align: center;
-  color: #666;
-}
-
 
 /* event modal preview-image */
 .preview-image {

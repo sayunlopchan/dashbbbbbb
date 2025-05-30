@@ -1002,40 +1002,6 @@
             setInterval(fetchUnreadCount, 30000); // Every 30 seconds
         });
     </script>
-    <style>
-        .notification-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .view-all-link {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .view-all-link:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-
-        .unread-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--danger-color);
-            border-radius: 50%;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        .notification-badge {
-            display: none; /* Hidden by default, shown only when there are unread notifications */
-        }
-    </style>
 </body>
 
 </html>

@@ -91,11 +91,11 @@
             </li>
             <li>
                 <a href="/product">
-                  <i class="fas fa-box"></i>
-                  <span>Product</span>
-                  <div class="tooltip">Product</div>
+                    <i class="fas fa-box"></i>
+                    <span>Product</span>
+                    <div class="tooltip">Product</div>
                 </a>
-              </li>
+            </li>
             <li class="logout-item">
                 <a href="#" id="logoutButton">
                     <i class="fas fa-sign-out-alt"></i>
@@ -117,9 +117,23 @@
                 <h3>Employee</h3>
             </div>
             <div class="topbar-right">
-                <div class="notification">
+                <div class="notification" id="notificationIcon">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge">0</span>
+                    <!-- Notification Modal -->
+                    <div class="notification-modal" id="notificationModal">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <button class="close-notifications" id="closeNotifications">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="notificationList" class="notification-list">
+                            <!-- Notifications will be inserted here dynamically -->
+                            <div class="notification-loading">Loading notifications...</div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="user-greeting">
                     <img src="/img/Knox Logo-01.png" alt="User">
@@ -127,6 +141,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Content -->
         <div class="content">
@@ -155,88 +170,41 @@
             </div>
             <!-- Enrolled Members Table -->
             <div class="table-container">
-            <table class="trainer-table">
-                <thead>
-                    <tr>
-                        <th>S.N</th>
-                        <th>Id</th>
-                        <th>Full Name</th>
-                        <th>Email Id</th>
-                        <th>Contact No.</th>
-                        <th>Joining Date</th>
-                        <th>Position</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>
-                            <span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span>
-                        </td>
-                        <td>
-                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <!-- <tr>
-                        <td>2</td>
-                        <td>KB300</td>
-                        <td>Anish Karki</td>
-                        <td>karki@anish.com</td>
-                        <td>06/05/2025</td>
-                        <td>9876543210</td>
-                        <td>Receptionist</td>
-                        <td>
-                            <span class="status inactive"> <i class="fa-solid fa-circle-exclamation"></i> Inactive</span>
-                        </td>
-                        <td>
-                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>KB300</td>
-                        <td>Anish Karki</td>
-                        <td>karki@anish.com</td>
-                        <td>06/05/2025</td>
-                        <td>9876543210</td>
-                        <td>Receptionist</td>
-                        <td>
-                            <span class="status active"> <i class="fa-solid fa-circle-check"></i> Active</span>
-                        </td>
-                        <td>
-                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>KB300</td>
-                        <td>Anish Karki</td>
-                        <td>karki@anish.com</td>
-                        <td>06/05/2025</td>
-                        <td>9876543210</td>
-                        <td>Receptionist</td>
-                        <td>
-                            <span class="status inactive"> <i class="fa-solid fa-circle-exclamation"></i> Inactive</span>
-                        </td>
-                        <td>
-                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr> -->
-                </tbody>
-            </table>
-</div>
+                <table class="trainer-table">
+                    <thead>
+                        <tr>
+                            <th>S.N</th>
+                            <th>Id</th>
+                            <th>Full Name</th>
+                            <th>Email Id</th>
+                            <th>Contact No.</th>
+                            <th>Joining Date</th>
+                            <th>Position</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>
+                                <span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span>
+                            </td>
+                            <td>
+                                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
             <!-- Pagination Controls -->
             <div class="pagination-controls">
                 <button id="prevPage" class="pagination-btn" disabled>
@@ -301,164 +269,165 @@
         </div>
     </div>
 
-    <!-- Remove the local confirmation modal since we'll use the global one -->
+
+
     <script src="/js/main.js"></script>
-
     <script>
-        // DOM Elements
-        const addEmployeeBtn = document.getElementById('addEmployeeBtn');
-        const addEmployeeModal = document.getElementById('addEmployeeModal');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const employeeForm = document.getElementById('employeeForm');
-        const employeeTableBody = document.querySelector('.trainer-table tbody');
-        const prevPageBtn = document.getElementById("prevPage");
-        const nextPageBtn = document.getElementById("nextPage");
-        const pageInfo = document.getElementById("pageInfo");
+        document.addEventListener('DOMContentLoaded', function () {
+            // DOM Elements
+            const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+            const addEmployeeModal = document.getElementById('addEmployeeModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const employeeForm = document.getElementById('employeeForm');
+            const employeeTableBody = document.querySelector('.trainer-table tbody');
+            const prevPageBtn = document.getElementById("prevPage");
+            const nextPageBtn = document.getElementById("nextPage");
+            const pageInfo = document.getElementById("pageInfo");
 
-        // Pagination state
-        let currentPage = 1;
-        let totalPages = 1;
-        const itemsPerPage = 10;
-        let allEmployees = []; // Store all employees
-        let currentAction = null;
-        let currentEmployeeId = null;
+            // Pagination state
+            let currentPage = 1;
+            let totalPages = 1;
+            const itemsPerPage = 10;
+            let allEmployees = []; // Store all employees
+            let currentAction = null;
+            let currentEmployeeId = null;
 
-        // Utility Functions
-        const toast = (message, type = 'success') => {
-            window.toast(message, type);
-        };
+            // Utility Functions
+            const toast = (message, type = 'success') => {
+                window.toast(message, type);
+            };
 
-        const validateForm = (formData) => {
-            const errors = [];
+            const validateForm = (formData) => {
+                const errors = [];
 
-            // Full Name validation
-            if (!formData.fullName || formData.fullName.trim().length < 2) {
-                errors.push('Please enter a valid full name');
-            }
+                // Full Name validation
+                if (!formData.fullName || formData.fullName.trim().length < 2) {
+                    errors.push('Please enter a valid full name');
+                }
 
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!formData.email || !emailRegex.test(formData.email)) {
-                errors.push('Please enter a valid email address');
-            }
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!formData.email || !emailRegex.test(formData.email)) {
+                    errors.push('Please enter a valid email address');
+                }
 
-            // Contact validation
-            const contactRegex = /^[0-9]{10,15}$/;
-            if (!formData.contact || !contactRegex.test(formData.contact)) {
-                errors.push('Please enter a valid 10-15 digit contact number');
-            }
+                // Contact validation
+                const contactRegex = /^[0-9]{10,15}$/;
+                if (!formData.contact || !contactRegex.test(formData.contact)) {
+                    errors.push('Please enter a valid 10-15 digit contact number');
+                }
 
-            // Position validation
-            if (!formData.position || formData.position.trim().length < 2) {
-                errors.push('Please enter a valid position');
-            }
+                // Position validation
+                if (!formData.position || formData.position.trim().length < 2) {
+                    errors.push('Please enter a valid position');
+                }
 
-            // Join Date validation
-            if (!formData.joiningDate) {
-                errors.push('Please select a joining date');
-            }
+                // Join Date validation
+                if (!formData.joiningDate) {
+                    errors.push('Please select a joining date');
+                }
 
-            // Status validation
-            if (!['active', 'inactive'].includes(formData.status)) {
-                errors.push('Please select a valid status');
-            }
+                // Status validation
+                if (!['active', 'inactive'].includes(formData.status)) {
+                    errors.push('Please select a valid status');
+                }
 
-            return errors;
-        };
+                return errors;
+            };
 
-        const resetModal = () => {
-            employeeForm.reset();
-            document.querySelector('#addEmployeeModal .modal-header h2').textContent = 'Add New Employee';
-            document.querySelector('#employeeForm button[type="submit"]').textContent = 'Add Employee';
-            employeeForm.dataset.mode = 'add';
-            delete employeeForm.dataset.employeeId;
-        };
+            const resetModal = () => {
+                employeeForm.reset();
+                document.querySelector('#addEmployeeModal .modal-header h2').textContent = 'Add New Employee';
+                document.querySelector('#employeeForm button[type="submit"]').textContent = 'Add Employee';
+                employeeForm.dataset.mode = 'add';
+                delete employeeForm.dataset.employeeId;
+            };
 
-        // Fetch and Display Employees
-        async function fetchEmployees(page = 1) {
-            try {
-                // Get status filter value
-                const statusFilter = document.getElementById('statusFilter').value;
+            // Fetch and Display Employees
+            async function fetchEmployees(page = 1) {
+                try {
+                    // Get status filter value
+                    const statusFilter = document.getElementById('statusFilter').value;
 
-                let query = [];
-                if (statusFilter) query.push(`status=${statusFilter}`);
-                const queryString = query.length ? "?" + query.join("&") : "";
+                    let query = [];
+                    if (statusFilter) query.push(`status=${statusFilter}`);
+                    const queryString = query.length ? "?" + query.join("&") : "";
 
-                const response = await fetch(`/api/employees${queryString}`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Store all employees
-                    allEmployees = result.data;
+                    const response = await fetch(`/api/employees${queryString}`);
+                    const result = await response.json();
 
-                    // Calculate pagination
-                    const startIndex = (page - 1) * itemsPerPage;
-                    const endIndex = startIndex + itemsPerPage;
-                    const paginatedEmployees = allEmployees.slice(startIndex, endIndex);
+                    if (result.success) {
+                        // Store all employees
+                        allEmployees = result.data;
 
-                    // Calculate total pages
-                    totalPages = Math.ceil(allEmployees.length / itemsPerPage);
+                        // Calculate pagination
+                        const startIndex = (page - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        const paginatedEmployees = allEmployees.slice(startIndex, endIndex);
 
-                    // Render the table with paginated data
-                    displayEmployees(paginatedEmployees);
+                        // Calculate total pages
+                        totalPages = Math.ceil(allEmployees.length / itemsPerPage);
 
-                    // Update pagination
-                    updatePagination({
-                        currentPage: page,
-                        totalPages: totalPages,
-                        total: allEmployees.length
-                    });
-                } else {
-                    console.error('Failed to fetch employees:', result.message);
+                        // Render the table with paginated data
+                        displayEmployees(paginatedEmployees);
+
+                        // Update pagination
+                        updatePagination({
+                            currentPage: page,
+                            totalPages: totalPages,
+                            total: allEmployees.length
+                        });
+                    } else {
+                        console.error('Failed to fetch employees:', result.message);
+                        employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading employees. Please try again.</td></tr>`;
+                        // Reset pagination on error
+                        updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+                    }
+                } catch (error) {
+                    console.error('Error fetching employees:', error);
                     employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading employees. Please try again.</td></tr>`;
                     // Reset pagination on error
                     updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
                 }
-            } catch (error) {
-                console.error('Error fetching employees:', error);
-                employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading employees. Please try again.</td></tr>`;
-                // Reset pagination on error
-                updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
-            }
-        }
-
-        function updatePagination(paginationData) {
-            // Ensure we have valid numbers for pagination
-            currentPage = parseInt(paginationData.currentPage) || 1;
-            totalPages = parseInt(paginationData.totalPages) || 1;
-
-            // Update page info with proper number formatting
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} employees)`;
-
-            // Update button states
-            prevPageBtn.disabled = currentPage <= 1;
-            nextPageBtn.disabled = currentPage >= totalPages;
-
-            // Add visual feedback for disabled state
-            prevPageBtn.classList.toggle('disabled', currentPage <= 1);
-            nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
-        }
-
-        // Display Employees in Table
-        function displayEmployees(employees) {
-            employeeTableBody.innerHTML = '';
-
-            if (!employees || !Array.isArray(employees) || employees.length === 0) {
-                employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">No employees found.</td></tr>`;
-                return;
             }
 
-            employees.forEach((employee, index) => {
-                if (!employee) return; // Skip invalid employees
+            function updatePagination(paginationData) {
+                // Ensure we have valid numbers for pagination
+                currentPage = parseInt(paginationData.currentPage) || 1;
+                totalPages = parseInt(paginationData.totalPages) || 1;
 
-                const tr = document.createElement("tr");
-                const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+                // Update page info with proper number formatting
+                pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} employees)`;
 
-                // Format dates safely
-                const joinDate = employee.joiningDate ?
-                    new Date(employee.joiningDate).toLocaleDateString() : 'N/A';
+                // Update button states
+                prevPageBtn.disabled = currentPage <= 1;
+                nextPageBtn.disabled = currentPage >= totalPages;
 
-                tr.innerHTML = `
+                // Add visual feedback for disabled state
+                prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+                nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
+            }
+
+            // Display Employees in Table
+            function displayEmployees(employees) {
+                employeeTableBody.innerHTML = '';
+
+                if (!employees || !Array.isArray(employees) || employees.length === 0) {
+                    employeeTableBody.innerHTML = `<tr><td colspan="9" class="text-center">No employees found.</td></tr>`;
+                    return;
+                }
+
+                employees.forEach((employee, index) => {
+                    if (!employee) return; // Skip invalid employees
+
+                    const tr = document.createElement("tr");
+                    const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+
+                    // Format dates safely
+                    const joinDate = employee.joiningDate ?
+                        new Date(employee.joiningDate).toLocaleDateString() : 'N/A';
+
+                    tr.innerHTML = `
                     <td>${rowNumber}</td>
                     <td>${employee.employeeId || 'N/A'}</td>
                     <td>${employee.fullName || 'N/A'}</td>
@@ -481,329 +450,329 @@
                         </button>
                     </td>
                 `;
-                employeeTableBody.appendChild(tr);
-            });
-
-            attachActionListeners();
-        }
-
-        // Edit Employee
-        function editEmployee(employeeId) {
-            console.log('Attempting to edit employee with ID:', employeeId);
-            
-            fetch(`/api/employees/${employeeId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(result => {
-                console.log('Received employee data:', result);
-                
-                if (!result.success) {
-                    throw new Error(result.message || 'Failed to fetch employee details');
-                }
-
-                const employee = result.data;
-                
-                // Safe date parsing
-                let formattedDate = '';
-                try {
-                    const joiningDate = new Date(employee.joiningDate);
-                    
-                    // Check if date is valid
-                    if (!isNaN(joiningDate.getTime())) {
-                        // Format date to YYYY-MM-DD for input
-                        const year = joiningDate.getFullYear();
-                        const month = String(joiningDate.getMonth() + 1).padStart(2, '0');
-                        const day = String(joiningDate.getDate()).padStart(2, '0');
-                        formattedDate = `${year}-${month}-${day}`;
-                    } else {
-                        console.warn('Invalid date received:', employee.joiningDate);
-                    }
-                } catch (dateError) {
-                    console.error('Error parsing date:', dateError);
-                }
-                
-                // Populate form with employee data
-                document.getElementById('fullName').value = employee.fullName || '';
-                document.getElementById('email').value = employee.email || '';
-                document.getElementById('contact').value = employee.contact || '';
-                document.getElementById('position').value = employee.position || '';
-                document.getElementById('date').value = formattedDate;
-                
-                // Set status
-                const statusActive = document.getElementById('statusActive');
-                const statusInactive = document.getElementById('statusInactive');
-                
-                if (employee.status === 'inactive') {
-                    statusInactive.checked = true;
-                } else {
-                    statusActive.checked = true;
-                }
-
-                // Change modal title and button text
-                document.querySelector('#addEmployeeModal .modal-header h2').textContent = 'Update Employee';
-                document.querySelector('#employeeForm button[type="submit"]').textContent = 'Update Employee';
-                
-                // Set form mode and employee ID
-                employeeForm.dataset.mode = 'edit';
-                employeeForm.dataset.employeeId = employeeId;
-
-                // Show modal
-                addEmployeeModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            })
-            .catch(error => {
-                console.error('Error in editEmployee:', error);
-                toast(`Failed to fetch employee details: ${error.message}`, 'error');
-            });
-        }
-
-        // Show Confirmation Dialog
-        function showConfirmationDialog(title, message, action, employeeId) {
-            currentAction = action;
-            currentEmployeeId = employeeId;
-
-            window.confirmDialog({
-                title: title,
-                message: message,
-                type: action === 'delete' ? 'delete' : 'warning'
-            }).then(confirmed => {
-                if (confirmed && currentAction === 'delete') {
-                    deleteEmployee(currentEmployeeId);
-                }
-            });
-        }
-
-        // Delete Employee
-        async function deleteEmployee(employeeId) {
-            try {
-                const response = await fetch(`/api/employees/${employeeId}`, {
-                    method: 'DELETE'
+                    employeeTableBody.appendChild(tr);
                 });
-                const result = await response.json();
-                
-                if (result.success) {
-                    window.toast('Employee deleted successfully', 'success');
-                    fetchEmployees(currentPage); // refresh current page
-                } else {
-                    window.toast(result.message || 'Failed to delete employee', 'error');
-                }
-            } catch (error) {
-                console.error('Error deleting employee:', error);
-                window.toast('Failed to delete employee. Please try again.', 'error');
-            }
-        }
 
-        // Attach Action Listeners
-        function attachActionListeners() {
-            document.querySelectorAll('.action-btn.edit').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const employeeId = btn.getAttribute('data-employee-id');
-                    editEmployee(employeeId);
-                });
-            });
-
-            document.querySelectorAll('.action-btn.delete').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const employeeId = btn.getAttribute('data-employee-id');
-                    if (employeeId) {
-                        showConfirmationDialog(
-                            'Delete Employee',
-                            'Are you sure you want to delete this employee? This action cannot be undone.',
-                            'delete',
-                            employeeId
-                        );
-                    }
-                });
-            });
-        }
-
-        // Modal Handling
-        addEmployeeBtn.addEventListener('click', function() {
-            resetModal();
-            addEmployeeModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        cancelBtn.addEventListener('click', function() {
-            addEmployeeModal.classList.remove('active');
-            document.body.style.overflow = '';
-        });
-
-        // Close modal when clicking outside
-        addEmployeeModal.addEventListener('click', function(e) {
-            if (e.target === addEmployeeModal) {
-                addEmployeeModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        });
-
-        // Pagination event listeners
-        prevPageBtn.addEventListener("click", () => {
-            if (currentPage > 1) {
-                fetchEmployees(currentPage - 1);
-            }
-        });
-
-        nextPageBtn.addEventListener("click", () => {
-            if (currentPage < totalPages) {
-                fetchEmployees(currentPage + 1);
-            }
-        });
-
-        // Modify existing event listeners to work with pagination
-        document.getElementById('statusFilter').addEventListener('change', () => {
-            currentPage = 1; // Reset to first page when filter changes
-            fetchEmployees(currentPage);
-        });
-
-        // Form Submission Handler
-        employeeForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = {
-                fullName: document.getElementById('fullName').value,
-                email: document.getElementById('email').value,
-                contact: document.getElementById('contact').value,
-                position: document.getElementById('position').value,
-                joiningDate: document.getElementById('date').value,
-                status: document.querySelector('input[name="status"]:checked').value
-            };
-
-            const validationErrors = validateForm(formData);
-            if (validationErrors.length > 0) {
-                toast(validationErrors.join(', '), 'error');
-                return;
+                attachActionListeners();
             }
 
-            try {
-                const mode = employeeForm.dataset.mode || 'add';
-                const employeeId = employeeForm.dataset.employeeId;
-                
-                console.log('Form submission mode:', mode);
-                console.log('Employee ID:', employeeId);
-                console.log('Form data:', formData);
+            // Edit Employee
+            function editEmployee(employeeId) {
+                console.log('Attempting to edit employee with ID:', employeeId);
 
-                const url = mode === 'add' 
-                    ? '/api/employees' 
-                    : `/api/employees/${employeeId}`;
-                
-                const method = mode === 'add' ? 'POST' : 'PUT';
-
-                const response = await fetch(url, {
-                    method: method,
+                fetch(`/api/employees/${employeeId}`, {
+                    method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
+                    }
+                })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        console.log('Received employee data:', result);
+
+                        if (!result.success) {
+                            throw new Error(result.message || 'Failed to fetch employee details');
+                        }
+
+                        const employee = result.data;
+
+                        // Safe date parsing
+                        let formattedDate = '';
+                        try {
+                            const joiningDate = new Date(employee.joiningDate);
+
+                            // Check if date is valid
+                            if (!isNaN(joiningDate.getTime())) {
+                                // Format date to YYYY-MM-DD for input
+                                const year = joiningDate.getFullYear();
+                                const month = String(joiningDate.getMonth() + 1).padStart(2, '0');
+                                const day = String(joiningDate.getDate()).padStart(2, '0');
+                                formattedDate = `${year}-${month}-${day}`;
+                            } else {
+                                console.warn('Invalid date received:', employee.joiningDate);
+                            }
+                        } catch (dateError) {
+                            console.error('Error parsing date:', dateError);
+                        }
+
+                        // Populate form with employee data
+                        document.getElementById('fullName').value = employee.fullName || '';
+                        document.getElementById('email').value = employee.email || '';
+                        document.getElementById('contact').value = employee.contact || '';
+                        document.getElementById('position').value = employee.position || '';
+                        document.getElementById('date').value = formattedDate;
+
+                        // Set status
+                        const statusActive = document.getElementById('statusActive');
+                        const statusInactive = document.getElementById('statusInactive');
+
+                        if (employee.status === 'inactive') {
+                            statusInactive.checked = true;
+                        } else {
+                            statusActive.checked = true;
+                        }
+
+                        // Change modal title and button text
+                        document.querySelector('#addEmployeeModal .modal-header h2').textContent = 'Update Employee';
+                        document.querySelector('#employeeForm button[type="submit"]').textContent = 'Update Employee';
+
+                        // Set form mode and employee ID
+                        employeeForm.dataset.mode = 'edit';
+                        employeeForm.dataset.employeeId = employeeId;
+
+                        // Show modal
+                        addEmployeeModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    })
+                    .catch(error => {
+                        console.error('Error in editEmployee:', error);
+                        toast(`Failed to fetch employee details: ${error.message}`, 'error');
+                    });
+            }
+
+            // Show Confirmation Dialog
+            function showConfirmationDialog(title, message, action, employeeId) {
+                currentAction = action;
+                currentEmployeeId = employeeId;
+
+                window.confirmDialog({
+                    title: title,
+                    message: message,
+                    type: action === 'delete' ? 'delete' : 'warning'
+                }).then(confirmed => {
+                    if (confirmed && currentAction === 'delete') {
+                        deleteEmployee(currentEmployeeId);
+                    }
+                });
+            }
+
+            // Delete Employee
+            async function deleteEmployee(employeeId) {
+                try {
+                    const response = await fetch(`/api/employees/${employeeId}`, {
+                        method: 'DELETE'
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        window.toast('Employee deleted successfully', 'success');
+                        fetchEmployees(currentPage); // refresh current page
+                    } else {
+                        window.toast(result.message || 'Failed to delete employee', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting employee:', error);
+                    window.toast('Failed to delete employee. Please try again.', 'error');
+                }
+            }
+
+            // Attach Action Listeners
+            function attachActionListeners() {
+                document.querySelectorAll('.action-btn.edit').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const employeeId = btn.getAttribute('data-employee-id');
+                        editEmployee(employeeId);
+                    });
                 });
 
-                const result = await response.json();
+                document.querySelectorAll('.action-btn.delete').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const employeeId = btn.getAttribute('data-employee-id');
+                        if (employeeId) {
+                            showConfirmationDialog(
+                                'Delete Employee',
+                                'Are you sure you want to delete this employee? This action cannot be undone.',
+                                'delete',
+                                employeeId
+                            );
+                        }
+                    });
+                });
+            }
 
-                console.log('Server response:', result);
+            // Modal Handling
+            addEmployeeBtn.addEventListener('click', function () {
+                resetModal();
+                addEmployeeModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
 
-                if (response.ok) {
+            cancelBtn.addEventListener('click', function () {
+                addEmployeeModal.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            // Close modal when clicking outside
+            addEmployeeModal.addEventListener('click', function (e) {
+                if (e.target === addEmployeeModal) {
                     addEmployeeModal.classList.remove('active');
                     document.body.style.overflow = '';
-                    
-                    resetModal();
-                    fetchEmployees();
-
-                    toast(`Employee ${mode === 'add' ? 'added' : 'updated'} successfully!`);
-                } else {
-                    throw new Error(result.message || `Failed to ${mode} employee`);
                 }
-            } catch (error) {
-                console.error('Error in form submission:', error);
-                toast(error.message, 'error');
-            }
-        });
-
-        // Add reset button event listener
-        document.getElementById('resetEmployeeFilters').addEventListener('click', () => {
-            currentPage = 1;
-            document.getElementById('statusFilter').value = '';
-            fetchEmployees(1);
-            window.toast('Filters have been reset', 'info');
-        });
-
-        // Add download button event listener
-        document.getElementById('downloadEmployees').addEventListener('click', () => {
-            // Get the filtered employees
-            const filteredEmployees = allEmployees.filter(employee => {
-                const status = document.getElementById('statusFilter').value;
-                if (status && employee.status !== status) {
-                    return false;
-                }
-                return true;
             });
 
-            if (filteredEmployees.length === 0) {
-                window.toast('No employee data to download', 'error');
-                return;
-            }
-
-            // Create CSV content
-            const headers = ['S.N', 'Employee ID', 'Full Name', 'Email', 'Contact', 'Position', 'Joining Date', 'Status'];
-            const csvContent = [
-                headers.join(','),
-                ...filteredEmployees.map((employee, index) => [
-                    index + 1,
-                    employee.employeeId,
-                    employee.fullName,
-                    employee.email,
-                    employee.contact,
-                    employee.position,
-                    formatDate(employee.joiningDate),
-                    employee.status.charAt(0).toUpperCase() + employee.status.slice(1)
-                ].join(','))
-            ].join('\n');
-
-            // Create and download file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            const date = new Date().toISOString().split('T')[0];
-            
-            link.setAttribute('href', url);
-            link.setAttribute('download', `employees_list_${date}.csv`);
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-
-        // Add print button event listener
-        document.getElementById('printEmployees').addEventListener('click', () => {
-            // Get the filtered employees
-            const filteredEmployees = allEmployees.filter(employee => {
-                const status = document.getElementById('statusFilter').value;
-                if (status && employee.status !== status) {
-                    return false;
+            // Pagination event listeners
+            prevPageBtn.addEventListener("click", () => {
+                if (currentPage > 1) {
+                    fetchEmployees(currentPage - 1);
                 }
-                return true;
             });
 
-            if (filteredEmployees.length === 0) {
-                window.toast('No employee data to print', 'error');
-                return;
-            }
+            nextPageBtn.addEventListener("click", () => {
+                if (currentPage < totalPages) {
+                    fetchEmployees(currentPage + 1);
+                }
+            });
 
-            // Create print window
-            const printWindow = window.open('', '_blank');
+            // Modify existing event listeners to work with pagination
+            document.getElementById('statusFilter').addEventListener('change', () => {
+                currentPage = 1; // Reset to first page when filter changes
+                fetchEmployees(currentPage);
+            });
 
-            // Create print content
-            const printContent = `
+            // Form Submission Handler
+            employeeForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                const formData = {
+                    fullName: document.getElementById('fullName').value,
+                    email: document.getElementById('email').value,
+                    contact: document.getElementById('contact').value,
+                    position: document.getElementById('position').value,
+                    joiningDate: document.getElementById('date').value,
+                    status: document.querySelector('input[name="status"]:checked').value
+                };
+
+                const validationErrors = validateForm(formData);
+                if (validationErrors.length > 0) {
+                    toast(validationErrors.join(', '), 'error');
+                    return;
+                }
+
+                try {
+                    const mode = employeeForm.dataset.mode || 'add';
+                    const employeeId = employeeForm.dataset.employeeId;
+
+                    console.log('Form submission mode:', mode);
+                    console.log('Employee ID:', employeeId);
+                    console.log('Form data:', formData);
+
+                    const url = mode === 'add'
+                        ? '/api/employees'
+                        : `/api/employees/${employeeId}`;
+
+                    const method = mode === 'add' ? 'POST' : 'PUT';
+
+                    const response = await fetch(url, {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+
+                    console.log('Server response:', result);
+
+                    if (response.ok) {
+                        addEmployeeModal.classList.remove('active');
+                        document.body.style.overflow = '';
+
+                        resetModal();
+                        fetchEmployees();
+
+                        toast(`Employee ${mode === 'add' ? 'added' : 'updated'} successfully!`);
+                    } else {
+                        throw new Error(result.message || `Failed to ${mode} employee`);
+                    }
+                } catch (error) {
+                    console.error('Error in form submission:', error);
+                    toast(error.message, 'error');
+                }
+            });
+
+            // Add reset button event listener
+            document.getElementById('resetEmployeeFilters').addEventListener('click', () => {
+                currentPage = 1;
+                document.getElementById('statusFilter').value = '';
+                fetchEmployees(1);
+                window.toast('Filters have been reset', 'info');
+            });
+
+            // Add download button event listener
+            document.getElementById('downloadEmployees').addEventListener('click', () => {
+                // Get the filtered employees
+                const filteredEmployees = allEmployees.filter(employee => {
+                    const status = document.getElementById('statusFilter').value;
+                    if (status && employee.status !== status) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (filteredEmployees.length === 0) {
+                    window.toast('No employee data to download', 'error');
+                    return;
+                }
+
+                // Create CSV content
+                const headers = ['S.N', 'Employee ID', 'Full Name', 'Email', 'Contact', 'Position', 'Joining Date', 'Status'];
+                const csvContent = [
+                    headers.join(','),
+                    ...filteredEmployees.map((employee, index) => [
+                        index + 1,
+                        employee.employeeId,
+                        employee.fullName,
+                        employee.email,
+                        employee.contact,
+                        employee.position,
+                        formatDate(employee.joiningDate),
+                        employee.status.charAt(0).toUpperCase() + employee.status.slice(1)
+                    ].join(','))
+                ].join('\n');
+
+                // Create and download file
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                const date = new Date().toISOString().split('T')[0];
+
+                link.setAttribute('href', url);
+                link.setAttribute('download', `employees_list_${date}.csv`);
+                link.style.visibility = 'hidden';
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Add print button event listener
+            document.getElementById('printEmployees').addEventListener('click', () => {
+                // Get the filtered employees
+                const filteredEmployees = allEmployees.filter(employee => {
+                    const status = document.getElementById('statusFilter').value;
+                    if (status && employee.status !== status) {
+                        return false;
+                    }
+                    return true;
+                });
+
+                if (filteredEmployees.length === 0) {
+                    window.toast('No employee data to print', 'error');
+                    return;
+                }
+
+                // Create print window
+                const printWindow = window.open('', '_blank');
+
+                // Create print content
+                const printContent = `
                 <html>
                     <head>
                         <title>Employees Report</title>
@@ -857,33 +826,169 @@
                 </html>
             `;
 
-            // Write content to print window
-            printWindow.document.write(printContent);
-            printWindow.document.close();
+                // Write content to print window
+                printWindow.document.write(printContent);
+                printWindow.document.close();
 
-            // Wait for content to load then print
-            printWindow.onload = function() {
-                printWindow.print();
-                printWindow.close();
-            };
+                // Wait for content to load then print
+                printWindow.onload = function () {
+                    printWindow.print();
+                    printWindow.close();
+                };
 
-            window.toast('Printing employees list...', 'success');
-        });
-
-        // Helper function to format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
+                window.toast('Printing employees list...', 'success');
             });
-        }
 
-        // Initial fetch of employees
-        fetchEmployees();
+            // Helper function to format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+            }
+
+            // Initial fetch of employees
+            fetchEmployees();
+        })
+
+        // notification
+        document.addEventListener('DOMContentLoaded', function () {
+            const notificationIcon = document.getElementById('notificationIcon');
+            const notificationModal = document.getElementById('notificationModal');
+            const closeNotifications = document.getElementById('closeNotifications');
+            const notificationList = document.getElementById('notificationList');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Function to show modal
+            function showNotificationModal() {
+                notificationModal.style.display = 'block';
+                notificationModal.classList.add('active');
+                fetchNotifications();
+            }
+
+            // Function to hide modal
+            function hideNotificationModal() {
+                notificationModal.style.display = 'none';
+                notificationModal.classList.remove('active');
+            }
+
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = '<div class="notification-loading">Loading notifications...</div>';
+                    const response = await fetch('/api/notifications');
+                    const data = await response.json();
+
+                    if (data.success) {
+                        if (data.data.length === 0) {
+                            notificationList.innerHTML = '<div class="notification-empty">No notifications</div>';
+                        } else {
+                            notificationList.innerHTML = data.data.map(notification => `
+                                <div class="notification-item ${notification.read ? '' : 'unread'}" data-id="${notification.id}">
+                                    <div class="notification-title">${notification.title}</div>
+                                    <div class="notification-message">${notification.message}</div>
+                                    <div class="notification-time">${formatNotificationTime(notification.createdAt)}</div>
+                                </div>
+                            `).join('');
+
+                            // Attach click handlers to unread notifications
+                            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                                item.addEventListener('click', () => markAsRead(item.dataset.id));
+                            });
+                        }
+
+                        updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = '<div class="notification-error">Error loading notifications</div>';
+                }
+            }
+
+            async function updateUnreadCount() {
+                try {
+                    const response = await fetch('/api/notifications/unread-count');
+                    const data = await response.json();
+                    if (data.success) {
+                        const count = data.data.unreadCount;
+                        notificationBadge.textContent = count;
+                        notificationBadge.style.display = count > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error updating unread count:', error);
+                }
+            }
+
+            async function markAsRead(notificationId) {
+                try {
+                    const response = await fetch(`/api/notifications/${notificationId}/read`, {
+                        method: 'POST'
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                        if (notificationItem) {
+                            notificationItem.classList.remove('unread');
+                        }
+                        updateUnreadCount();
+                    }
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                }
+            }
+
+            function formatNotificationTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+
+                if (diffInSeconds < 60) return 'just now';
+                if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+                if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+                if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+
+                return date.toLocaleDateString();
+            }
+
+            // Updated event listeners
+            notificationIcon.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (notificationModal.classList.contains('active')) {
+                    hideNotificationModal();
+                } else {
+                    showNotificationModal();
+                }
+            });
+
+            closeNotifications.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                hideNotificationModal();
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function (e) {
+                if (
+                    notificationModal.classList.contains('active') &&
+                    !notificationModal.contains(e.target) &&
+                    !notificationIcon.contains(e.target)
+                ) {
+                    hideNotificationModal();
+                }
+            });
+
+            // Prevent modal from closing when clicking inside
+            notificationModal.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+
+            // Initial unread count update
+            updateUnreadCount();
+        });
+   
     </script>
     <script src="./js/logout.js"></script>
-</body>
-
-</html>
+</body></html>

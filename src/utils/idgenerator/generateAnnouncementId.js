@@ -18,8 +18,8 @@ const generateAnnouncementId = async () => {
     // Ensure sequence_value is a number and pad to 2 digits
     const paddedSequence = (counter.sequence_value || 1).toString().padStart(2, '0');
 
-    // Generate the announcement ID with ANN prefix
-    return `ANN${paddedSequence}`;
+    // Generate the announcement ID with KB-ANN prefix
+    return `KB-ANN${paddedSequence}`;
   } catch (error) {
     console.error('Error generating announcement ID:', error);
     

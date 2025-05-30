@@ -37,8 +37,19 @@ export const createAnnouncementService = async (announcementData) => {
     // Start transaction
     session.startTransaction();
 
-    // Generate unique announcement ID
-    const announcementId = await generateAnnouncementId();
+    // Get the last announcement to determine the next ID
+    const lastAnnouncement = await Announcement.findOne({}, {}, { sort: { 'announcementId': -1 } });
+    
+    let announcementId;
+    if (lastAnnouncement) {
+      // Extract the number from the last announcement ID
+      const lastNumber = parseInt(lastAnnouncement.announcementId.replace('KB-ANN', ''));
+      const nextNumber = lastNumber + 1;
+      announcementId = `KB-ANN${nextNumber.toString().padStart(2, '0')}`;
+    } else {
+      // If no announcements exist, start with KB-ANN01
+      announcementId = 'KB-ANN01';
+    }
 
     // Create new announcement
     const announcement = new Announcement({
@@ -48,6 +59,16 @@ export const createAnnouncementService = async (announcementData) => {
     });
 
     await announcement.save({ session });
+
+    // Update the counter to match the last used number
+    if (lastAnnouncement) {
+      const lastNumber = parseInt(lastAnnouncement.announcementId.replace('KB-ANN', ''));
+      await mongoose.model('Counter').findOneAndUpdate(
+        { name: 'announcement_counter' },
+        { sequence_value: lastNumber },
+        { upsert: true }
+      );
+    }
 
     // Commit transaction
     await session.commitTransaction();

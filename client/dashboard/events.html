@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/events.css">
-  
 </head>
 
 <body>
@@ -118,9 +117,29 @@
                 <h3>Events</h3>
             </div>
             <div class="topbar-right">
+                <!-- notification  -->
                 <div class="notification">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">3</span>
+                    <span class="notification-badge">0</span>
+                    
+                    <!-- Notification Modal -->
+                    <div class="notification-modal">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <div class="notification-actions">
+                                <a href="/notifications" class="view-all-link">View All</a>
+                                <button class="close-notifications">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="notification-list">
+                            <!-- Notifications will be populated here -->
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="user-greeting">
                     <img src="/img/Knox Logo-01.png" alt="User">
@@ -323,6 +342,104 @@
         </div>
     </div>
 
+    <!-- Add Edit Event Modal -->
+    <div class="modal-overlay" id="editEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Edit Event</h2>
+                    <p>Update event details</p>
+                </div>
+                <button class="modal-close" id="closeEditEventModal">&times;</button>
+            </div>
+            <form id="editEventForm">
+                <input type="hidden" id="editEventId">
+                <div class="form-grid form-grid-event">
+                    <div class="form-group">
+                        <label for="editEventTitle">Event Title</label>
+                        <input type="text" id="editEventTitle" name="title" required placeholder="Enter event title">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventOrganizer">Organizer</label>
+                        <input type="text" id="editEventOrganizer" name="organizer" required placeholder="Enter event organizer">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventCategory">Category</label>
+                        <select id="editEventCategory" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="fitness">Fitness</option>
+                            <option value="competition">Competition</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="social">Social</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventLocation">Location</label>
+                        <input type="text" id="editEventLocation" name="location" required placeholder="Enter event location">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventStartTime">Start Time</label>
+                        <input type="datetime-local" id="editEventStartTime" name="startTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventEndTime">End Time</label>
+                        <input type="datetime-local" id="editEventEndTime" name="endTime" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editEventDescription">Description</label>
+                        <textarea id="editEventDescription" name="description" rows="4" required placeholder="Enter event description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventTags">Tags (optional)</label>
+                        <input type="text" id="editEventTags" name="tags" placeholder="Enter tags separated by comma">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEventImages">Images (optional)</label>
+                        <input type="file" id="editEventImages" name="images" multiple accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <div class="image-preview-container" id="editImagePreviewContainer"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelEditEventModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Edit Announcement Modal -->
+    <div class="modal-overlay" id="editAnnouncementModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>Edit Announcement</h2>
+                    <p>Update announcement details</p>
+                </div>
+                <button class="modal-close" id="closeEditAnnouncementModal">&times;</button>
+            </div>
+            <form id="editAnnouncementForm">
+                <input type="hidden" id="editAnnouncementId">
+                <div class="form-grid form-grid-announcement">
+                    <div class="form-group">
+                        <label for="editAnnouncementTitle">Announcement Title</label>
+                        <input type="text" id="editAnnouncementTitle" name="title" required placeholder="Enter announcement title">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="editAnnouncementDescription">Description</label>
+                        <textarea id="editAnnouncementDescription" name="description" rows="4" required placeholder="Enter announcement description"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelEditAnnouncementModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Announcement</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Function to format date
         function formatDate(dateString) {
@@ -368,15 +485,29 @@
             events.forEach(event => {
                 const eventCard = document.createElement('div');
                 eventCard.classList.add('card');
+                
+                // Create image container if event has images
+                let imageHTML = '';
+                if (event.images && event.images.length > 0) {
+                    imageHTML = `
+                        <div class="event-images">
+                            ${event.images.map(image => `
+                                <img src="${image}" alt="${event.title}" class="event-image" onerror="this.style.display='none'">
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
                 eventCard.innerHTML = `
+                    ${imageHTML}
                     <h3>${event.title}</h3>
                     <small>${formatDate(event.startTime)}</small>
                     <p>${event.description}</p>
                     <p class="participants">👥 ${event.participantCount || 0} participants <br> 
-                        <span class="instructor">with ${event.authorName}</span>
+                        <span class="instructor">with ${event.organizer}</span>
                     </p>
-                    <p class="edit" data-event-id="${event.eventId}"><i class="fa-solid fa-pen"></i></p>
-                    <p class="delete" data-event-id="${event.eventId}"><i class="fa-solid fa-trash"></i></p>
+                    <p class="edit" data-event-id="${event.eventId}" data-event='${JSON.stringify(event)}'><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete" data-event-id="${event.eventId}" data-event='${JSON.stringify(event)}'><i class="fa-solid fa-trash"></i></p>
                 `;
                 eventsContainer.appendChild(eventCard);
             });
@@ -408,14 +539,14 @@
 
         // Handle edit event
         function handleEditEvent(event) {
-            const eventId = event.currentTarget.dataset.eventId;
-            // Open edit modal and populate with event details
-            openEditEventModal(eventId);
+            const eventData = JSON.parse(event.currentTarget.dataset.event);
+            openEditEventModal(eventData);
         }
 
         // Handle delete event
         async function handleDeleteEvent(event) {
             const eventId = event.currentTarget.dataset.eventId;
+            const eventData = JSON.parse(event.currentTarget.closest('.card').querySelector('.edit').dataset.event);
             
             const confirmed = await window.confirmDialog({
                 title: 'Delete Event',
@@ -426,9 +557,12 @@
             if (!confirmed) return;
 
             try {
-                const response = await fetch(`/api/events/${eventId}`, {
+                console.log('Attempting to delete event with ID:', eventData.eventId); // Debug log
+                const response = await fetch(`/api/events/${eventData.eventId}`, {
                     method: 'DELETE'
                 });
+
+                console.log('Delete response status:', response.status); // Debug log
 
                 if (response.ok) {
                     window.toast('Event deleted successfully', 'success');
@@ -443,14 +577,289 @@
             }
         }
 
-        // Open edit event modal (to be implemented)
-        function openEditEventModal(eventId) {
-            // TODO: Implement edit event modal functionality
-            window.toast('Edit functionality coming soon', 'info');
+        // Edit Event Modal Elements
+        const editEventModal = document.getElementById('editEventModal');
+        const closeEditEventModalBtn = document.getElementById('closeEditEventModal');
+        const cancelEditEventModalBtn = document.getElementById('cancelEditEventModal');
+        const editEventForm = document.getElementById('editEventForm');
+        const editImageUpload = document.getElementById('editEventImages');
+        const editImagePreviewContainer = document.getElementById('editImagePreviewContainer');
+
+        // Function to open edit event modal
+        async function openEditEventModal(event) {
+            try {
+                // Debug log to see what data we're receiving
+                console.log('Event data received:', event);
+
+                // Ensure we have valid data before proceeding
+                if (!event) {
+                    throw new Error('No event data received');
+                }
+
+                // Populate form with event details
+                const formFields = {
+                    'editEventId': event.eventId,
+                    'editEventTitle': event.title || '',
+                    'editEventOrganizer': event.organizer || '',
+                    'editEventCategory': event.category || '',
+                    'editEventLocation': event.location || '',
+                    'editEventDescription': event.description || '',
+                    'editEventTags': event.tags ? event.tags.join(', ') : ''
+                };
+
+                // Set form field values
+                Object.entries(formFields).forEach(([fieldId, value]) => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.value = value;
+                    } else {
+                        console.warn(`Element with id ${fieldId} not found`);
+                    }
+                });
+
+                // Format dates properly for datetime-local input
+                const formatDateForInput = (dateString) => {
+                    if (!dateString) return '';
+                    try {
+                        const date = new Date(dateString);
+                        if (isNaN(date.getTime())) {
+                            console.warn('Invalid date:', dateString);
+                            return '';
+                        }
+                        return date.toISOString().slice(0, 16);
+                    } catch (error) {
+                        console.error('Error formatting date:', error);
+                        return '';
+                    }
+                };
+
+                // Set date values
+                const startTimeElement = document.getElementById('editEventStartTime');
+                const endTimeElement = document.getElementById('editEventEndTime');
+
+                if (startTimeElement) {
+                    startTimeElement.value = formatDateForInput(event.startTime);
+                }
+                if (endTimeElement) {
+                    endTimeElement.value = formatDateForInput(event.endTime);
+                }
+
+                // Clear existing image previews
+                editImagePreviewContainer.innerHTML = '';
+
+                // Show existing images if any
+                if (event.images && Array.isArray(event.images) && event.images.length > 0) {
+                    event.images.forEach(imageUrl => {
+                        if (!imageUrl) return; // Skip invalid image URLs
+
+                        const imagePreview = document.createElement('div');
+                        imagePreview.classList.add('image-preview');
+
+                        const previewImg = document.createElement('img');
+                        previewImg.src = imageUrl;
+                        previewImg.classList.add('preview-image');
+                        previewImg.onerror = () => {
+                            console.warn('Failed to load image:', imageUrl);
+                            editImagePreviewContainer.removeChild(imagePreview);
+                        };
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.innerHTML = '×';
+                        removeBtn.classList.add('remove-image');
+                        removeBtn.style.position = 'absolute';
+                        removeBtn.style.top = '5px';
+                        removeBtn.style.right = '5px';
+                        removeBtn.style.background = 'rgba(255,0,0,0.7)';
+                        removeBtn.style.color = 'white';
+                        removeBtn.style.border = 'none';
+                        removeBtn.style.borderRadius = '50%';
+                        removeBtn.style.width = '15px';
+                        removeBtn.style.height = '15px';
+                        removeBtn.style.fontSize = '10px';
+                        removeBtn.style.display = 'flex';
+                        removeBtn.style.justifyContent = 'center';
+                        removeBtn.style.alignItems = 'center';
+                        removeBtn.style.cursor = 'pointer';
+
+                        removeBtn.addEventListener('click', () => {
+                            editImagePreviewContainer.removeChild(imagePreview);
+                            editImageUpload.disabled = false;
+                        });
+
+                        imagePreview.appendChild(previewImg);
+                        imagePreview.appendChild(removeBtn);
+                        imagePreview.style.position = 'relative';
+
+                        editImagePreviewContainer.appendChild(imagePreview);
+                    });
+                }
+
+                // Show modal
+                editEventModal.classList.add('active');
+            } catch (error) {
+                console.error('Error opening edit modal:', error);
+                window.toast('Failed to load event details', 'error');
+            }
         }
 
-        // Fetch events when page loads
-        document.addEventListener('DOMContentLoaded', fetchEvents);
+        // Close Edit Modal Functions
+        function closeEditEventModal() {
+            editEventModal.classList.remove('active');
+            editEventForm.reset();
+            editImagePreviewContainer.innerHTML = '';
+            editImageUpload.disabled = false;
+        }
+
+        closeEditEventModalBtn.addEventListener('click', closeEditEventModal);
+        cancelEditEventModalBtn.addEventListener('click', closeEditEventModal);
+
+        // Close modal when clicking outside
+        editEventModal.addEventListener('click', (e) => {
+            if (e.target === editEventModal) {
+                closeEditEventModal();
+            }
+        });
+
+        // Handle edit form submission
+        editEventForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const eventId = document.getElementById('editEventId').value;
+            console.log('Attempting to edit event with ID:', eventId); // Debug log
+
+            // Create FormData object
+            const formData = new FormData();
+            
+            // Add text fields
+            formData.append('title', document.getElementById('editEventTitle').value);
+            formData.append('organizer', document.getElementById('editEventOrganizer').value);
+            formData.append('category', document.getElementById('editEventCategory').value);
+            formData.append('location', document.getElementById('editEventLocation').value);
+
+            // Format dates properly
+            const startTime = document.getElementById('editEventStartTime').value;
+            const endTime = document.getElementById('editEventEndTime').value;
+            
+            if (startTime) {
+                formData.append('startTime', new Date(startTime).toISOString());
+            }
+            if (endTime) {
+                formData.append('endTime', new Date(endTime).toISOString());
+            }
+
+            formData.append('description', document.getElementById('editEventDescription').value);
+            
+            // Add tags if provided
+            const tags = document.getElementById('editEventTags').value;
+            if (tags) {
+                formData.append('tags', tags);
+            }
+
+            // Add new images if selected
+            if (editImageUpload.files.length > 0) {
+                for (let i = 0; i < editImageUpload.files.length; i++) {
+                    formData.append('images', editImageUpload.files[i]);
+                }
+            }
+
+            try {
+                console.log('Sending PUT request to:', `/api/events/${eventId}`); // Debug log
+                const response = await fetch(`/api/events/${eventId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                console.log('Response status:', response.status); // Debug log
+
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (response.status === 404) {
+                    window.toast('Event not found. It may have been deleted.', 'error');
+                    closeEditEventModal();
+                    fetchEvents(); // Refresh events list
+                    return;
+                }
+
+                const result = await response.json();
+                console.log('Response data:', result); // Debug log
+
+                if (response.ok) {
+                    window.toast('Event updated successfully!', 'success');
+                    closeEditEventModal();
+                    fetchEvents(); // Refresh events list
+                } else {
+                    window.toast(result.message || 'Failed to update event', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating event:', error);
+                window.toast('An error occurred while updating the event', 'error');
+            }
+        });
+
+        // Image Upload Handling for Edit Modal
+        editImageUpload.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            const currentImageCount = editImagePreviewContainer.querySelectorAll('.image-preview').length;
+
+            if (currentImageCount + files.length > 3) {
+                window.toast('You can only upload a maximum of 3 images', 'error');
+                e.target.value = '';
+                return;
+            }
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imagePreview = document.createElement('div');
+                    imagePreview.classList.add('image-preview');
+
+                    const previewImg = document.createElement('img');
+                    previewImg.src = event.target.result;
+                    previewImg.classList.add('preview-image');
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.innerHTML = '×';
+                    removeBtn.classList.add('remove-image');
+                    removeBtn.style.position = 'absolute';
+                    removeBtn.style.top = '5px';
+                    removeBtn.style.right = '5px';
+                    removeBtn.style.background = 'rgba(255,0,0,0.7)';
+                    removeBtn.style.color = 'white';
+                    removeBtn.style.border = 'none';
+                    removeBtn.style.borderRadius = '50%';
+                    removeBtn.style.width = '15px';
+                    removeBtn.style.height = '15px';
+                    removeBtn.style.fontSize = '10px';
+                    removeBtn.style.display = 'flex';
+                    removeBtn.style.justifyContent = 'center';
+                    removeBtn.style.alignItems = 'center';
+                    removeBtn.style.cursor = 'pointer';
+
+                    removeBtn.addEventListener('click', () => {
+                        editImagePreviewContainer.removeChild(imagePreview);
+                        editImageUpload.disabled = false;
+                    });
+
+                    imagePreview.appendChild(previewImg);
+                    imagePreview.appendChild(removeBtn);
+                    imagePreview.style.position = 'relative';
+
+                    editImagePreviewContainer.appendChild(imagePreview);
+
+                    const updatedImageCount = editImagePreviewContainer.querySelectorAll('.image-preview').length;
+                    if (updatedImageCount >= 3) {
+                        editImageUpload.disabled = true;
+                        window.toast('Maximum of 3 images reached', 'info');
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+
+            e.target.value = '';
+        });
 
         // Existing switchTab function
         function switchTab(tab) {
@@ -692,7 +1101,7 @@
                     <h3>${announcement.title}</h3>
                     <small>Posted on ${formatDate(announcement.postDate)} by ${announcement.authorName}</small>
                     <p>${announcement.description}</p>
-                    <p class="edit" data-announcement-id="${announcement.announcementId}"><i class="fa-solid fa-pen"></i></p>
+                    <p class="edit" data-announcement-id="${announcement.announcementId}" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-pen"></i></p>
                     <p class="delete" data-announcement-id="${announcement.announcementId}"><i class="fa-solid fa-trash"></i></p>
                 `;
                 announcementsContainer.appendChild(announcementCard);
@@ -711,8 +1120,8 @@
         // Handle edit announcement
         function handleEditAnnouncement(event) {
             const announcementId = event.currentTarget.dataset.announcementId;
-            // TODO: Implement edit announcement modal functionality
-            window.toast('Edit announcement functionality coming soon', 'info');
+            const announcementData = JSON.parse(event.currentTarget.dataset.announcement);
+            openEditAnnouncementModal(announcementData);
         }
 
         // Handle delete announcement
@@ -785,6 +1194,8 @@
             };
 
             try {
+                console.log('Creating announcement with data:', formData); // Debug log
+
                 const response = await fetch('/api/announcements', {
                     method: 'POST',
                     headers: {
@@ -793,7 +1204,20 @@
                     body: JSON.stringify(formData)
                 });
 
-                const result = await response.json();
+                console.log('Response status:', response.status); // Debug log
+
+                // Get the response text first
+                const responseText = await response.text();
+                console.log('Raw response:', responseText); // Debug log
+
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Error parsing response:', parseError);
+                    window.toast('Server returned invalid response', 'error');
+                    return;
+                }
 
                 if (response.ok) {
                     // Show success notification
@@ -803,8 +1227,10 @@
                     closeAnnouncementModal();
                     fetchAnnouncements(); // Refresh announcements list
                 } else {
-                    // Show error notification
-                    window.toast(result.message || 'Failed to create announcement', 'error');
+                    // Show error notification with more details
+                    const errorMessage = result.message || result.error || 'Failed to create announcement';
+                    console.error('Server error:', errorMessage);
+                    window.toast(errorMessage, 'error');
                 }
             } catch (error) {
                 console.error('Error creating announcement:', error);
@@ -863,6 +1289,243 @@
             fetchAnnouncements();
             setupSearch();
         });
+
+        // Edit Announcement Modal Elements
+        const editAnnouncementModal = document.getElementById('editAnnouncementModal');
+        const closeEditAnnouncementModalBtn = document.getElementById('closeEditAnnouncementModal');
+        const cancelEditAnnouncementModalBtn = document.getElementById('cancelEditAnnouncementModal');
+        const editAnnouncementForm = document.getElementById('editAnnouncementForm');
+
+        // Function to open edit announcement modal
+        function openEditAnnouncementModal(announcement) {
+            try {
+                console.log('Announcement data received:', announcement);
+
+                if (!announcement) {
+                    throw new Error('No announcement data received');
+                }
+
+                // Populate form with announcement details
+                document.getElementById('editAnnouncementId').value = announcement.announcementId;
+                document.getElementById('editAnnouncementTitle').value = announcement.title || '';
+                document.getElementById('editAnnouncementDescription').value = announcement.description || '';
+
+                // Show modal
+                editAnnouncementModal.classList.add('active');
+            } catch (error) {
+                console.error('Error opening edit announcement modal:', error);
+                window.toast('Failed to load announcement details', 'error');
+            }
+        }
+
+        // Close Edit Announcement Modal Functions
+        function closeEditAnnouncementModal() {
+            editAnnouncementModal.classList.remove('active');
+            editAnnouncementForm.reset();
+        }
+
+        closeEditAnnouncementModalBtn.addEventListener('click', closeEditAnnouncementModal);
+        cancelEditAnnouncementModalBtn.addEventListener('click', closeEditAnnouncementModal);
+
+        // Close modal when clicking outside
+        editAnnouncementModal.addEventListener('click', (e) => {
+            if (e.target === editAnnouncementModal) {
+                closeEditAnnouncementModal();
+            }
+        });
+
+        // Handle edit announcement form submission
+        editAnnouncementForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const announcementId = document.getElementById('editAnnouncementId').value;
+            console.log('Attempting to edit announcement with ID:', announcementId);
+
+            const formData = {
+                title: document.getElementById('editAnnouncementTitle').value,
+                description: document.getElementById('editAnnouncementDescription').value
+            };
+
+            try {
+                console.log('Sending PUT request to:', `/api/announcements/${announcementId}`);
+                const response = await fetch(`/api/announcements/${announcementId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (response.status === 404) {
+                    window.toast('Announcement not found. It may have been deleted.', 'error');
+                    closeEditAnnouncementModal();
+                    fetchAnnouncements();
+                    return;
+                }
+
+                const result = await response.json();
+                console.log('Response data:', result);
+
+                if (response.ok) {
+                    window.toast('Announcement updated successfully!', 'success');
+                    closeEditAnnouncementModal();
+                    fetchAnnouncements();
+                } else {
+                    window.toast(result.message || 'Failed to update announcement', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating announcement:', error);
+                window.toast('An error occurred while updating the announcement', 'error');
+            }
+        });
+    
+    
+            // Notification Modal Logic
+            document.addEventListener('DOMContentLoaded', function() {
+            const notificationIcon = document.querySelector('.notification');
+            const notificationModal = document.querySelector('.notification-modal');
+            const closeNotifications = document.querySelector('.close-notifications');
+            const notificationList = document.querySelector('.notification-list');
+            const notificationBadge = document.querySelector('.notification-badge');
+
+            // Toggle notification modal
+            notificationIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.toggle('active');
+                if (notificationModal.classList.contains('active')) {
+                    fetchNotifications();
+                }
+            });
+
+            // Close notification modal
+            closeNotifications.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationModal.classList.remove('active');
+            });
+
+            // Close modal when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                    notificationModal.classList.remove('active');
+                }
+            });
+
+            // Fetch unread count
+            async function fetchUnreadCount() {
+                try {
+                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
+                    const data = await response.json();
+                    if (data.success) {
+                        notificationBadge.textContent = data.data.unreadCount;
+                        // Show/hide badge based on count
+                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    }
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+
+            // Fetch notifications from API
+            async function fetchNotifications() {
+                try {
+                    notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+                    const response = await fetch(`${baseUrl}/api/notifications`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const notifications = data.data;
+                        
+                        if (notifications.length === 0) {
+                            notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        // Render notifications
+                        notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+                        // Add click handler to mark notifications as read
+                        const notificationItems = document.querySelectorAll('.notification-item');
+                        notificationItems.forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const notificationId = item.dataset.notificationId;
+                                if (item.classList.contains('unread')) {
+                                    try {
+                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+                                            method: 'PATCH',
+                                            credentials: 'include'
+                                        });
+                                        
+                                        if (response.ok) {
+                                            // Update UI
+                                            item.classList.remove('unread');
+                                            const unreadDot = item.querySelector('.unread-dot');
+                                            if (unreadDot) unreadDot.remove();
+                                            
+                                            // Update unread count
+                                            await fetchUnreadCount();
+                                        }
+                                    } catch (error) {
+                                        console.error('Error marking notification as read:', error);
+                                    }
+                                }
+
+                                // Close notification modal
+                                notificationModal.classList.remove('active');
+
+                                // Redirect to application page
+                                window.location.href = '/application';
+                            });
+                        });
+                    } else {
+                        throw new Error(data.message || 'Failed to fetch notifications');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                    notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Initial fetch of notifications and unread count
+            fetchNotifications();
+            fetchUnreadCount();
+
+            // Refresh unread count periodically
+            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        });
+    
+    
     </script>
 
     <script src="/js/main.js"></script>

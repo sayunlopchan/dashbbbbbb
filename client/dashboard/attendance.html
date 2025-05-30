@@ -120,9 +120,29 @@
         <h3>Attendance</h3>
       </div>
       <div class="topbar-right">
+        <!-- notification  -->
         <div class="notification">
           <i class="fas fa-bell"></i>
-          <span class="notification-badge">3</span>
+          <span class="notification-badge">0</span>
+
+          <!-- Notification Modal -->
+          <div class="notification-modal">
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <div class="notification-actions">
+                <a href="/notifications" class="view-all-link">View All</a>
+                <button class="close-notifications">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            <div class="notification-list">
+              <!-- Notifications will be populated here -->
+              <div class="notification-loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+              </div>
+            </div>
+          </div>
         </div>
         <div class="user-greeting">
           <img src="/img/Knox Logo-01.png" alt="User">
@@ -133,6 +153,7 @@
 
     <!-- Content -->
     <div class="content">
+      <!-- Header -->
       <div class="content-header">
         <h1>Attendance Overview</h1>
         <button id="addAttendanceBtn">
@@ -180,11 +201,10 @@
         <!-- search -->
         <div class="filter-group search-box">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search Member..." autocomplete="off">
+          <input type="text" id="searchAttendance" placeholder="Search Member..." autocomplete="off">
         </div>
         <!--  -->
         <div class="filter-group download-filter">
-
           <!-- Select last day filter -->
           <select name="download-filter" id="filterDownload">
             <option value="today" selected>Today</option>
@@ -194,8 +214,12 @@
           </select>
 
           <!-- download in CSV -->
-          <button class="download" id="download"><i class="fa-solid fa-download"></i></button>
-          <button class="print" id="print"><i class="fa-solid fa-print"></i></button>
+          <button class="download" id="downloadAttendance" title="Download CSV">
+            <i class="fa-solid fa-download"></i>
+          </button>
+          <button class="print" id="printAttendance" title="Print">
+            <i class="fa-solid fa-print"></i>
+          </button>
           <!-- Reset Filters Button -->
           <button class="reset" id="resetFilters" title="Reset Filters">
             <i class="fa-solid fa-rotate"></i>
@@ -204,7 +228,7 @@
       </div>
 
 
-      <!-- Member Attendance Detail -->
+      <!-- Member Attendance table -->
       <div class="table-container">
         <table class="members-table">
           <thead>
@@ -303,1057 +327,870 @@
   </div>
 
   <script>
-    // Attendance Management Module
-    const AttendanceManager = {
-      // Configuration and State
-      config: {
-        apiBaseUrl: 'http://localhost:4000/api',
-        endpoints: {
-          members: '/members',
-          attendances: '/attendances',
-          checkIn: '/attendances/check-in',
-          checkOut: '/attendances/check-out'
-        },
-        pagination: {
-          currentPage: 1,
-          totalPages: 1,
-          itemsPerPage: 10,
-          total: 0
+
+    // Notification Modal Logic
+    document.addEventListener('DOMContentLoaded', function () {
+      const notificationIcon = document.querySelector('.notification');
+      const notificationModal = document.querySelector('.notification-modal');
+      const closeNotifications = document.querySelector('.close-notifications');
+      const notificationList = document.querySelector('.notification-list');
+      const notificationBadge = document.querySelector('.notification-badge');
+
+      // Toggle notification modal
+      notificationIcon.addEventListener('click', function (e) {
+        e.stopPropagation();
+        notificationModal.classList.toggle('active');
+        if (notificationModal.classList.contains('active')) {
+          fetchNotifications();
         }
-      },
+      });
 
-      // DOM Element References
-      elements: {
-        addAttendanceBtn: document.getElementById('addAttendanceBtn'),
-        addAttenModal: document.getElementById('addAttenModal'),
-        attenForm: document.getElementById('attenForm'),
-        attenSearch: document.getElementById('attenSearch'),
-        searchResultContainer: document.querySelector('.search-result-container'),
-        timeInput: document.getElementById('time'),
-        checkoutTimeInput: document.getElementById('checkoutTime'),
-        tableBody: document.querySelector('.members-table tbody'),
-        filterDate: document.getElementById('filterDate'),
-        searchInput: document.querySelector('.search-box input'),
-        downloadBtn: document.getElementById('download'),
-        printBtn: document.getElementById('print'),
-        prevPageBtn: document.getElementById('prevPage'),
-        nextPageBtn: document.getElementById('nextPage'),
-        pageInfo: document.getElementById('pageInfo'),
-        infoBoxes: {
-          totalMembers: document.querySelector('.info-box:nth-child(1) .info-box-number'),
-          checkIns: document.querySelector('.info-box:nth-child(2) .info-box-number'),
-          date: document.querySelector('.info-box:nth-child(3) .info-box-number')
-        },
-        confirmationModal: document.getElementById('confirmationModal'),
-        confirmationTitle: document.getElementById('confirmationTitle'),
-        confirmationMessage: document.getElementById('confirmationMessage'),
-        confirmActionBtn: document.getElementById('confirmAction'),
-        cancelActionBtn: document.getElementById('cancelAction'),
-        filterDownload: document.getElementById('filterDownload')
-      },
+      // Close notification modal
+      closeNotifications.addEventListener('click', function (e) {
+        e.stopPropagation();
+        notificationModal.classList.remove('active');
+      });
 
-      // Utility Methods
-      utils: {
-        debounce(func, delay) {
-          let timeoutId;
-          return function () {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-              func.apply(context, args);
-            }, delay);
-          };
-        },
-
-        formatDate(dateString) {
-          return dateString
-            ? new Date(dateString).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            })
-            : 'N/A';
-        },
-
-        formatTime(dateString) {
-          return dateString
-            ? new Date(dateString).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
-            })
-            : 'N/A';
-        },
-
-        formatDateTime(dateString) {
-          return dateString
-            ? new Date(dateString).toLocaleString('en-US', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-            : 'N/A';
-        },
-
-        async fetchData(url, options = {}) {
-          try {
-            const response = await fetch(url, {
-              headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-              },
-              ...options
-            });
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Request failed');
-            }
-
-            return await response.json();
-          } catch (error) {
-            toast(error.message, 'error');
-            throw error;
-          }
-        },
-
-        // Method to format time to HH:mm format
-        formatTimeForAPI(timeString) {
-          if (!timeString) return null;
-
-          // Parse the time input
-          const [hours, minutes] = timeString.split(':');
-
-          // Create a full date with the specified time
-          const now = new Date();
-          const formattedTime = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            parseInt(hours),
-            parseInt(minutes)
-          );
-
-          // Return a format that can be easily parsed
-          return formattedTime.toISOString();
-        },
-
-        createPaginationContainer() {
-          // Create pagination container
-          const container = document.createElement('div');
-          container.classList.add('pagination-container');
-
-          // Previous button
-          const prevBtn = document.createElement('button');
-          prevBtn.innerHTML = '&laquo; Previous';
-          prevBtn.classList.add('pagination-btn', 'prev');
-
-          // Next button
-          const nextBtn = document.createElement('button');
-          nextBtn.innerHTML = 'Next &raquo;';
-          nextBtn.classList.add('pagination-btn', 'next');
-
-          // Current page display
-          const currentPageSpan = document.createElement('span');
-          currentPageSpan.classList.add('current-page');
-
-          // Append to container
-          container.appendChild(prevBtn);
-          container.appendChild(currentPageSpan);
-          container.appendChild(nextBtn);
-
-          // Insert after the table
-          const tableContainer = document.querySelector('.table-container');
-          tableContainer.appendChild(container);
-
-          return {
-            container,
-            prevBtn,
-            nextBtn,
-            currentPageSpan
-          };
+      // Close modal when clicking outside
+      document.addEventListener('click', function (e) {
+        if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+          notificationModal.classList.remove('active');
         }
-      },
+      });
 
-      // Member Search Functionality
-      memberSearch: {
-        async searchMembers(query) {
-          if (!query || query.length < 2) {
-            AttendanceManager.elements.searchResultContainer.innerHTML = '';
-            return;
+      // Fetch unread count
+      async function fetchUnreadCount() {
+        try {
+          const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
+          const data = await response.json();
+          if (data.success) {
+            notificationBadge.textContent = data.data.unreadCount;
+            // Show/hide badge based on count
+            notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
           }
-
-          try {
-            const url = `${AttendanceManager.config.apiBaseUrl}${AttendanceManager.config.endpoints.members}?search=${encodeURIComponent(query)}`;
-            const result = await AttendanceManager.utils.fetchData(url);
-
-            AttendanceManager.elements.searchResultContainer.innerHTML = '';
-
-            if (result.data && result.data.length > 0) {
-              result.data.forEach(member => {
-                const resultItem = document.createElement('div');
-                resultItem.classList.add('search-result-item');
-                resultItem.innerHTML = `
-                  <div class="search-result-primary">
-                    <strong>${member.fullName}</strong>
-                    <span>${member.memberId}</span>
-                  </div>
-                  <div class="search-result-secondary">
-                    <small>${member.email}</small>
-                    <small>Current Membership: ${member.membershipType}</small>
-                  </div>
-                `;
-                resultItem.dataset.memberId = member.memberId;
-                resultItem.addEventListener('click', () => {
-                  // Update search input with full member details
-                  AttendanceManager.elements.attenSearch.value = `${member.fullName} (${member.memberId})`;
-
-                  // Store memberId in dataset for later use
-                  AttendanceManager.elements.attenSearch.dataset.memberId = member.memberId;
-
-                  // Clear search results
-                  AttendanceManager.elements.searchResultContainer.innerHTML = '';
-                });
-                AttendanceManager.elements.searchResultContainer.appendChild(resultItem);
-              });
-            } else {
-              const noResultsItem = document.createElement('div');
-              noResultsItem.classList.add('no-results');
-              noResultsItem.textContent = 'No members found';
-              AttendanceManager.elements.searchResultContainer.appendChild(noResultsItem);
-            }
-          } catch (error) {
-            console.error('Error searching members:', error);
-          }
+        } catch (error) {
+          console.error('Error fetching unread count:', error);
         }
-      },
-
-      // Attendance Data Management
-      attendanceData: {
-        async fetchAttendanceData() {
-          try {
-            // Get today's date in YYYY-MM-DD format
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Calculate start date based on filter
-            const calculateStartDate = (days) => {
-              const startDate = new Date();
-              if (days === 'today') {
-                startDate.setHours(0, 0, 0, 0);
-              } else {
-                startDate.setDate(startDate.getDate() - parseInt(days));
-              }
-              return startDate.toISOString().split('T')[0];
-            };
-
-            // Get the selected filter values
-            const selectedFilter = AttendanceManager.elements.filterDownload.value;
-            const selectedDate = AttendanceManager.elements.filterDate.value;
-            
-            // Determine the date range based on filters
-            let startDate, endDate;
-            
-            if (selectedDate) {
-              // If calendar date is selected, use that specific date
-              startDate = selectedDate;
-              endDate = selectedDate;
-            } else {
-              // Otherwise use the download filter range
-              startDate = calculateStartDate(selectedFilter);
-              endDate = today;
-            }
-            
-            // Prepare query parameters
-            const params = new URLSearchParams({
-              page: AttendanceManager.config.pagination.currentPage,
-              limit: AttendanceManager.config.pagination.itemsPerPage,
-              startDate: startDate,
-              endDate: endDate,
-              search: AttendanceManager.elements.searchInput.value || ''
-            });
-
-            const url = `${AttendanceManager.config.apiBaseUrl}${AttendanceManager.config.endpoints.attendances}?${params}`;
-            const result = await AttendanceManager.utils.fetchData(url);
-
-            // Clear existing table rows
-            AttendanceManager.elements.tableBody.innerHTML = '';
-
-            if (!result.data || result.data.length === 0) {
-              const noRecordsMessage = selectedDate 
-                ? `No attendance records found for ${AttendanceManager.utils.formatDate(selectedDate)}`
-                : `No attendance records found for ${selectedFilter === 'today' ? 'today' : 'the selected period'}`;
-              
-              AttendanceManager.elements.tableBody.innerHTML = `
-                <tr>
-                  <td colspan="8" class="text-center">${noRecordsMessage}</td>
-                </tr>
-              `;
-            } else {
-              // Filter data based on selected date if calendar filter is active
-              const filteredData = selectedDate 
-                ? result.data.filter(attendance => {
-                    const attendanceDate = new Date(attendance.date).toISOString().split('T')[0];
-                    return attendanceDate === selectedDate;
-                  })
-                : result.data;
-
-              if (filteredData.length === 0) {
-                const noRecordsMessage = selectedDate 
-                  ? `No attendance records found for ${AttendanceManager.utils.formatDate(selectedDate)}`
-                  : `No attendance records found for ${selectedFilter === 'today' ? 'today' : 'the selected period'}`;
-                
-                AttendanceManager.elements.tableBody.innerHTML = `
-                  <tr>
-                    <td colspan="8" class="text-center">${noRecordsMessage}</td>
-                  </tr>
-                `;
-              } else {
-                // Populate table with filtered attendance data
-                filteredData.forEach((attendance, index) => {
-                  const row = document.createElement('tr');
-                  const rowNumber = ((AttendanceManager.config.pagination.currentPage - 1) * AttendanceManager.config.pagination.itemsPerPage) + index + 1;
-                  
-                  row.innerHTML = `
-                    <td>${rowNumber}</td>
-                    <td>${attendance.member.memberId}</td>
-                    <td>${attendance.member.fullName}</td>
-                    <td>${attendance.member.email}</td>
-                    <td>${AttendanceManager.utils.formatTime(attendance.checkIn.time)}</td>
-                    <td>${AttendanceManager.utils.formatDate(attendance.date)}</td>
-                    <td>${AttendanceManager.utils.formatTime(attendance.checkOut.time)}</td>
-                    <td>
-                      ${attendance.checkOut.time ? `
-                        <button class="action-btn success" disabled title="Checked Out">
-                          <i class="fas fa-check"></i>
-                        </button>
-                      ` : `
-                        <button class="action-btn checkout" data-member-id="${attendance.member.memberId}" title="Check Out">
-                          <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                      `}
-                      <button class="action-btn delete" data-member-id="${attendance.member.memberId}" title="Delete">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  `;
-                  AttendanceManager.elements.tableBody.appendChild(row);
-                });
-              }
-            }
-
-            // Update info boxes
-            await this.updateInfoBoxes();
-            const filteredData = selectedDate 
-              ? result.data.filter(attendance => {
-                  const attendanceDate = new Date(attendance.date).toISOString().split('T')[0];
-                  return attendanceDate === selectedDate;
-                })
-              : result.data;
-            AttendanceManager.elements.infoBoxes.checkIns.textContent = filteredData.length || '0';
-            
-            // Always show current date in dd/mm/yyyy format
-            const currentDate = new Date();
-            const formattedDate = currentDate.toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric'
-            });
-            AttendanceManager.elements.infoBoxes.date.textContent = formattedDate;
-
-            // Update pagination
-            this.updatePagination({
-              ...result.pagination,
-              total: filteredData.length
-            });
-
-            // Setup edit and delete event listeners
-            this.setupActionListeners();
-
-          } catch (error) {
-            console.error('Error fetching attendance data:', error);
-            AttendanceManager.elements.tableBody.innerHTML = `
-              <tr>
-                <td colspan="8" class="text-center">Error loading attendance records. Please try again.</td>
-              </tr>
-            `;
-          }
-        },
-
-        async updateInfoBoxes() {
-          try {
-            // Fetch total members count
-            const membersUrl = `${AttendanceManager.config.apiBaseUrl}${AttendanceManager.config.endpoints.members}`;
-            const membersResult = await AttendanceManager.utils.fetchData(membersUrl);
-
-            // Update total members count in info box
-            if (membersResult.data) {
-              AttendanceManager.elements.infoBoxes.totalMembers.textContent = membersResult.data.length || '0';
-            }
-          } catch (error) {
-            console.error('Error updating info boxes:', error);
-            AttendanceManager.elements.infoBoxes.totalMembers.textContent = '0';
-          }
-        },
-
-        updatePagination(paginationInfo) {
-          // Update pagination state
-          AttendanceManager.config.pagination.currentPage = parseInt(paginationInfo.page) || 1;
-          AttendanceManager.config.pagination.totalPages = parseInt(paginationInfo.pages) || 1;
-          AttendanceManager.config.pagination.total = parseInt(paginationInfo.total) || 0;
-
-          // Update page info display
-          AttendanceManager.elements.pageInfo.textContent =
-            `Page ${AttendanceManager.config.pagination.currentPage} of ${AttendanceManager.config.pagination.totalPages} (Total: ${AttendanceManager.config.pagination.total} records)`;
-
-          // Update button states
-          AttendanceManager.elements.prevPageBtn.disabled = AttendanceManager.config.pagination.currentPage <= 1;
-          AttendanceManager.elements.nextPageBtn.disabled = AttendanceManager.config.pagination.currentPage >= AttendanceManager.config.pagination.totalPages;
-
-          // Add visual feedback for disabled state
-          AttendanceManager.elements.prevPageBtn.classList.toggle('disabled', AttendanceManager.config.pagination.currentPage <= 1);
-          AttendanceManager.elements.nextPageBtn.classList.toggle('disabled', AttendanceManager.config.pagination.currentPage >= AttendanceManager.config.pagination.totalPages);
-        },
-
-        setupActionListeners() {
-          const deleteButtons = document.querySelectorAll('.action-btn.delete');
-          const checkoutButtons = document.querySelectorAll('.action-btn.checkout');
-
-          deleteButtons.forEach(button => {
-            button.addEventListener('click', () => this.handleDeleteAttendance(button.dataset.memberId));
-          });
-
-          checkoutButtons.forEach(button => {
-            button.addEventListener('click', () => this.handleCheckout(button.dataset.memberId));
-          });
-        },
-
-        async handleDeleteAttendance(memberId) {
-          AttendanceManager.confirmationDialog.show(
-            'Delete Attendance Record',
-            'Are you sure you want to delete this attendance record? This action cannot be undone.',
-            'delete',
-            memberId
-          );
-        },
-
-        async handleCheckout(memberId) {
-          try {
-            const currentTime = new Date().toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false
-            });
-
-            const response = await fetch(`${AttendanceManager.config.apiBaseUrl}${AttendanceManager.config.endpoints.checkOut}/${memberId}`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                time: AttendanceManager.utils.formatTimeForAPI(currentTime)
-              })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-              toast('Check-out recorded successfully', 'success');
-              this.fetchAttendanceData();
-            } else {
-              toast(result.message || 'Failed to record check-out', 'error');
-            }
-          } catch (error) {
-            console.error('Error recording check-out:', error);
-            toast('Failed to record check-out. Please try again.', 'error');
-          }
-        },
-
-        setupPaginationListeners() {
-          // Previous page listener
-          AttendanceManager.elements.prevPageBtn.addEventListener('click', () => {
-            if (AttendanceManager.config.pagination.currentPage > 1) {
-              AttendanceManager.config.pagination.currentPage--;
-              this.fetchAttendanceData();
-            }
-          });
-
-          // Next page listener
-          AttendanceManager.elements.nextPageBtn.addEventListener('click', () => {
-            if (AttendanceManager.config.pagination.currentPage < AttendanceManager.config.pagination.totalPages) {
-              AttendanceManager.config.pagination.currentPage++;
-              this.fetchAttendanceData();
-            }
-          });
-        }
-      },
-
-      // Attendance Marking
-      markAttendance: {
-        // Reset modal to default state
-        resetModal() {
-          // Reset form
-          this.elements.attenForm.reset();
-
-          // Reset hidden inputs
-          document.getElementById('attendanceMode').value = 'add';
-          document.getElementById('selectedMemberId').value = '';
-
-          // Reset modal title and subtitle
-          document.getElementById('modalTitle').textContent = 'Mark New Attendance';
-          document.getElementById('modalSubtitle').textContent = 'Fill in the details to mark a new attendance.';
-
-          // Reset submit button text
-          document.getElementById('submitAttendanceBtn').textContent = 'Mark Attendance';
-
-          // Clear search results and member ID
-          this.elements.attenSearch.value = '';
-          delete this.elements.attenSearch.dataset.memberId;
-          this.elements.searchResultContainer.innerHTML = '';
-        },
-
-        // Prepare modal for editing
-        prepareEditModal(attendance) {
-          // Set mode to edit
-          document.getElementById('attendanceMode').value = 'edit';
-          document.getElementById('selectedMemberId').value = attendance.member.memberId;
-
-          // Update modal title and subtitle
-          document.getElementById('modalTitle').textContent = 'Edit Attendance';
-          document.getElementById('modalSubtitle').textContent = `Edit attendance for ${attendance.member.fullName}`;
-
-          // Update submit button text
-          document.getElementById('submitAttendanceBtn').textContent = 'Update Attendance';
-
-          // Populate form with existing data
-          this.elements.attenSearch.value = `${attendance.member.fullName} (${attendance.member.memberId})`;
-          this.elements.attenSearch.dataset.memberId = attendance.member.memberId;
-
-          // Format and set times
-          this.elements.timeInput.value = attendance.checkIn.time
-            ? new Date(attendance.checkIn.time).toTimeString().slice(0, 5)
-            : '';
-        },
-
-        async submitAttendance(e) {
-          e.preventDefault();
-
-          // Determine mode
-          const mode = document.getElementById('attendanceMode').value;
-
-          // Get member ID from the search input's dataset
-          const memberId = this.elements.attenSearch.dataset.memberId ||
-            document.getElementById('selectedMemberId').value;
-
-          if (!memberId) {
-            toast('Please select a member', 'error');
-            return;
-          }
-
-          const checkInTime = this.elements.timeInput.value;
-
-          if (!checkInTime) {
-            toast('Please provide check-in time', 'warning');
-            return;
-          }
-
-          try {
-            // Determine API endpoint and method based on mode
-            const baseUrl = `${this.config.apiBaseUrl}${this.config.endpoints.attendances}`;
-            const apiMethod = mode === 'edit' ? 'PUT' : 'POST';
-
-            // Check-in request
-            const checkInUrl = mode === 'edit'
-              ? `${baseUrl}/${memberId}/check-in`
-              : `${this.config.apiBaseUrl}${this.config.endpoints.checkIn}/${memberId}`;
-
-            await this.utils.fetchData(checkInUrl, {
-              method: apiMethod,
-              body: JSON.stringify({
-                time: this.utils.formatTimeForAPI(checkInTime)
-              })
-            });
-
-            toast(`${mode === 'edit' ? 'Updated' : 'Marked'} check-in successfully`, 'success');
-
-            // Reset form and close modal
-            this.elements.attenForm.reset();
-            document.getElementById('attendanceMode').value = 'add';
-            document.getElementById('selectedMemberId').value = '';
-            this.elements.attenSearch.value = '';
-            delete this.elements.attenSearch.dataset.memberId;
-            this.elements.searchResultContainer.innerHTML = '';
-
-            this.elements.addAttenModal.classList.remove('active');
-            document.body.style.overflow = '';
-
-            // Refresh attendance data
-            this.attendanceData.fetchAttendanceData();
-
-          } catch (error) {
-            console.error('Attendance submission error:', error);
-            toast(error.message, 'error');
-          }
-        }
-      },
-
-      // Download Attendance Functionality
-      downloadAttendance: {
-        // Convert attendance data to CSV
-        convertToCSV(data) {
-          // Define CSV headers
-          const headers = [
-            'S.N',
-            'Member ID',
-            'Full Name',
-            'Email',
-            'Check-In Time',
-            'Date',
-            'Check-Out Time'
-          ];
-
-          // Convert data to CSV rows
-          const csvRows = data.map((attendance, index) => [
-            index + 1,
-            attendance.member.memberId,
-            attendance.member.fullName,
-            attendance.member.email,
-            this.formatCSVTime(attendance.checkIn.time),
-            this.formatCSVDate(attendance.date),
-            this.formatCSVTime(attendance.checkOut.time)
-          ]);
-
-          // Combine headers and rows
-          const csvContent = [
-            headers.join(','),
-            ...csvRows.map(row => row.map(this.escapeCSV).join(','))
-          ].join('\n');
-
-          return csvContent;
-        },
-
-        // Format time for CSV
-        formatCSVTime(dateString) {
-          if (!dateString) return '';
-
-          const date = new Date(dateString);
-          return isNaN(date.getTime())
-            ? ''
-            : date.toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: true
-            });
-        },
-
-        // Format date for CSV
-        formatCSVDate(dateString) {
-          if (!dateString) return '';
-
-          const date = new Date(dateString);
-          return isNaN(date.getTime())
-            ? ''
-            : date.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            });
-        },
-
-        // Escape special characters for CSV
-        escapeCSV(value) {
-          if (value === null || value === undefined) return '';
-
-          // Convert to string and escape quotes
-          let strValue = String(value).replace(/"/g, '""');
-
-          // Wrap in quotes if contains comma, quote, or newline
-          if (/[",\n]/.test(strValue)) {
-            strValue = `"${strValue}"`;
-          }
-
-          return strValue;
-        },
-
-        // Trigger download for CSV
-        async triggerDownload() {
-          try {
-            // Get download filter value
-            const downloadFilter = document.getElementById('filterDownload').value;
-
-            // Calculate start date based on filter
-            const calculateStartDate = (days) => {
-              const startDate = new Date();
-              if (days === 'today') {
-                startDate.setHours(0, 0, 0, 0);
-              } else {
-                startDate.setDate(startDate.getDate() - parseInt(days));
-              }
-              return startDate.toISOString().split('T')[0];
-            };
-
-            // Prepare query parameters
-            const params = new URLSearchParams({
-              startDate: calculateStartDate(downloadFilter),
-              limit: 1000
-            });
-
-            // Fetch attendance data for the selected time range
-            const apiUrl = `${AttendanceManager.config.apiBaseUrl}${AttendanceManager.config.endpoints.attendances}?${params}`;
-            const result = await AttendanceManager.utils.fetchData(apiUrl);
-
-            // Current date for filename
-            const currentDate = new Date().toISOString().split('T')[0];
-            const filename = `attendance_${downloadFilter}_${currentDate}`;
-
-            // Download CSV
-            const csvContent = this.convertToCSV(result.data);
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const downloadUrl = URL.createObjectURL(blob);
-
-            link.setAttribute('href', downloadUrl);
-            link.setAttribute('download', `${filename}.csv`);
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Show success notification
-            toast(`Attendance records downloaded for ${downloadFilter} in CSV`, 'success');
-
-          } catch (error) {
-            console.error('Download error:', error);
-            toast('Failed to download attendance records', 'error');
-          }
-        },
-
-        // Print attendance data
-        async printAttendance() {
-          try {
-            // Get download filter value
-            const downloadFilter = document.getElementById('filterDownload').value;
-
-            // Calculate start date based on filter
-            const calculateStartDate = (days) => {
-              const startDate = new Date();
-              if (days === 'today') {
-                startDate.setHours(0, 0, 0, 0);
-              } else {
-                startDate.setDate(startDate.getDate() - parseInt(days));
-              }
-              return startDate.toISOString().split('T')[0];
-            };
-
-            // Prepare query parameters
-            const params = new URLSearchParams({
-              startDate: calculateStartDate(downloadFilter),
-              limit: 1000
-            });
-
-            // Fetch attendance data for the selected time range
-            const apiUrl = `${AttendanceManager.config.apiBaseUrl}${AttendanceManager.config.endpoints.attendances}?${params}`;
-            const result = await AttendanceManager.utils.fetchData(apiUrl);
-
-            // Create print window
-            const printWindow = window.open('', '_blank');
-
-            // Create print content
-            const printContent = `
-              <html>
-                <head>
-                  <title>Attendance Report</title>
-                  <style>
-                    body { font-family: Arial, sans-serif; }
-                    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f5f5f5; }
-                    h1 { text-align: center; }
-                    .header { margin-bottom: 20px; }
-                    .footer { margin-top: 20px; text-align: center; font-size: 12px; }
-                  </style>
-                </head>
-                <body>
-                  <div class="header">
-                    <h1>Attendance Report</h1>
-                    <p>Period: ${downloadFilter}</p>
-                    <p>Generated on: ${new Date().toLocaleString()}</p>
-                  </div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>S.N</th>
-                        <th>Member ID</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Check-In Time</th>
-                        <th>Date</th>
-                        <th>Check-Out Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${result.data.map((attendance, index) => `
-                        <tr>
-                          <td>${index + 1}</td>
-                          <td>${attendance.member.memberId}</td>
-                          <td>${attendance.member.fullName}</td>
-                          <td>${attendance.member.email}</td>
-                          <td>${this.formatCSVTime(attendance.checkIn.time)}</td>
-                          <td>${this.formatCSVDate(attendance.date)}</td>
-                          <td>${this.formatCSVTime(attendance.checkOut.time)}</td>
-                        </tr>
-                      `).join('')}
-                    </tbody>
-                  </table>
-                  <div class="footer">
-                    <p>© ${new Date().getFullYear()} Knox Barbell - Attendance Report</p>
-                  </div>
-                </body>
-              </html>
-            `;
-
-            // Write content to print window
-            printWindow.document.write(printContent);
-            printWindow.document.close();
-
-            // Wait for content to load then print
-            printWindow.onload = function () {
-              printWindow.print();
-              printWindow.close();
-            };
-
-            toast('Printing attendance records...', 'success');
-
-          } catch (error) {
-            console.error('Print error:', error);
-            toast('Failed to print attendance records', 'error');
-          }
-        }
-      },
-
-      // Confirmation Dialog Management
-      confirmationDialog: {
-        show(title, message, action, id) {
-          this.elements.confirmationTitle.textContent = title;
-          this.elements.confirmationMessage.textContent = message;
-          this.currentAction = action;
-          this.currentId = id;
-
-          // Update confirm button color based on action
-          const confirmBtn = this.elements.confirmActionBtn;
-          if (action === 'delete') {
-            confirmBtn.style.backgroundColor = '#e74c3c';
-            confirmBtn.style.borderColor = '#e74c3c';
-            confirmBtn.style.color = 'white';
-          }
-
-          this.elements.confirmationModal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        },
-
-        hide() {
-          this.elements.confirmationModal.classList.remove('active');
-          document.body.style.overflow = '';
-          this.currentAction = null;
-          this.currentId = null;
-
-          // Reset confirm button color
-          const confirmBtn = this.elements.confirmActionBtn;
-          confirmBtn.style.backgroundColor = '';
-          confirmBtn.style.borderColor = '';
-          confirmBtn.style.color = '';
-        },
-
-        get elements() {
-          return {
-            confirmationModal: document.getElementById('confirmationModal'),
-            confirmationTitle: document.getElementById('confirmationTitle'),
-            confirmationMessage: document.getElementById('confirmationMessage'),
-            confirmActionBtn: document.getElementById('confirmAction'),
-            cancelActionBtn: document.getElementById('cancelAction')
-          };
-        },
-
-        currentAction: null,
-        currentId: null
-      },
-
-      // Initialization
-      init() {
-        // Set default date to today in the calendar filter
-        const today = new Date().toISOString().split('T')[0];
-        this.elements.filterDate.value = today;
-
-        // Modal and Form Event Listeners
-        this.elements.addAttendanceBtn.addEventListener('click', () => {
-          // Set current time when modal opens
-          const now = new Date();
-          const currentTime = now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit',
-            hour12: false 
-          });
-          this.elements.timeInput.value = currentTime;
-          
-          this.elements.addAttenModal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        });
-
-        // Close modal listeners
-        const closeModalListeners = [
-          this.elements.addAttenModal,
-          document.querySelector('#cancelBtn')
-        ];
-
-        closeModalListeners.forEach(el => {
-          el.addEventListener('click', (e) => {
-            if (e.target === this.elements.addAttenModal || e.target.closest('#cancelBtn')) {
-              this.elements.addAttenModal.classList.remove('active');
-              document.body.style.overflow = '';
-            }
-          });
-        });
-
-        // Member search setup
-        const debouncedSearch = this.utils.debounce(
-          this.memberSearch.searchMembers, 
-          300
-        );
-
-        // Search input event listener
-        this.elements.attenSearch.addEventListener('input', () => {
-          debouncedSearch(this.elements.attenSearch.value);
-        });
-
-        // Close search results when clicking outside
-        document.addEventListener('click', (event) => {
-          if (!this.elements.searchResultContainer.contains(event.target) && 
-              event.target !== this.elements.attenSearch) {
-            this.elements.searchResultContainer.innerHTML = '';
-          }
-        });
-
-        // Form submission
-        this.elements.attenForm.addEventListener(
-          'submit', 
-          this.markAttendance.submitAttendance.bind(this)
-        );
-
-        // Filtering event listeners
-        this.elements.filterDate.addEventListener('change', () => {
-          // Clear the download filter when calendar date is selected
-          this.elements.filterDownload.value = 'today';
-          this.config.pagination.currentPage = 1; // Reset to first page when filter changes
-          this.attendanceData.fetchAttendanceData();
-        });
-
-        let searchTimeout;
-        this.elements.searchInput.addEventListener('input', () => {
-          clearTimeout(searchTimeout);
-          searchTimeout = setTimeout(() => {
-            this.config.pagination.currentPage = 1; // Reset to first page when search changes
-            this.attendanceData.fetchAttendanceData();
-          }, 300);
-        });
-
-        // Download and Print functionality
-        this.elements.downloadBtn.addEventListener('click', () => {
-          this.downloadAttendance.triggerDownload();
-        });
-
-        this.elements.printBtn.addEventListener('click', () => {
-          this.downloadAttendance.printAttendance();
-        });
-
-        // Setup pagination listeners
-        this.attendanceData.setupPaginationListeners();
-
-        // Initial data fetch
-        this.attendanceData.fetchAttendanceData();
-
-        // Confirmation Dialog Event Listeners
-        this.confirmationDialog.elements.confirmActionBtn.addEventListener('click', async () => {
-          if (this.confirmationDialog.currentAction === 'delete') {
-            try {
-              // Construct the delete URL with the correct endpoint structure
-              const deleteUrl = `${this.config.apiBaseUrl}${this.config.endpoints.attendances}/member/${this.confirmationDialog.currentId}`;
-              
-              const response = await fetch(deleteUrl, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json'
-                }
-              });
-              
-              if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to delete attendance record');
-              }
-
-              const result = await response.json();
-              
-              if (result.success) {
-                toast('Attendance record deleted successfully', 'success');
-                this.attendanceData.fetchAttendanceData();
-              } else {
-                toast(result.message || 'Failed to delete attendance record', 'error');
-              }
-            } catch (error) {
-              console.error('Error deleting attendance record:', error);
-              toast(error.message || 'Failed to delete attendance record. Please try again.', 'error');
-            }
-          }
-          this.confirmationDialog.hide();
-        });
-
-        this.confirmationDialog.elements.cancelActionBtn.addEventListener('click', () => {
-          this.confirmationDialog.hide();
-        });
-
-        // Close modal when clicking outside
-        this.confirmationDialog.elements.confirmationModal.addEventListener('click', (e) => {
-          if (e.target === this.confirmationDialog.elements.confirmationModal) {
-            this.confirmationDialog.hide();
-          }
-        });
-
-        // Add event listener for download filter change
-        this.elements.filterDownload.addEventListener('change', () => {
-          // Clear the calendar date when download filter changes
-          this.elements.filterDate.value = '';
-          this.config.pagination.currentPage = 1; // Reset to first page when filter changes
-          this.attendanceData.fetchAttendanceData();
-        });
-
-        // Add event listener for reset filters button
-        document.getElementById('resetFilters').addEventListener('click', () => {
-          // Reset all filters
-          this.elements.filterDate.value = today; // Reset to today's date
-          this.elements.searchInput.value = '';
-          this.elements.filterDownload.value = 'today';
-          
-          // Reset pagination
-          this.config.pagination.currentPage = 1;
-          
-          // Fetch data with reset filters
-          this.attendanceData.fetchAttendanceData();
-          
-          // Show notification
-          toast('Filters have been reset', 'success');
-        });
       }
-    };
 
-    // Initialize the Attendance Manager when DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      AttendanceManager.init();
+      // Fetch notifications from API
+      async function fetchNotifications() {
+        try {
+          notificationList.innerHTML = `
+                        <div class="notification-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                        </div>
+                    `;
+
+          const response = await fetch(`${baseUrl}/api/notifications`);
+          const data = await response.json();
+
+          if (data.success) {
+            const notifications = data.data;
+
+            if (notifications.length === 0) {
+              notificationList.innerHTML = `
+                                <div class="notification-empty">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>No new notifications</p>
+                                </div>
+                            `;
+              return;
+            }
+
+            // Render notifications
+            notificationList.innerHTML = notifications.map(notif => `
+                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                 data-notification-id="${notif._id}">
+                                <div class="notification-title">
+                                    ${notif.title}
+                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                </div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                            </div>
+                        `).join('');
+
+            // Add click handler to mark notifications as read
+            const notificationItems = document.querySelectorAll('.notification-item');
+            notificationItems.forEach(item => {
+              item.addEventListener('click', async () => {
+                const notificationId = item.dataset.notificationId;
+                if (item.classList.contains('unread')) {
+                  try {
+                    const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+                      method: 'PATCH',
+                      credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                      // Update UI
+                      item.classList.remove('unread');
+                      const unreadDot = item.querySelector('.unread-dot');
+                      if (unreadDot) unreadDot.remove();
+
+                      // Update unread count
+                      await fetchUnreadCount();
+                    }
+                  } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                  }
+                }
+
+                // Close notification modal
+                notificationModal.classList.remove('active');
+
+                // Redirect to application page
+                window.location.href = '/application';
+              });
+            });
+          } else {
+            throw new Error(data.message || 'Failed to fetch notifications');
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+          notificationList.innerHTML = `
+                        <div class="notification-empty">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Failed to load notifications</p>
+                        </div>
+                    `;
+        }
+      }
+
+      // Initial fetch of notifications and unread count
+      fetchNotifications();
+      fetchUnreadCount();
+
+      // Refresh unread count periodically
+      setInterval(fetchUnreadCount, 30000); // Every 30 seconds
     });
   </script>
   <script src="/js/main.js"></script>
   <script src="./js/logout.js"></script>
-</body>
+  <script>
+    // Modal Elements
+    const addAttendanceBtn = document.getElementById('addAttendanceBtn');
+    const addAttenModal = document.getElementById('addAttenModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const attenForm = document.getElementById('attenForm');
+    const attenSearch = document.getElementById('attenSearch');
+    const searchResultContainer = document.querySelector('.search-result-container');
+    const timeInput = document.getElementById('time');
+    const selectedMemberId = document.getElementById('selectedMemberId');
 
+    // Function to open modal
+    function openAttendanceModal() {
+      addAttenModal.classList.add('active');
+      // Reset form when opening
+      attenForm.reset();
+      document.getElementById('attendanceMode').value = 'add';
+      document.getElementById('modalTitle').textContent = 'Mark New Attendance';
+      document.getElementById('modalSubtitle').textContent = 'Fill in the details to mark a new attendance.';
+      
+      // Set current time
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      timeInput.value = `${hours}:${minutes}`;
+    }
+
+    // Function to close modal
+    function closeAttendanceModal() {
+      addAttenModal.classList.remove('active');
+      // Clear search results
+      searchResultContainer.innerHTML = '';
+      // Clear selected member
+      selectedMemberId.value = '';
+    }
+
+    // Debounce function to limit API calls
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Function to search members
+    async function searchMembers(query) {
+      if (!query.trim()) {
+        searchResultContainer.innerHTML = '';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${baseUrl}/api/members/search?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (data.success) {
+          if (data.data.length === 0) {
+            searchResultContainer.innerHTML = `
+              <div class="search-no-results">
+                <i class="fas fa-search"></i>
+                <p>No members found</p>
+              </div>
+            `;
+            return;
+          }
+
+          searchResultContainer.innerHTML = data.data.map(member => `
+            <div class="search-result-item" 
+                 data-member-id="${member.memberId}"
+                 data-member-name="${member.fullName}">
+              <div class="member-info">
+                <span class="member-name">${member.fullName}</span>
+                <span class="member-id">${member.memberId}</span>
+              </div>
+              <span class="member-email">${member.email}</span>
+            </div>
+          `).join('');
+
+          // Add click handlers to search results
+          document.querySelectorAll('.search-result-item').forEach(item => {
+            item.addEventListener('click', () => {
+              const memberId = item.dataset.memberId;
+              const memberName = item.dataset.memberName;
+              selectedMemberId.value = memberId;
+              attenSearch.value = `${memberName} (${memberId})`; // Show both name and ID
+              searchResultContainer.innerHTML = '';
+            });
+          });
+        } else {
+          searchResultContainer.innerHTML = `
+            <div class="search-error">
+              <i class="fas fa-exclamation-circle"></i>
+              <p>Error searching members</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error searching members:', error);
+        searchResultContainer.innerHTML = `
+          <div class="search-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Error searching members</p>
+          </div>
+        `;
+      }
+    }
+
+    // Debounced search function
+    const debouncedSearch = debounce(searchMembers, 300);
+
+    // Event Listeners for Search
+    attenSearch.addEventListener('input', (e) => {
+      debouncedSearch(e.target.value);
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!attenSearch.contains(e.target) && !searchResultContainer.contains(e.target)) {
+        searchResultContainer.innerHTML = '';
+      }
+    });
+
+    // Form submit handler
+    attenForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!selectedMemberId.value) {
+        window.toast('Please select a member', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitAttendanceBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marking...';
+
+      try {
+        // Format the time for the API
+        const [hours, minutes] = timeInput.value.split(':');
+        const checkInTime = new Date();
+        checkInTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+
+        const response = await fetch(`${baseUrl}/api/attendances/check-in/${selectedMemberId.value}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            time: checkInTime.toISOString()
+          })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          window.toast('Attendance marked successfully', 'success');
+          closeAttendanceModal();
+          // Refresh the attendance data
+          await fetchAttendanceData();
+          // Refresh today's check-ins count
+          await fetchTodayCheckIns();
+        } else {
+          // Handle specific error cases
+          if (result.message === 'Member already checked in today') {
+            window.toast('This member has already checked in today', 'warning');
+          } else if (result.message === 'Invalid check-in time') {
+            window.toast('Please select a valid check-in time', 'error');
+          } else {
+            window.toast(result.message || 'Failed to mark attendance', 'error');
+          }
+        }
+      } catch (error) {
+        console.error('Error marking attendance:', error);
+        window.toast('Error marking attendance. Please try again.', 'error');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Mark Attendance';
+      }
+    });
+
+    // Event Listeners for Modal
+    addAttendanceBtn.addEventListener('click', openAttendanceModal);
+    cancelBtn.addEventListener('click', closeAttendanceModal);
+
+    // Close modal when clicking outside
+    addAttenModal.addEventListener('click', (e) => {
+      if (e.target === addAttenModal) {
+        closeAttendanceModal();
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && addAttenModal.classList.contains('active')) {
+        closeAttendanceModal();
+      }
+    });
+
+    // Function to fetch and update total members count
+    async function fetchTotalMembers() {
+      try {
+        const response = await fetch(`${baseUrl}/api/members`);
+        const data = await response.json();
+
+        if (data.success) {
+          // Update the total members count in the info box
+          const totalMembersElement = document.querySelector('.info-box:first-child .info-box-number');
+          totalMembersElement.textContent = data.data.length || 0;
+        } else {
+          console.error('Failed to fetch members:', data.message);
+          window.toast('Failed to fetch members count', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching members:', error);
+        window.toast('Error fetching members count', 'error');
+      }
+    }
+
+    // Function to fetch today's check-ins
+    async function fetchTodayCheckIns() {
+      try {
+        const today = new Date().toLocaleDateString('en-CA');
+        const response = await fetch(`${baseUrl}/api/attendances?date=${today}`);
+        const data = await response.json();
+
+        if (data.success) {
+          // Count check-ins for today
+          const todayCheckIns = data.data.filter(attendance => {
+            if (!attendance.checkIn || !attendance.checkIn.time) return false;
+            const checkInDate = new Date(attendance.checkIn.time);
+            return checkInDate.toLocaleDateString('en-CA') === today;
+          }).length;
+
+          // Update the check-ins count in the info box
+          const checkInsElement = document.querySelector('.info-box:nth-child(2) .info-box-number');
+          checkInsElement.textContent = todayCheckIns;
+        }
+      } catch (error) {
+        console.error('Error fetching today\'s check-ins:', error);
+      }
+    }
+
+    // Store all attendance data
+    let allAttendanceData = [];
+
+    // Helper function to get date range based on filter
+    function getDateRange(range) {
+      const today = new Date();
+      today.setHours(23, 59, 59, 999); // End of today
+      const startDate = new Date();
+      startDate.setHours(0, 0, 0, 0); // Start of today
+
+      switch (range) {
+        case '7':
+          startDate.setDate(today.getDate() - 7);
+          break;
+        case '30':
+          startDate.setDate(today.getDate() - 30);
+          break;
+        case '365':
+          startDate.setDate(today.getDate() - 365);
+          break;
+        default: // today
+          // Already set to today
+          break;
+      }
+
+      return { startDate, endDate: today };
+    }
+
+    // Function to fetch and display attendance data
+    async function fetchAttendanceData(date = null, dateRange = null) {
+      try {
+        let url = `${baseUrl}/api/attendances`;
+        const params = new URLSearchParams();
+
+        if (dateRange) {
+          // If dateRange is provided, use it for fetching data
+          const { startDate, endDate } = getDateRange(dateRange);
+          params.append('startDate', startDate.toISOString());
+          params.append('endDate', endDate.toISOString());
+        } else {
+          // Otherwise use the specific date or today's date
+          const today = new Date().toLocaleDateString('en-CA');
+          params.append('date', date || today);
+        }
+
+        const response = await fetch(`${url}?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+
+        if (result.success) {
+          allAttendanceData = result.data;
+          displayAttendanceData(allAttendanceData);
+          updateAttendanceCounts(allAttendanceData);
+        } else {
+          throw new Error(result.message || 'Failed to fetch attendance data');
+        }
+      } catch (error) {
+        console.error('Error fetching attendance data:', error);
+        window.toast('Error fetching attendance data. Please refresh the page.', 'error');
+      }
+    }
+
+    // Function to fetch data for download/print
+    async function fetchDataForExport(dateRange) {
+      try {
+        const url = `${baseUrl}/api/attendances`;
+        const params = new URLSearchParams();
+        const { startDate, endDate } = getDateRange(dateRange);
+        
+        params.append('startDate', startDate.toISOString());
+        params.append('endDate', endDate.toISOString());
+
+        const response = await fetch(`${url}?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.message || 'Failed to fetch data for export');
+        }
+
+        return result.data;
+      } catch (error) {
+        console.error('Error fetching data for export:', error);
+        throw error;
+      }
+    }
+
+    // Function to display attendance data with filters
+    function displayAttendanceData(data) {
+      const tbody = document.querySelector('.members-table tbody');
+      const searchTerm = document.getElementById('searchAttendance').value.toLowerCase().trim();
+      const dateFilter = document.getElementById('filterDate').value;
+      
+      // Filter data based on search term and date
+      let filteredData = data;
+      
+      // Apply date filter if set
+      if (dateFilter) {
+        const filterDate = new Date(dateFilter).toLocaleDateString('en-CA');
+        filteredData = filteredData.filter(attendance => {
+          const attendanceDate = new Date(attendance.date).toLocaleDateString('en-CA');
+          return attendanceDate === filterDate;
+        });
+      }
+      
+      // Apply search filter if search term exists
+      if (searchTerm) {
+        filteredData = filteredData.filter(attendance => {
+          return (
+            attendance.member.memberId.toLowerCase().includes(searchTerm) ||
+            attendance.member.fullName.toLowerCase().includes(searchTerm) ||
+            attendance.member.email.toLowerCase().includes(searchTerm)
+          );
+        });
+      }
+
+      // Store filtered data for download/print
+      window.currentFilteredData = filteredData;
+
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="no-data">No attendance records found</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = filteredData.map((attendance, index) => {
+        const checkInTime = attendance.checkIn?.time ? new Date(attendance.checkIn.time).toLocaleTimeString() : 'N/A';
+        const checkOutTime = attendance.checkOut?.time ? new Date(attendance.checkOut.time).toLocaleTimeString() : 'N/A';
+        const date = new Date(attendance.date).toLocaleDateString();
+        const isCheckedOut = attendance.checkOut?.time !== null;
+
+        return `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${attendance.member.memberId}</td>
+            <td>${attendance.member.fullName}</td>
+            <td>${attendance.member.email}</td>
+            <td>${checkInTime}</td>
+            <td>${date}</td>
+            <td>${checkOutTime}</td>
+            <td class="action-buttons">
+              ${!isCheckedOut ? `
+                <button class="action-btn checkout" 
+                        data-attendance-id="${attendance._id}" 
+                        data-member-id="${attendance.member.memberId}"
+                        title="Check Out">
+                  <i class="fas fa-sign-out-alt"></i>
+                </button>
+              ` : `
+                <span class="action-icon checked" title="Checked Out">
+                  <i class="fas fa-check-circle"></i>
+                </span>
+              `}
+              <button class="action-btn delete" 
+                      data-member-id="${attendance.member.memberId}"
+                      title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Reattach event listeners to action buttons
+      attachActionListeners();
+    }
+
+    // Function to update attendance counts
+    function updateAttendanceCounts(data) {
+      // Update total members count - fetch from members API instead of attendance data
+      fetchTotalMembers();
+
+      // Update today's check-ins count
+      const today = new Date().toLocaleDateString('en-CA');
+      const todayCheckIns = data.filter(attendance => {
+        const attendanceDate = new Date(attendance.date).toLocaleDateString('en-CA');
+        return attendanceDate === today;
+      }).length;
+      const checkInsElement = document.querySelector('.info-box:nth-child(2) .info-box-number');
+      checkInsElement.textContent = todayCheckIns;
+
+      // Update current date
+      const dateElement = document.querySelector('.info-box:nth-child(3) .info-box-number');
+      dateElement.textContent = new Date().toLocaleDateString();
+    }
+
+    // Update download filter event listener
+    document.getElementById('filterDownload').addEventListener('change', (e) => {
+      const dateRange = e.target.value;
+      fetchAttendanceData(null, dateRange);
+    });
+
+    // Update date filter event listener
+    document.getElementById('filterDate').addEventListener('change', (e) => {
+      const selectedDate = e.target.value;
+      // Reset the days filter when using date filter
+      document.getElementById('filterDownload').value = 'today';
+      if (selectedDate) {
+        fetchAttendanceData(selectedDate);
+      } else {
+        fetchAttendanceData(); // Fetch today's data if no date selected
+      }
+    });
+
+    // Update reset filters
+    document.getElementById('resetFilters').addEventListener('click', () => {
+      // Reset date filter
+      document.getElementById('filterDate').value = '';
+      // Reset search input
+      document.getElementById('searchAttendance').value = '';
+      // Reset download filter
+      document.getElementById('filterDownload').value = 'today';
+      // Refresh the display with today's data
+      fetchAttendanceData();
+      window.toast('Filters have been reset', 'info');
+    });
+
+    // Update download button event listener
+    document.getElementById('downloadAttendance').addEventListener('click', async () => {
+      try {
+        const dateRange = document.getElementById('filterDownload').value;
+        const exportData = await fetchDataForExport(dateRange);
+
+        if (!exportData || exportData.length === 0) {
+          window.toast('No attendance data to download', 'error');
+          return;
+        }
+
+        // Create CSV content
+        const headers = ['S.N', 'Member ID', 'Full Name', 'Email', 'Check-In Time', 'Date', 'Check-Out Time'];
+        const csvContent = [
+          headers.join(','),
+          ...exportData.map((attendance, index) => [
+            index + 1,
+            attendance.member.memberId,
+            attendance.member.fullName,
+            attendance.member.email,
+            formatTime(attendance.checkIn?.time),
+            formatDate(attendance.date),
+            formatTime(attendance.checkOut?.time)
+          ].join(','))
+        ].join('\n');
+
+        // Create and download file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        
+        // Create filename based on date range
+        let filename = 'attendance_report';
+        if (dateRange !== 'today') {
+          filename += `_last_${dateRange}_days`;
+        }
+        filename += `_${date}.csv`;
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        window.toast('Attendance report downloaded successfully', 'success');
+      } catch (error) {
+        console.error('Error downloading attendance:', error);
+        window.toast('Failed to download attendance report', 'error');
+      }
+    });
+
+    // Update print button event listener
+    document.getElementById('printAttendance').addEventListener('click', async () => {
+      try {
+        const dateRange = document.getElementById('filterDownload').value;
+        const exportData = await fetchDataForExport(dateRange);
+
+        if (!exportData || exportData.length === 0) {
+          window.toast('No attendance data to print', 'error');
+          return;
+        }
+
+        // Create print window
+        const printWindow = window.open('', '_blank');
+
+        // Create print content
+        const printContent = `
+          <html>
+          <head>
+            <title>Attendance Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f5f5f5; }
+              h1 { text-align: center; }
+              .header { margin-bottom: 20px; }
+              .footer { margin-top: 20px; text-align: center; font-size: 12px; }
+              .filters { margin-bottom: 20px; text-align: center; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Attendance Report</h1>
+              <div class="filters">
+                ${dateRange !== 'today' ? `<p>Period: Last ${dateRange} days</p>` : ''}
+                <p>Generated on: ${new Date().toLocaleString()}</p>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>S.N</th>
+                  <th>Member ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Check-In Time</th>
+                  <th>Date</th>
+                  <th>Check-Out Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${exportData.map((attendance, index) => `
+                  <tr>
+                    <td>${index + 1}</td>
+                    <td>${attendance.member.memberId}</td>
+                    <td>${attendance.member.fullName}</td>
+                    <td>${attendance.member.email}</td>
+                    <td>${formatTime(attendance.checkIn?.time)}</td>
+                    <td>${formatDate(attendance.date)}</td>
+                    <td>${formatTime(attendance.checkOut?.time)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Knox Barbell - Attendance Report</p>
+            </div>
+          </body>
+          </html>
+        `;
+
+        // Write content to print window
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+
+        // Wait for content to load then print
+        printWindow.onload = function () {
+          printWindow.print();
+          printWindow.close();
+        };
+
+        window.toast('Printing attendance report...', 'success');
+      } catch (error) {
+        console.error('Error printing attendance:', error);
+        window.toast('Failed to print attendance report', 'error');
+      }
+    });
+
+    // Update search event listener to work with current data
+    document.getElementById('searchAttendance').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      displayAttendanceData(allAttendanceData);
+    });
+
+    // Helper function to format date
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+
+    // Helper function to format time
+    function formatTime(timeString) {
+      if (!timeString) return 'N/A';
+      const date = new Date(timeString);
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    // Function to attach event listeners to action buttons
+    function attachActionListeners() {
+      document.querySelectorAll('.action-btn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const attendanceId = e.currentTarget.dataset.attendanceId;
+          
+          if (e.currentTarget.classList.contains('checkout')) {
+            const memberId = e.currentTarget.dataset.memberId;
+            const confirmed = await window.confirmDialog({
+              title: 'Check Out Member',
+              message: 'Are you sure you want to check out this member?',
+              type: 'info'
+            });
+
+            if (confirmed) {
+              try {
+                const response = await fetch(`${baseUrl}/api/attendances/check-out/${memberId}`, {
+                  method: 'POST',
+                  credentials: 'include',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                  window.toast('Member checked out successfully', 'success');
+                  // Refresh the attendance data
+                  fetchAttendanceData(document.getElementById('filterDate').value || null);
+                } else {
+                  window.toast(result.message || 'Failed to check out member', 'error');
+                }
+              } catch (error) {
+                console.error('Error checking out member:', error);
+                window.toast('Error checking out member', 'error');
+              }
+            }
+          } else if (e.currentTarget.classList.contains('delete')) {
+            const memberId = e.currentTarget.dataset.memberId;
+            const confirmed = await window.confirmDialog({
+              title: 'Delete Attendance',
+              message: 'Are you sure you want to delete this attendance record?',
+              type: 'delete'
+            });
+
+            if (confirmed) {
+              try {
+                const response = await fetch(`${baseUrl}/api/attendances/member/${memberId}`, {
+                  method: 'DELETE',
+                  credentials: 'include'
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                  window.toast('Attendance record deleted successfully', 'success');
+                  // Refresh the attendance data
+                  fetchAttendanceData(document.getElementById('filterDate').value || null);
+                } else {
+                  window.toast(result.message || 'Failed to delete attendance record', 'error');
+                }
+              } catch (error) {
+                console.error('Error deleting attendance:', error);
+                window.toast('Error deleting attendance record', 'error');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // Initial load - make sure this runs after DOM is fully loaded
+    window.addEventListener('load', () => {
+      // Set today's date in the date filter
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('filterDate').value = today;
+      
+      // Fetch initial data
+      fetchAttendanceData();
+      fetchTotalMembers();
+    });
+  </script>
+</body>
 </html>
