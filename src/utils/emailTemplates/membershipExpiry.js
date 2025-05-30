@@ -1,4 +1,4 @@
-export const membershipExpiryTemplate = ({ 
+const membershipExpiryTemplate = ({ 
   name = 'Member',
   expiryDate = 'N/A',
   renewalLink = '#'
@@ -134,4 +134,6 @@ export const membershipExpiryTemplate = ({
 `;
 };
 
-export default membershipExpiryTemplate; 
+module.exports = {
+  membershipExpiryTemplate
+}; 

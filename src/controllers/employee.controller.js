@@ -1,9 +1,9 @@
-import * as employeeService from "../services/employee.service.js";
+const employeeService = require("../services/employee.service");
 
 /**
  * Create new employee
  */
-export const createEmployee = async (req, res) => {
+const createEmployee = async (req, res) => {
   try {
     // Validate required fields
     const requiredFields = ["fullName", "email", "contact", "position"];
@@ -75,7 +75,7 @@ export const createEmployee = async (req, res) => {
 /**
  * Get all employees
  */
-export const getAllEmployees = async (req, res) => {
+const getAllEmployees = async (req, res) => {
   try {
     // Validate date range if provided
     if (req.query.startDate && isNaN(new Date(req.query.startDate).getTime())) {
@@ -108,7 +108,7 @@ export const getAllEmployees = async (req, res) => {
 /**
  * Get employee by ID
  */
-export const getEmployeeById = async (req, res) => {
+const getEmployeeById = async (req, res) => {
   try {
     const employee = await employeeService.getEmployeeById(
       req.params.employeeId
@@ -128,7 +128,7 @@ export const getEmployeeById = async (req, res) => {
 /**
  * Update employee
  */
-export const updateEmployee = async (req, res) => {
+const updateEmployee = async (req, res) => {
   try {
     // Validate that at least one valid field is being updated
     const validFields = [
@@ -216,7 +216,7 @@ export const updateEmployee = async (req, res) => {
 /**
  * Delete employee
  */
-export const deleteEmployee = async (req, res) => {
+const deleteEmployee = async (req, res) => {
   try {
     await employeeService.deleteEmployee(req.params.employeeId);
     res.status(200).json({
@@ -229,4 +229,12 @@ export const deleteEmployee = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+module.exports = {
+  createEmployee,
+  getAllEmployees,
+  getEmployeeById,
+  updateEmployee,
+  deleteEmployee,
 };

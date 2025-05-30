@@ -1,12 +1,12 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   checkIn,
   checkOut,
   getMemberAttendance,
   getAllAttendance,
   deleteAttendance,
-} from "../controllers/attendance.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
+} = require("../controllers/attendance.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -25,4 +25,4 @@ router.get("/", authenticate, getAllAttendance);
 // Delete member's attendance records
 router.delete("/member/:memberId", authenticate, deleteAttendance);
 
-export default router;
+module.exports = router;

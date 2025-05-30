@@ -1,14 +1,14 @@
-import Application from "../models/application.model.js";
-import Member from "../models/member.model.js";
-import * as memberService from "./member.service.js";
-import * as applicationHistoryService from "./applicationHistory.service.js";
-import { generateMemberId } from "../utils/idgenerator/generateMemberId.js";
-import * as notificationService from "./notification.service.js";
-import mongoose from "mongoose";
-import {
+const Application = require("../models/application.model");
+const Member = require("../models/member.model");
+const memberService = require("./member.service");
+const applicationHistoryService = require("./applicationHistory.service");
+const { generateMemberId } = require("../utils/idgenerator/generateMemberId");
+const notificationService = require("./notification.service");
+const mongoose = require("mongoose");
+const {
   sendWelcomeEmail,
   sendMembershipAcceptanceEmail,
-} from "../utils/emailService.js";
+} = require("../utils/emailService");
 
 // Validate input data for application creation
 const validateApplicationData = async (applicationData) => {
@@ -30,7 +30,7 @@ const validateApplicationData = async (applicationData) => {
 };
 
 // Get all applications
-export const getAllApplicationsService = async (query = {}) => {
+const getAllApplicationsService = async (query = {}) => {
   try {
     const {
       page = 1,
@@ -79,7 +79,7 @@ export const getAllApplicationsService = async (query = {}) => {
 };
 
 // Get application by applicationId
-export const getApplicationByIdService = async (applicationId) => {
+const getApplicationByIdService = async (applicationId) => {
   const application = await Application.findOne({ applicationId });
   if (!application) {
     throw new Error("Application not found");
@@ -88,7 +88,7 @@ export const getApplicationByIdService = async (applicationId) => {
 };
 
 // Create a new application
-export const createApplicationService = async (applicationData) => {
+const createApplicationService = async (applicationData) => {
   const session = await mongoose.startSession();
 
   try {
@@ -177,7 +177,7 @@ export const createApplicationService = async (applicationData) => {
 };
 
 // Accept application and create a member
-export const acceptApplicationService = async (applicationId) => {
+const acceptApplicationService = async (applicationId) => {
   const session = await mongoose.startSession();
   let application;
   let member;
@@ -250,75 +250,95 @@ export const acceptApplicationService = async (applicationId) => {
       throw new Error("Address is required for member creation");
     }
 
-    console.log(
-      "Creating member with data:",
-      JSON.stringify(memberData, null, 2)
-    );
-
-    // Create member within transaction
+    // Create new member
     member = await memberService.createMemberService(memberData, { session });
 
-    // Create notification within transaction
-    await notificationService.createApplicationNotificationService(
+    // Update application status
+    application.applicationStatus = "accepted";
+    application.processedAt = new Date();
+    await application.save({ session });
+
+    // Create application history
+    await applicationHistoryService.createApplicationHistoryService(
       application,
       { session }
     );
 
-    // Delete the application after successful member creation
-    await Application.deleteOne({ applicationId }).session(session);
+    // Send acceptance email
+    try {
+      await sendMembershipAcceptanceEmail(
+        member.email,
+        member.fullName,
+        {
+          memberId: member.memberId,
+          membershipType: member.membershipType,
+          startDate: member.startDate,
+          endDate: member.endDate,
+        }
+      );
+    } catch (emailError) {
+      console.error("Failed to send acceptance email:", emailError);
+      // Non-critical error, don't stop the transaction
+    }
 
     // Commit transaction
     await session.commitTransaction();
 
-    // Send membership acceptance email (outside of transaction)
-    try {
-      await sendMembershipAcceptanceEmail(member);
-    } catch (emailError) {
-      console.error("Failed to send membership acceptance email:", emailError);
-    }
-
-    return member;
+    return { application, member };
   } catch (error) {
     // Abort transaction on error
     await session.abortTransaction();
-
-    // Log the full error
-    console.error("Accept Application Error:", error);
-
-    // Optionally create a rejection notification
-    if (application) {
-      try {
-        await notificationService.createApplicationNotificationService(
-          application
-        );
-      } catch (notificationError) {
-        console.error(
-          "Failed to create rejection notification:",
-          notificationError
-        );
-      }
-    }
-
-    throw error;
+    console.error("Error in acceptApplicationService:", error);
+    throw new Error(`Failed to accept application: ${error.message}`);
   } finally {
     // End session
     session.endSession();
   }
 };
 
-// Delete an application
-export const deleteApplicationService = async (applicationId) => {
-  const application = await Application.findOneAndDelete({ applicationId });
-  if (!application) {
-    throw new Error("Application not found");
-  }
+// Delete application
+const deleteApplicationService = async (applicationId) => {
+  const session = await mongoose.startSession();
 
-  // Optionally create a notification about application deletion
   try {
-    await notificationService.createApplicationNotificationService(application);
-  } catch (notificationError) {
-    console.error("Failed to create deletion notification:", notificationError);
-  }
+    // Start transaction
+    session.startTransaction();
 
-  return application;
+    // Find and delete application
+    const application = await Application.findOneAndDelete(
+      { applicationId },
+      { session }
+    );
+
+    if (!application) {
+      throw new Error("Application not found");
+    }
+
+    // Create application history
+    await applicationHistoryService.createApplicationHistoryService(
+      application,
+      { session }
+    );
+
+    // Commit transaction
+    await session.commitTransaction();
+
+    return application;
+  } catch (error) {
+    // Abort transaction on error
+    await session.abortTransaction();
+    console.error("Error in deleteApplicationService:", error);
+    throw new Error(`Failed to delete application: ${error.message}`);
+  } finally {
+    // End session
+    session.endSession();
+  }
+};
+
+module.exports = {
+  getAllApplicationsService,
+  getApplicationByIdService,
+  createApplicationService,
+  acceptApplicationService,
+  deleteApplicationService
 };

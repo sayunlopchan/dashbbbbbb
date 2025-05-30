@@ -1,7 +1,8 @@
-import Event from "../models/Event.model.js";
-import mongoose from "mongoose";
+const Event = require("../models/event.model");
+const mongoose = require("mongoose");
+
 // Create a new event
-export const createEventService = async (eventData, userId) => {
+const createEventService = async (eventData, userId) => {
   try {
     // Validate MongoDB ObjectId for author
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -56,7 +57,7 @@ export const createEventService = async (eventData, userId) => {
 };
 
 // Get all events
-export const getAllEventsService = async () => {
+const getAllEventsService = async () => {
   try {
     return await Event.find()
       .populate("author", "username email")
@@ -68,7 +69,7 @@ export const getAllEventsService = async () => {
 };
 
 // Get event by ID
-export const getEventByIdService = async (eventId) => {
+const getEventByIdService = async (eventId) => {
   try {
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
@@ -92,7 +93,7 @@ export const getEventByIdService = async (eventId) => {
 };
 
 // Update event
-export const updateEventService = async (eventId, eventData, userId) => {
+const updateEventService = async (eventId, eventData, userId) => {
   try {
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
@@ -139,7 +140,7 @@ export const updateEventService = async (eventId, eventData, userId) => {
 };
 
 // Delete event
-export const deleteEventService = async (eventId, userId) => {
+const deleteEventService = async (eventId, userId) => {
   try {
     // Validate MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
@@ -161,4 +162,12 @@ export const deleteEventService = async (eventId, userId) => {
     console.error("Delete Event Error:", error);
     throw new Error(`Failed to delete event: ${error.message}`);
   }
+};
+
+module.exports = {
+  createEventService,
+  getAllEventsService,
+  getEventByIdService,
+  updateEventService,
+  deleteEventService
 };

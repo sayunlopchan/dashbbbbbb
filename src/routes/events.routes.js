@@ -1,13 +1,13 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createEvent,
   getAllEvents,
   getEventById,
   updateEvent,
   deleteEvent,
-} from "../controllers/event.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
-import upload from "../middlewares/upload.middleware.js";
+} = require("../controllers/event.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
+const upload = require("../middlewares/upload.middleware");
 
 const router = express.Router();
 
@@ -31,4 +31,4 @@ router
   // Delete event
   .delete(authenticate, deleteEvent);
 
-export default router;
+module.exports = router;

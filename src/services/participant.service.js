@@ -1,7 +1,7 @@
-import Participant from "../models/participant.model.js";
-import Event from "../models/event.model.js";
+const Participant = require("../models/participant.model");
+const Event = require("../models/event.model");
 
-export const addParticipantService = async (eventId, participantInfo) => {
+const addParticipantService = async (eventId, participantInfo) => {
   // Check if event exists
   const event = await Event.findOne({ eventId });
 
@@ -35,7 +35,7 @@ export const addParticipantService = async (eventId, participantInfo) => {
   return participant;
 };
 
-export const getEventParticipantsService = async (eventId, options = {}) => {
+const getEventParticipantsService = async (eventId, options = {}) => {
   const page = parseInt(options.page) || 1;
   const limit = parseInt(options.limit) || 10;
   const skip = (page - 1) * limit;
@@ -64,7 +64,7 @@ export const getEventParticipantsService = async (eventId, options = {}) => {
   };
 };
 
-export const removeParticipantService = async (eventId, participantId) => {
+const removeParticipantService = async (eventId, participantId) => {
   // Check if event exists
   const event = await Event.findOne({ eventId });
 
@@ -89,9 +89,16 @@ export const removeParticipantService = async (eventId, participantId) => {
   return participant;
 };
 
-export const removeEventParticipantsService = async (eventId) => {
+const removeEventParticipantsService = async (eventId) => {
   // Remove all participants for a specific event
   const result = await Participant.deleteMany({ event: eventId });
 
   return result;
+};
+
+module.exports = {
+  addParticipantService,
+  getEventParticipantsService,
+  removeParticipantService,
+  removeEventParticipantsService
 };

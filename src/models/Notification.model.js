@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const notificationSchema = new mongoose.Schema(
   {
@@ -74,4 +74,5 @@ notificationSchema.statics.createNotification = async function (data) {
 const Notification =
   mongoose.models.Notification ||
   mongoose.model("Notification", notificationSchema);
-export default Notification;
+
+module.exports = Notification;

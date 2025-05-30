@@ -1,12 +1,12 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createEmployee,
   getAllEmployees,
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
-} from "../controllers/employee.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
+} = require("../controllers/employee.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -25,4 +25,4 @@ router.put("/:employeeId", authenticate, updateEmployee);
 // Delete employee
 router.delete("/:employeeId", authenticate, deleteEmployee);
 
-export default router;
+module.exports = router;

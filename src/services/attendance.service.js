@@ -1,10 +1,10 @@
-import Attendance from "../models/attendance.model.js";
-import Member from "../models/member.model.js";
+const Attendance = require("../models/attendance.model");
+const Member = require("../models/member.model");
 
 /**
  * Check-in a member
  */
-export const checkIn = async (memberId, checkInData = {}) => {
+const checkIn = async (memberId, checkInData = {}) => {
   try {
     // Verify member exists
     const member = await Member.findOne({ memberId });
@@ -54,7 +54,7 @@ export const checkIn = async (memberId, checkInData = {}) => {
 /**
  * Check-out a member
  */
-export const checkOut = async (memberId, checkOutData = {}) => {
+const checkOut = async (memberId, checkOutData = {}) => {
   try {
     // Verify member exists
     const member = await Member.findOne({ memberId });
@@ -100,7 +100,7 @@ export const checkOut = async (memberId, checkOutData = {}) => {
 /**
  * Get member's attendance history
  */
-export const getMemberAttendance = async (memberId, query = {}) => {
+const getMemberAttendance = async (memberId, query = {}) => {
   try {
     const { page = 1, limit = 10, startDate, endDate } = query;
 
@@ -143,7 +143,7 @@ export const getMemberAttendance = async (memberId, query = {}) => {
 /**
  * Get attendance records for all members
  */
-export const getAllAttendance = async (query = {}) => {
+const getAllAttendance = async (query = {}) => {
   try {
     const { page = 1, limit = 10, date, search, startDate, endDate } = query;
 
@@ -200,7 +200,7 @@ export const getAllAttendance = async (query = {}) => {
 /**
  * Delete attendance records for a member
  */
-export const deleteAttendance = async (memberId, query = {}) => {
+const deleteAttendance = async (memberId, query = {}) => {
   try {
     // Verify member exists
     const member = await Member.findOne({ memberId });
@@ -228,4 +228,12 @@ export const deleteAttendance = async (memberId, query = {}) => {
     console.error("Error in deleteAttendance service:", error);
     throw error;
   }
+};
+
+module.exports = {
+  checkIn,
+  checkOut,
+  getMemberAttendance,
+  getAllAttendance,
+  deleteAttendance
 };

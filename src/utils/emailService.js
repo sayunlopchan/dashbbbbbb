@@ -1,11 +1,11 @@
-import nodemailer from 'nodemailer';
-import { applicationSubmissionTemplate } from './emailTemplates/applicationSubmission.js';
-import { membershipAcceptanceTemplate } from './emailTemplates/membershipAcceptance.js';
-import { pendingMembershipPaymentTemplate } from './emailTemplates/pendingMembershipPayment.js';
-import { membershipExpiryReminderTemplate } from './emailTemplates/membershipExpiryReminder.js';
-import { membershipExpiryTemplate } from './emailTemplates/membershipExpiry.js';
-import { membershipCancellationTemplate } from './emailTemplates/membershipCancellation.js';
-import dayjs from 'dayjs';
+const nodemailer = require('nodemailer');
+const { applicationSubmissionTemplate } = require('./emailTemplates/applicationSubmission');
+const { membershipAcceptanceTemplate } = require('./emailTemplates/membershipAcceptance');
+const { pendingMembershipPaymentTemplate } = require('./emailTemplates/pendingMembershipPayment');
+const { membershipExpiryReminderTemplate } = require('./emailTemplates/membershipExpiryReminder');
+const { membershipExpiryTemplate } = require('./emailTemplates/membershipExpiry');
+const { membershipCancellationTemplate } = require('./emailTemplates/membershipCancellation');
+const dayjs = require('dayjs');
 
 // Create a transporter using the default SMTP transport
 const createTransporter = () => {
@@ -80,7 +80,7 @@ const validateEmailParams = (email, name, options = {}) => {
  * @param {Object} options - Email configuration options
  * @returns {Promise<void>}
  */
-export const sendEmail = async (to, name, options = {}) => {
+const sendEmail = async (to, name, options = {}) => {
   console.log(`🔔 Attempting to send email to: ${to}`);
   console.log(`📧 Email Details:`, {
     to,
@@ -136,7 +136,7 @@ export const sendEmail = async (to, name, options = {}) => {
  * @param {Object} additionalInfo - Additional email information
  * @returns {Promise<void>}
  */
-export const sendWelcomeEmail = async (email, name, additionalInfo = {}) => {
+const sendWelcomeEmail = async (email, name, additionalInfo = {}) => {
   console.log(`📝 Preparing welcome email for: ${email}`);
   
   const { applicationId, message } = additionalInfo;
@@ -156,7 +156,7 @@ export const sendWelcomeEmail = async (email, name, additionalInfo = {}) => {
  * @param {Object} memberDetails - Member's details
  * @returns {Promise<void>}
  */
-export const sendMembershipAcceptanceEmail = async (memberDetails) => {
+const sendMembershipAcceptanceEmail = async (memberDetails) => {
   console.log(`🎉 Preparing membership acceptance email for: ${memberDetails.email}`);
 
   return sendEmail(memberDetails.email, memberDetails.fullName, {
@@ -178,7 +178,7 @@ export const sendMembershipAcceptanceEmail = async (memberDetails) => {
  * @param {Object} memberDetails - Member's details including expiry date
  * @returns {Promise<void>}
  */
-export const sendExpiryEmail = async (email, name, memberDetails = {}) => {
+const sendExpiryEmail = async (email, name, memberDetails = {}) => {
   console.log(`⏰ Preparing expiry email for: ${email}`);
   
   return sendEmail(email, name, {
@@ -191,7 +191,7 @@ export const sendExpiryEmail = async (email, name, memberDetails = {}) => {
 };
 
 // Add a new function for sending pending membership payment reminder
-export const sendPendingMembershipPaymentReminder = async (memberDetails) => {
+const sendPendingMembershipPaymentReminder = async (memberDetails) => {
   console.log(`💳 Preparing pending payment reminder email for: ${memberDetails.email}`);
 
   return sendEmail(memberDetails.email, memberDetails.fullName, {
@@ -210,7 +210,7 @@ export const sendPendingMembershipPaymentReminder = async (memberDetails) => {
  * @param {Object} memberDetails - Member's details
  * @returns {Promise<void>}
  */
-export const sendMembershipExpiryReminder = async (memberDetails) => {
+const sendMembershipExpiryReminder = async (memberDetails) => {
   console.log(`⏳ Preparing membership expiry reminder email for: ${memberDetails.email}`);
 
   // Validate required member details
@@ -260,7 +260,7 @@ export const sendMembershipExpiryReminder = async (memberDetails) => {
 };
 
 // Add this after the existing email service functions
-export const sendMembershipCancellationEmail = async (memberDetails) => {
+const sendMembershipCancellationEmail = async (memberDetails) => {
   console.log(`❌ Preparing membership cancellation email for: ${memberDetails.email}`);
 
   return sendEmail(memberDetails.email, memberDetails.fullName, {
@@ -272,4 +272,14 @@ export const sendMembershipCancellationEmail = async (memberDetails) => {
       cancellationReason: memberDetails.cancellationReason || 'non-payment'
     })
   });
+};
+
+module.exports = {
+  sendEmail,
+  sendWelcomeEmail,
+  sendMembershipAcceptanceEmail,
+  sendExpiryEmail,
+  sendPendingMembershipPaymentReminder,
+  sendMembershipExpiryReminder,
+  sendMembershipCancellationEmail
 };

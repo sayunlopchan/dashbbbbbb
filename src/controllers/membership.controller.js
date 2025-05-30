@@ -1,7 +1,7 @@
-import * as membershipService from "../services/membership.service.js";
+const membershipService = require("../services/membership.service");
 
 // Create Membership
-export const createMembership = async (req, res) => {
+const createMembership = async (req, res) => {
   try {
     const membership = await membershipService.createMembershipService(
       req.body
@@ -20,7 +20,7 @@ export const createMembership = async (req, res) => {
 };
 
 // Get All Memberships
-export const getAllMemberships = async (req, res) => {
+const getAllMemberships = async (req, res) => {
   try {
     const memberships = await membershipService.getAllMembershipsService(
       req.query
@@ -39,7 +39,7 @@ export const getAllMemberships = async (req, res) => {
 };
 
 // Get Membership by ID
-export const getMembershipById = async (req, res) => {
+const getMembershipById = async (req, res) => {
   try {
     const membership = await membershipService.getMembershipByIdService(
       req.params.id
@@ -58,7 +58,7 @@ export const getMembershipById = async (req, res) => {
 };
 
 // Update Membership
-export const updateMembership = async (req, res) => {
+const updateMembership = async (req, res) => {
   try {
     const membership = await membershipService.updateMembershipService(
       req.params.id,
@@ -78,7 +78,7 @@ export const updateMembership = async (req, res) => {
 };
 
 // Delete Membership
-export const deleteMembership = async (req, res) => {
+const deleteMembership = async (req, res) => {
   try {
     await membershipService.deleteMembershipService(req.params.id);
     res.status(200).json({
@@ -91,4 +91,12 @@ export const deleteMembership = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+module.exports = {
+  createMembership,
+  getAllMemberships,
+  getMembershipById,
+  updateMembership,
+  deleteMembership,
 };

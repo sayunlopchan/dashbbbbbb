@@ -1,11 +1,11 @@
-import Member from "../models/member.model.js";
-import dayjs from "dayjs";
-import { sendMembershipExpiryReminder } from "../utils/emailService.js";
-import { createPaymentService } from "./payment.service.js";
-import mongoose from "mongoose";
+const Member = require("../models/member.model");
+const dayjs = require("dayjs");
+const { sendMembershipExpiryReminder } = require("../utils/emailService");
+const { createPaymentService } = require("./payment.service");
+const mongoose = require("mongoose");
 
 // Create Member
-export const createMemberService = async (data, options = {}) => {
+const createMemberService = async (data, options = {}) => {
   console.log("Creating member with data:", JSON.stringify(data, null, 2));
 
   const existing = await Member.findOne({ email: data.email });
@@ -76,7 +76,7 @@ export const createMemberService = async (data, options = {}) => {
 };
 
 // Get All Members with pagination/filtering
-export const getAllMembersService = async (query = {}) => {
+const getAllMembersService = async (query = {}) => {
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 0; // Changed from 10 to 0 to fetch all by default
   const skip = (page - 1) * (limit || 1); // Handle case when limit is 0
@@ -133,14 +133,14 @@ export const getAllMembersService = async (query = {}) => {
 };
 
 // Get by memberId
-export const getMemberByMemberIdService = async (memberId) => {
+const getMemberByMemberIdService = async (memberId) => {
   const member = await Member.findOne({ memberId });
   if (!member) throw new Error("Member not found");
   return member;
 };
 
 // Update by memberId
-export const updateMemberService = async (memberId, data) => {
+const updateMemberService = async (memberId, data) => {
   // Find existing member to get current details
   const existingMember = await Member.findOne({ memberId });
   if (!existingMember) throw new Error("Member not found");
@@ -203,14 +203,14 @@ export const updateMemberService = async (memberId, data) => {
 };
 
 // Delete by memberId
-export const deleteMemberService = async (memberId) => {
+const deleteMemberService = async (memberId) => {
   const deleted = await Member.findOneAndDelete({ memberId });
   if (!deleted) throw new Error("Member not found");
   return deleted;
 };
 
 // Process payment for membership
-export const processMemberPaymentService = async (memberId, paymentData) => {
+const processMemberPaymentService = async (memberId, paymentData) => {
   const session = await mongoose.startSession();
 
   try {
@@ -250,57 +250,15 @@ export const processMemberPaymentService = async (memberId, paymentData) => {
       paymentMethod: paymentData.paymentMethod,
       paymentDate: new Date(),
       status: "completed",
-      type: paymentType,
-      paymentId: payment.paymentId, // Store the payment ID reference
+      paymentId: payment._id,
     };
 
-    // Add payment to member's payment history
+    // Update member's payment history
     member.payments.push(memberPaymentRecord);
-
-    // Update last payment date
-    member.lastPaymentDate = new Date();
-
-    // If membership type is provided and different from current, update it
-    if (
-      paymentData.membershipType &&
-      paymentData.membershipType !== member.membershipType
-    ) {
-      member.membershipType = paymentData.membershipType;
-
-      // Update membership duration based on type
-      const membershipDurationMap = {
-        silver: 1,
-        gold: 3,
-        diamond: 6,
-        platinum: 12,
-      };
-      member.membershipDuration =
-        membershipDurationMap[paymentData.membershipType];
-
-      // Recalculate end date
-      const newEndDate = new Date(member.startDate);
-      newEndDate.setMonth(newEndDate.getMonth() + member.membershipDuration);
-      member.endDate = newEndDate;
-    }
-
-    // Activate membership if it was pending or cancelled
-    if (["pending", "cancelled"].includes(member.memberStatus)) {
-      member.memberStatus = "active";
-
-      // Clear cancellation details if they exist
-      member.cancellationReason = null;
-      member.cancellationDate = null;
-    }
-
-    // Save the member with new payment
     await member.save({ session });
 
     await session.commitTransaction();
-
-    return {
-      payment: memberPaymentRecord,
-      paymentRecord: payment,
-    };
+    return payment;
   } catch (error) {
     await session.abortTransaction();
     throw error;
@@ -310,7 +268,7 @@ export const processMemberPaymentService = async (memberId, paymentData) => {
 };
 
 // Renew membership
-export const renewMembershipService = async (memberId, renewalData) => {
+const renewMembershipService = async (memberId, renewalData) => {
   const session = await mongoose.startSession();
 
   try {
@@ -322,100 +280,44 @@ export const renewMembershipService = async (memberId, renewalData) => {
       throw new Error("Member not found");
     }
 
-    // Validate renewal data
-    if (!renewalData.membershipType) {
-      throw new Error("Membership type is required");
+    // Calculate new end date
+    const currentEndDate = new Date(member.endDate);
+    const newEndDate = new Date(currentEndDate);
+    newEndDate.setMonth(newEndDate.getMonth() + renewalData.duration);
+
+    // Update member's end date
+    member.endDate = newEndDate;
+    member.membershipDuration = renewalData.duration;
+    member.memberStatus = "active";
+
+    // Create payment record if payment is included
+    if (renewalData.payment) {
+      const paymentRecordData = {
+        memberId: member.memberId,
+        amount: renewalData.payment.amount,
+        paymentType: "renewal",
+        paymentMethod: renewalData.payment.method,
+        description: `Renewal payment for ${member.membershipType} membership`,
+        paymentDate: new Date(),
+        status: "completed",
+      };
+
+      const payment = await createPaymentService(paymentRecordData);
+
+      // Add payment to member's payment history
+      member.payments.push({
+        amount: renewalData.payment.amount,
+        paymentMethod: renewalData.payment.method,
+        paymentDate: new Date(),
+        status: "completed",
+        paymentId: payment._id,
+      });
     }
 
-    // Determine membership duration based on type
-    const membershipDurationMap = {
-      silver: 1,
-      gold: 3,
-      diamond: 6,
-      platinum: 12,
-    };
-    const membershipDuration =
-      membershipDurationMap[renewalData.membershipType];
-
-    // Capture previous membership details
-    const previousMembershipDetails = {
-      membershipType: member.membershipType,
-      startDate: member.startDate,
-      endDate: member.endDate,
-      memberStatus: member.memberStatus,
-    };
-
-    // Calculate new end date
-    const currentEndDate = member.endDate;
-    const newEndDate = new Date(currentEndDate);
-    newEndDate.setMonth(newEndDate.getMonth() + membershipDuration);
-
-    // Prepare renewal record with both previous and new details
-    const renewalRecord = {
-      previousMembership: previousMembershipDetails,
-      newMembership: {
-        membershipType: renewalData.membershipType,
-        startDate: currentEndDate, // New start date is the previous end date
-        endDate: newEndDate,
-        status: "active",
-      },
-      renewalDate: new Date(),
-    };
-
-    // Create payment record in Payment model
-    const paymentData = {
-      memberId: member.memberId,
-      amount: renewalData.paymentAmount,
-      paymentType: "membership",
-      paymentMethod: renewalData.paymentMethod,
-      description: `Renewal payment for ${
-        renewalData.membershipType
-      } membership (${membershipDuration} month${
-        membershipDuration > 1 ? "s" : ""
-      })`,
-      paymentDate: new Date(),
-      status: "completed",
-    };
-
-    const payment = await createPaymentService(paymentData);
-
-    // Add payment record to member's payment history
-    const paymentRecord = {
-      amount: renewalData.paymentAmount,
-      paymentMethod: renewalData.paymentMethod || "cash",
-      paymentDate: new Date(),
-      status: "completed",
-      type: "renewal",
-      paymentId: payment.paymentId, // Store the payment ID reference
-    };
-
-    // Update member details
-    member.endDate = newEndDate;
-    member.membershipType = renewalData.membershipType;
-    member.memberStatus = "active";
-    member.nextRenewalDate = newEndDate;
-
-    // Add payment to payment history
-    member.payments.push(paymentRecord);
-
-    // Add to renewal history
-    member.renewalHistory.push(renewalRecord);
-
-    // Update last payment date
-    member.lastPaymentDate = new Date();
-
-    // Save updated member
     await member.save({ session });
-
     await session.commitTransaction();
 
-    return {
-      member,
-      renewalRecord,
-      paymentRecord,
-      paymentType: "renewal",
-      payment,
-    };
+    return member;
   } catch (error) {
     await session.abortTransaction();
     throw error;
@@ -424,142 +326,73 @@ export const renewMembershipService = async (memberId, renewalData) => {
   }
 };
 
-// Get membership payment history
-export const getMemberPaymentHistoryService = async (memberId) => {
-  const member = await Member.findOne({ memberId }).select(
-    "payments renewalHistory"
-  );
+// Get member payment history
+const getMemberPaymentHistoryService = async (memberId) => {
+  const member = await Member.findOne({ memberId });
   if (!member) {
     throw new Error("Member not found");
   }
-
-  return {
-    payments: member.payments,
-    renewalHistory: member.renewalHistory,
-  };
+  return member.payments;
 };
 
-// Check and update membership status
-export const checkMembershipStatusService = async (memberId) => {
+// Check membership status
+const checkMembershipStatusService = async (memberId) => {
   const member = await Member.findOne({ memberId });
   if (!member) {
     throw new Error("Member not found");
   }
 
   const currentDate = new Date();
-  const endDate = new Date(member.endDate);
-  const daysUntilExpiry = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+  const isActive = currentDate >= member.startDate && currentDate <= member.endDate;
 
-  // Check if membership has expired
-  if (currentDate > endDate) {
-    member.memberStatus = "expired";
+  return {
+    memberId: member.memberId,
+    status: isActive ? "active" : "expired",
+    startDate: member.startDate,
+    endDate: member.endDate,
+    daysRemaining: isActive
+      ? Math.ceil((member.endDate - currentDate) / (1000 * 60 * 60 * 24))
+      : 0,
+  };
+};
+
+// Cancel membership
+const cancelMembershipService = async (
+  memberId,
+  cancelReason = "Manual Cancellation"
+) => {
+  const member = await Member.findOne({ memberId });
+  if (!member) {
+    throw new Error("Member not found");
   }
-  // Check if membership is expiring soon (within 10 days)
-  else if (daysUntilExpiry <= 10 && daysUntilExpiry > 0) {
-    member.memberStatus = "expiring";
-  }
-  // If not expired and not expiring soon, set to active
-  else if (currentDate >= new Date(member.startDate) && currentDate <= endDate) {
-    member.memberStatus = "active";
-  }
+
+  member.memberStatus = "cancelled";
+  member.cancellationDate = new Date();
+  member.cancellationReason = cancelReason;
 
   await member.save();
   return member;
 };
 
-// Update all membership statuses
-export const updateAllMembershipStatusesService = async () => {
-  const currentDate = new Date();
-  const members = await Member.find({
-    memberStatus: { $in: ["active", "expiring"] }
-  });
+// Send expiry reminder sequence
+const sendExpiryReminderSequence = async (member) => {
+  const daysUntilExpiry = dayjs(member.endDate).diff(dayjs(), "day");
 
-  const expiredMembers = [];
-
-  for (const member of members) {
-    const endDate = new Date(member.endDate);
-    const daysUntilExpiry = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
-
-    if (currentDate > endDate) {
-      member.memberStatus = "expired";
-      expiredMembers.push(member);
-    } else if (daysUntilExpiry <= 10 && daysUntilExpiry > 0) {
-      member.memberStatus = "expiring";
-    } else if (currentDate >= new Date(member.startDate) && currentDate <= endDate) {
-      member.memberStatus = "active";
-    }
-
-    await member.save();
-  }
-
-  return expiredMembers;
-};
-
-// Cancel Member Membership
-export const cancelMembershipService = async (
-  memberId,
-  cancelReason = "Manual Cancellation"
-) => {
-  try {
-    // Find the member
-    const member = await Member.findOne({ memberId });
-
-    if (!member) {
-      throw new Error("Member not found");
-    }
-
-    // Check if membership can be cancelled
-    if (member.memberStatus === "cancelled") {
-      throw new Error("Membership is already cancelled");
-    }
-
-    // Update member status and add cancellation details
-    member.memberStatus = "cancelled";
-    member.cancellationReason = cancelReason;
-    member.cancellationDate = new Date();
-
-    // Save the updated member
-    await member.save();
-
-    return member;
-  } catch (error) {
-    console.error(`Error in cancelMembershipService: ${error.message}`);
-    throw error;
+  if (daysUntilExpiry <= 7 && daysUntilExpiry > 0) {
+    await sendMembershipExpiryReminder(member, daysUntilExpiry);
   }
 };
 
-// Utility function to track and send expiry reminder emails
-export const sendExpiryReminderSequence = async (member) => {
-  try {
-    // Increment expiry reminder count
-    member.expiryReminderCount = (member.expiryReminderCount || 0) + 1;
-
-    // Calculate days until expiry
-    const daysUntilExpiry = dayjs(member.membershipExpiry).diff(dayjs(), "day");
-
-    // Send reminder email
-    await sendMembershipExpiryReminder({
-      email: member.email,
-      fullName: member.fullName,
-      memberId: member.memberId,
-      membershipType: member.membershipType,
-      expiryDate: dayjs(member.membershipExpiry).format("YYYY-MM-DD"),
-      reminderCount: member.expiryReminderCount,
-      daysUntilExpiry: daysUntilExpiry,
-    });
-
-    // Save updated member with reminder count
-    await member.save();
-
-    console.log(
-      `📧 Expiry Reminder #${member.expiryReminderCount} sent to ${member.fullName} (${daysUntilExpiry} days remaining)`
-    );
-    return member.expiryReminderCount;
-  } catch (error) {
-    console.error(
-      `❌ Failed to send expiry reminder to ${member.fullName}:`,
-      error
-    );
-    throw error;
-  }
+module.exports = {
+  createMemberService,
+  getAllMembersService,
+  getMemberByMemberIdService,
+  updateMemberService,
+  deleteMemberService,
+  processMemberPaymentService,
+  renewMembershipService,
+  getMemberPaymentHistoryService,
+  checkMembershipStatusService,
+  cancelMembershipService,
+  sendExpiryReminderSequence
 };

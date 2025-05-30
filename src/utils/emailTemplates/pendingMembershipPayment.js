@@ -7,7 +7,7 @@
  * @param {Date} params.startDate - Membership start date
  * @returns {string} HTML email template
  */
-export const pendingMembershipPaymentTemplate = (params) => {
+const pendingMembershipPaymentTemplate = (params) => {
   const { 
     fullName = 'Member', 
     memberId = 'N/A', 
@@ -45,4 +45,8 @@ export const pendingMembershipPaymentTemplate = (params) => {
       <p>Best regards,<br/>Your Organization</p>
     </div>
   `;
+};
+
+module.exports = {
+  pendingMembershipPaymentTemplate
 }; 

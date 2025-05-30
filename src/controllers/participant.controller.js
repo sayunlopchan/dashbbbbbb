@@ -1,12 +1,12 @@
-import {
+const {
   addParticipantService,
   getEventParticipantsService,
   removeParticipantService,
   removeEventParticipantsService,
-} from "../services/participant.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+} = require("../services/participant.service");
+const asyncHandler = require("../utils/asyncHandler");
 
-export const addParticipant = asyncHandler(async (req, res) => {
+const addParticipant = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
   const { fullName, email, contact } = req.body;
 
@@ -23,7 +23,7 @@ export const addParticipant = asyncHandler(async (req, res) => {
   });
 });
 
-export const getEventParticipants = asyncHandler(async (req, res) => {
+const getEventParticipants = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
@@ -39,7 +39,7 @@ export const getEventParticipants = asyncHandler(async (req, res) => {
   });
 });
 
-export const removeParticipant = asyncHandler(async (req, res) => {
+const removeParticipant = asyncHandler(async (req, res) => {
   const { eventId, participantId } = req.params;
 
   const participant = await removeParticipantService(eventId, participantId);
@@ -51,7 +51,7 @@ export const removeParticipant = asyncHandler(async (req, res) => {
   });
 });
 
-export const removeEventParticipants = asyncHandler(async (req, res) => {
+const removeEventParticipants = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
 
   const result = await removeEventParticipantsService(eventId);
@@ -62,3 +62,10 @@ export const removeEventParticipants = asyncHandler(async (req, res) => {
     deletedCount: result.deletedCount,
   });
 });
+
+module.exports = {
+  addParticipant,
+  getEventParticipants,
+  removeParticipant,
+  removeEventParticipants,
+};

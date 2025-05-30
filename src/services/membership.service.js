@@ -1,9 +1,9 @@
-import Membership from "../models/membership.model.js";
+const Membership = require("../models/membership.model");
 
 /**
  * Create a new membership
  */
-export const createMembershipService = async (membershipData) => {
+const createMembershipService = async (membershipData) => {
   try {
     // Validate input
     if (
@@ -35,7 +35,7 @@ export const createMembershipService = async (membershipData) => {
 /**
  * Get all memberships
  */
-export const getAllMembershipsService = async (query = {}) => {
+const getAllMembershipsService = async (query = {}) => {
   try {
     // Remove filtering by active status
     return await Membership.find();
@@ -47,7 +47,7 @@ export const getAllMembershipsService = async (query = {}) => {
 /**
  * Get membership by ID
  */
-export const getMembershipByIdService = async (id) => {
+const getMembershipByIdService = async (id) => {
   try {
     const membership = await Membership.findById(id);
     if (!membership) {
@@ -62,7 +62,7 @@ export const getMembershipByIdService = async (id) => {
 /**
  * Update membership
  */
-export const updateMembershipService = async (id, updateData) => {
+const updateMembershipService = async (id, updateData) => {
   try {
     // Prevent updating title to an existing title
     if (updateData.title) {
@@ -95,7 +95,7 @@ export const updateMembershipService = async (id, updateData) => {
 /**
  * Delete membership
  */
-export const deleteMembershipService = async (id) => {
+const deleteMembershipService = async (id) => {
   try {
     const membership = await Membership.findByIdAndDelete(id);
     if (!membership) {
@@ -105,4 +105,12 @@ export const deleteMembershipService = async (id) => {
   } catch (error) {
     throw new Error(error.message);
   }
+};
+
+module.exports = {
+  createMembershipService,
+  getAllMembershipsService,
+  getMembershipByIdService,
+  updateMembershipService,
+  deleteMembershipService
 };

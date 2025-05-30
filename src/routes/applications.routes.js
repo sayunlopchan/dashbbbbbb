@@ -1,13 +1,13 @@
-import { Router } from "express";
-import {
+const { Router } = require("express");
+const {
   createApplication,
   getAllApplications,
   acceptApplication,
   deleteApplication,
   getApplicationById,
-} from "../controllers/application.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
-import { validateApplication } from "../validations/application.validation.js";
+} = require("../controllers/application.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
+const { validateApplication } = require("../validations/application.validation");
 
 const router = Router();
 
@@ -26,4 +26,4 @@ router.put("/accept/:applicationId", authenticate, acceptApplication);
 // Delete an application (requires authentication)
 router.delete("/delete/:applicationId", authenticate, deleteApplication);
 
-export default router;
+module.exports = router;

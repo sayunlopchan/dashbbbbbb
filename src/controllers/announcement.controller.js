@@ -1,8 +1,8 @@
-import * as announcementService from "../services/announcement.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+const announcementService = require("../services/announcement.service");
+const asyncHandler = require("../utils/asyncHandler");
 
 // Get all announcements
-export const getAllAnnouncements = asyncHandler(async (req, res) => {
+const getAllAnnouncements = asyncHandler(async (req, res) => {
   // Get all announcements without pagination
   const announcements = await announcementService.getAllAnnouncementsService();
 
@@ -13,7 +13,7 @@ export const getAllAnnouncements = asyncHandler(async (req, res) => {
 });
 
 // Get a single announcement by ID
-export const getAnnouncementById = asyncHandler(async (req, res) => {
+const getAnnouncementById = asyncHandler(async (req, res) => {
   const { announcementId } = req.params;
 
   const announcement = await announcementService.getAnnouncementByIdService(
@@ -27,7 +27,7 @@ export const getAnnouncementById = asyncHandler(async (req, res) => {
 });
 
 // Create a new announcement
-export const createAnnouncement = asyncHandler(async (req, res) => {
+const createAnnouncement = asyncHandler(async (req, res) => {
   const announcementData = req.body;
 
   const announcement = await announcementService.createAnnouncementService(
@@ -41,7 +41,7 @@ export const createAnnouncement = asyncHandler(async (req, res) => {
 });
 
 // Update an announcement
-export const updateAnnouncement = asyncHandler(async (req, res) => {
+const updateAnnouncement = asyncHandler(async (req, res) => {
   const { announcementId } = req.params;
   const updateData = req.body;
 
@@ -57,7 +57,7 @@ export const updateAnnouncement = asyncHandler(async (req, res) => {
 });
 
 // Delete an announcement
-export const deleteAnnouncement = asyncHandler(async (req, res) => {
+const deleteAnnouncement = asyncHandler(async (req, res) => {
   const { announcementId } = req.params;
 
   await announcementService.deleteAnnouncementService(announcementId);
@@ -67,3 +67,11 @@ export const deleteAnnouncement = asyncHandler(async (req, res) => {
     message: "Announcement deleted successfully",
   });
 });
+
+module.exports = {
+  getAllAnnouncements,
+  getAnnouncementById,
+  createAnnouncement,
+  updateAnnouncement,
+  deleteAnnouncement,
+};

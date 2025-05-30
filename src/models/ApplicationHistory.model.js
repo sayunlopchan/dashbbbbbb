@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const applicationHistorySchema = new mongoose.Schema(
   {
@@ -60,4 +60,4 @@ const ApplicationHistory =
   mongoose.models.ApplicationHistory ||
   mongoose.model("ApplicationHistory", applicationHistorySchema);
 
-export default ApplicationHistory;
+module.exports = ApplicationHistory;

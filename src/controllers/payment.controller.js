@@ -1,8 +1,8 @@
-import * as paymentService from "../services/payment.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+const paymentService = require("../services/payment.service");
+const asyncHandler = require("../utils/asyncHandler");
 
 // Get all payments
-export const getAllPayments = asyncHandler(async (req, res) => {
+const getAllPayments = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
@@ -34,7 +34,7 @@ export const getAllPayments = asyncHandler(async (req, res) => {
 });
 
 // Create a new payment
-export const createPayment = asyncHandler(async (req, res) => {
+const createPayment = asyncHandler(async (req, res) => {
   const { memberId } = req.params;
   const paymentData = { ...req.body, memberId };
 
@@ -47,7 +47,7 @@ export const createPayment = asyncHandler(async (req, res) => {
 });
 
 // Get all payments for a member
-export const getMemberPayments = asyncHandler(async (req, res) => {
+const getMemberPayments = asyncHandler(async (req, res) => {
   const { memberId } = req.params;
 
   const payments = await paymentService.getMemberPaymentsService(memberId);
@@ -59,7 +59,7 @@ export const getMemberPayments = asyncHandler(async (req, res) => {
 });
 
 // Get revenue statistics
-export const getRevenueStats = asyncHandler(async (req, res) => {
+const getRevenueStats = asyncHandler(async (req, res) => {
   const stats = await paymentService.getRevenueStatsService();
 
   res.status(200).json({
@@ -69,7 +69,7 @@ export const getRevenueStats = asyncHandler(async (req, res) => {
 });
 
 // Get payment by ID
-export const getPaymentById = asyncHandler(async (req, res) => {
+const getPaymentById = asyncHandler(async (req, res) => {
   const { paymentId } = req.params;
 
   const payment = await paymentService.getPaymentByIdService(paymentId);
@@ -81,7 +81,7 @@ export const getPaymentById = asyncHandler(async (req, res) => {
 });
 
 // Update payment status
-export const updatePaymentStatus = asyncHandler(async (req, res) => {
+const updatePaymentStatus = asyncHandler(async (req, res) => {
   const { paymentId } = req.params;
   const { status } = req.body;
 
@@ -97,7 +97,7 @@ export const updatePaymentStatus = asyncHandler(async (req, res) => {
 });
 
 // Delete payment
-export const deletePayment = asyncHandler(async (req, res) => {
+const deletePayment = asyncHandler(async (req, res) => {
   const { paymentId } = req.params;
 
   const result = await paymentService.deletePaymentService(paymentId);
@@ -107,3 +107,13 @@ export const deletePayment = asyncHandler(async (req, res) => {
     message: result.message,
   });
 });
+
+module.exports = {
+  getAllPayments,
+  createPayment,
+  getMemberPayments,
+  getRevenueStats,
+  getPaymentById,
+  updatePaymentStatus,
+  deletePayment,
+};

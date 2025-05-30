@@ -1,9 +1,9 @@
-import { authenticate } from "./auth.middleware.js";
+const { authenticate } = require("./auth.middleware");
 
 /**
  * Middleware to protect routes that require authentication
  */
-export const protectRoute = (req, res, next) => {
+const protectRoute = (req, res, next) => {
   // Wrap authenticate to ensure it's called correctly
   try {
     authenticate(req, res, next);
@@ -13,3 +13,5 @@ export const protectRoute = (req, res, next) => {
     res.status(401).redirect("/unauthorized");
   }
 };
+
+module.exports = { protectRoute };

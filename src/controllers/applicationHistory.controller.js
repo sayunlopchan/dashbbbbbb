@@ -1,8 +1,8 @@
-import * as applicationHistoryService from "../services/applicationHistory.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+const applicationHistoryService = require("../services/applicationHistory.service");
+const asyncHandler = require("../utils/asyncHandler");
 
 // Get all application history
-export const getAllApplicationHistory = asyncHandler(async (req, res) => {
+const getAllApplicationHistory = asyncHandler(async (req, res) => {
   const history =
     await applicationHistoryService.getAllApplicationHistoryService();
 
@@ -14,7 +14,7 @@ export const getAllApplicationHistory = asyncHandler(async (req, res) => {
 });
 
 // Get application history by ID
-export const getApplicationHistoryById = asyncHandler(async (req, res) => {
+const getApplicationHistoryById = asyncHandler(async (req, res) => {
   const { applicationId } = req.params;
 
   const history =
@@ -29,7 +29,7 @@ export const getApplicationHistoryById = asyncHandler(async (req, res) => {
 });
 
 // Delete application history
-export const deleteApplicationHistory = asyncHandler(async (req, res) => {
+const deleteApplicationHistory = asyncHandler(async (req, res) => {
   const { applicationId } = req.params;
 
   await applicationHistoryService.deleteApplicationHistoryService(
@@ -41,3 +41,9 @@ export const deleteApplicationHistory = asyncHandler(async (req, res) => {
     message: "Application history deleted successfully",
   });
 });
+
+module.exports = {
+  getAllApplicationHistory,
+  getApplicationHistoryById,
+  deleteApplicationHistory,
+};

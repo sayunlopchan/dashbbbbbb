@@ -1,9 +1,9 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
 /**
  * Authentication middleware
  */
-export const authenticate = (req, res, next) => {
+const authenticate = (req, res, next) => {
   // Get token from cookies or Authorization header
   const token =
     req.cookies.token ||
@@ -51,3 +51,5 @@ export const authenticate = (req, res, next) => {
     return res.status(401).redirect("/unauthorized");
   }
 };
+
+module.exports = { authenticate };

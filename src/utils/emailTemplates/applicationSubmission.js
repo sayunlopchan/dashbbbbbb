@@ -6,7 +6,7 @@
  * @param {string} params.message - Custom message
  * @returns {string} HTML email template
  */
-export const applicationSubmissionTemplate = (params) => {
+const applicationSubmissionTemplate = (params) => {
   const { 
     name = 'Applicant', 
     applicationId = 'N/A', 
@@ -32,4 +32,8 @@ export const applicationSubmissionTemplate = (params) => {
       <p>Best regards,<br/>Your Organization</p>
     </div>
   `;
+};
+
+module.exports = {
+  applicationSubmissionTemplate
 }; 

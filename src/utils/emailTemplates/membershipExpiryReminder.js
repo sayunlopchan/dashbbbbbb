@@ -1,4 +1,4 @@
-export const membershipExpiryReminderTemplate = ({
+const membershipExpiryReminderTemplate = ({
   fullName = 'Member',
   memberId = 'N/A',
   membershipType = 'Standard',
@@ -162,4 +162,8 @@ export const membershipExpiryReminderTemplate = ({
 </body>
 </html>
 `;
+};
+
+module.exports = {
+  membershipExpiryReminderTemplate
 }; 

@@ -1,15 +1,15 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   addParticipant,
   getEventParticipants,
   removeParticipant,
   removeEventParticipants,
-} from "../controllers/participant.controller.js";
-import {
+} = require("../controllers/participant.controller");
+const {
   validateObjectId,
   validateEventExists,
-} from "../middlewares/validation.middleware.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
+} = require("../middlewares/validation.middleware");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -50,4 +50,4 @@ router.delete(
   removeEventParticipants
 );
 
-export default router;
+module.exports = router;

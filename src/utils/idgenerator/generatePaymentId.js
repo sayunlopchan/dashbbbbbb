@@ -1,4 +1,4 @@
-import Counter from '../../models/counter.model.js';
+const Counter = require('../../models/counter.model');
 
 const generatePaymentId = async () => {
   try {
@@ -29,4 +29,4 @@ const generatePaymentId = async () => {
   }
 };
 
-export default generatePaymentId; 
+module.exports = generatePaymentId; 

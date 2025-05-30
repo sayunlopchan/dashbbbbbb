@@ -1,6 +1,6 @@
-import express from "express";
-import * as announcementController from "../controllers/announcement.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
+const express = require("express");
+const announcementController = require("../controllers/announcement.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -31,4 +31,4 @@ router.delete(
   announcementController.deleteAnnouncement
 );
 
-export default router;
+module.exports = router;

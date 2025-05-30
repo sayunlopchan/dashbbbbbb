@@ -1,12 +1,12 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createMembership,
   getAllMemberships,
   getMembershipById,
   updateMembership,
   deleteMembership,
-} from "../controllers/membership.controller.js";
-import { protectRoute } from "../middlewares/protect.middleware.js";
+} = require("../controllers/membership.controller");
+const { protectRoute } = require("../middlewares/protect.middleware");
 
 const router = express.Router();
 
@@ -28,4 +28,4 @@ router.put("/:id", updateMembership);
 // Delete Membership
 router.delete("/:id", deleteMembership);
 
-export default router;
+module.exports = router;

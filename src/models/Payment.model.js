@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const PaymentSchema = new mongoose.Schema(
   {
@@ -56,4 +56,4 @@ PaymentSchema.index({ paymentType: 1, paymentDate: -1 });
 const Payment =
   mongoose.models.Payment || mongoose.model("Payment", PaymentSchema);
 
-export default Payment;
+module.exports = Payment;

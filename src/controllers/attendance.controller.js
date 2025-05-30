@@ -1,9 +1,9 @@
-import * as attendanceService from "../services/attendance.service.js";
+const attendanceService = require("../services/attendance.service");
 
 /**
  * Check-in member
  */
-export const checkIn = async (req, res) => {
+const checkIn = async (req, res) => {
   try {
     const { memberId } = req.params;
     // Use optional chaining to safely access time, defaulting to undefined if not present
@@ -73,7 +73,7 @@ export const checkIn = async (req, res) => {
 /**
  * Check-out member
  */
-export const checkOut = async (req, res) => {
+const checkOut = async (req, res) => {
   try {
     const { memberId } = req.params;
     // Use optional chaining to safely access time, defaulting to undefined if not present
@@ -121,7 +121,7 @@ export const checkOut = async (req, res) => {
 /**
  * Get member's attendance history
  */
-export const getMemberAttendance = async (req, res) => {
+const getMemberAttendance = async (req, res) => {
   try {
     const { memberId } = req.params;
 
@@ -160,7 +160,7 @@ export const getMemberAttendance = async (req, res) => {
 /**
  * Get all attendance records
  */
-export const getAllAttendance = async (req, res) => {
+const getAllAttendance = async (req, res) => {
   try {
     // Validate date if provided
     if (req.query.date && isNaN(new Date(req.query.date).getTime())) {
@@ -188,7 +188,7 @@ export const getAllAttendance = async (req, res) => {
 /**
  * Delete attendance records for a member
  */
-export const deleteAttendance = async (req, res) => {
+const deleteAttendance = async (req, res) => {
   try {
     const { memberId } = req.params;
 
@@ -222,4 +222,12 @@ export const deleteAttendance = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+module.exports = {
+  checkIn,
+  checkOut,
+  getMemberAttendance,
+  getAllAttendance,
+  deleteAttendance,
 };

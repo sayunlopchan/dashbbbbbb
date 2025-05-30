@@ -1,4 +1,4 @@
-export const membershipCancellationTemplate = ({ 
+const membershipCancellationTemplate = ({ 
   fullName = 'Member',
   memberId = 'N/A',
   membershipType = 'Standard',
@@ -144,4 +144,6 @@ export const membershipCancellationTemplate = ({
 </html>
 `;
 
-export default membershipCancellationTemplate; 
+module.exports = {
+  membershipCancellationTemplate
+}; 

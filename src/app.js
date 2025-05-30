@@ -1,33 +1,32 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
-import { loadEnv } from "./config/env.js";
-import { connectDB } from "./config/db.js";
-import dotenv from "dotenv";
-import { startAllCronJobs } from "./cron/index.js";
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const path = require("path");
+const { loadEnv } = require("./config/env");
+const { connectDB } = require("./config/db");
+const dotenv = require("dotenv");
+const { startAllCronJobs } = require("./cron/index");
 
 // Middlewares
-import { notFound } from "./middlewares/notFound.middleware.js";
-import { errorHandler } from "./middlewares/error.middleware.js";
-import { protectRoute } from "./middlewares/protect.middleware.js";
+const { notFound } = require("./middlewares/notFound.middleware");
+const { errorHandler } = require("./middlewares/error.middleware");
+const { protectRoute } = require("./middlewares/protect.middleware");
 
 // Routes
-import applicationRoutes from "./routes/applications.routes.js";
-import memberRoutes from "./routes/members.routes.js";
-import authRoutes from "./routes/auth.routes.js";
-import trainerRoutes from "./routes/trainer.routes.js";
-import notificationRoutes from "./routes/notifications.routes.js";
-import eventRoutes from "./routes/events.routes.js";
-import participantRoutes from "./routes/participants.routes.js";
-import announcementRoutes from "./routes/announcements.routes.js";
-import employeeRoutes from "./routes/employee.routes.js";
-import attendanceRoutes from "./routes/attendance.routes.js";
-import membershipRoutes from "./routes/membership.routes.js";
-import applicationHistoryRoutes from "./routes/applicationHistory.routes.js";
-import paymentRoutes from "./routes/payments.routes.js";
-import productRoutes from "./routes/product.routes.js";
+const applicationRoutes = require("./routes/applications.routes");
+const memberRoutes = require("./routes/members.routes");
+const authRoutes = require("./routes/auth.routes");
+const trainerRoutes = require("./routes/trainer.routes");
+const notificationRoutes = require("./routes/notifications.routes");
+const eventRoutes = require("./routes/events.routes");
+const participantRoutes = require("./routes/participants.routes");
+const announcementRoutes = require("./routes/announcements.routes");
+const employeeRoutes = require("./routes/employee.routes");
+const attendanceRoutes = require("./routes/attendance.routes");
+const membershipRoutes = require("./routes/membership.routes");
+const applicationHistoryRoutes = require("./routes/applicationHistory.routes");
+const paymentRoutes = require("./routes/payments.routes");
+const productRoutes = require("./routes/product.routes");
 
 // Load env and connect DB
 loadEnv();
@@ -42,9 +41,7 @@ dotenv.config();
 // Initialize app
 const app = express();
 
-// Get __dirname equivalent in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Get __dirname (already available in CommonJS)
 const clientPath = path.resolve(__dirname, '../client/dashboard');
 
 // Core middlewares
@@ -120,4 +117,4 @@ app.get('/debug-auth', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-export default app;
+module.exports = app;

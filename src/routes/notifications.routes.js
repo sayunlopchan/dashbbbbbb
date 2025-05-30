@@ -1,11 +1,11 @@
-import { Router } from "express";
-import {
+const { Router } = require("express");
+const {
   getAllNotifications,
   markNotificationAsRead,
   getUnreadNotificationsCount,
   deleteAllNotifications,
-} from "../controllers/notification.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
+} = require("../controllers/notification.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = Router();
 
@@ -21,4 +21,4 @@ router.patch("/:notificationId/read", authenticate, markNotificationAsRead);
 // Delete all notifications
 router.delete("/all", authenticate, deleteAllNotifications);
 
-export default router;
+module.exports = router;

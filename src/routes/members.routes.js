@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createMember,
   updateMember,
   deleteMember,
@@ -9,12 +9,12 @@ import {
   renewMembership,
   cancelMembership,
   searchMembers,
-} from "../controllers/member.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
-import {
+} = require("../controllers/member.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
+const {
   validateMember,
   validateMembershipRenewal,
-} from "../validations/member.validation.js";
+} = require("../validations/member.validation");
 
 const router = express.Router();
 
@@ -50,4 +50,4 @@ router.post(
 // Cancel Membership
 router.post("/:memberId/cancel", authenticate, cancelMembership);
 
-export default router;
+module.exports = router;

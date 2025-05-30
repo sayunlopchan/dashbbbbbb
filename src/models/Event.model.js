@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema(
   {
@@ -89,4 +89,4 @@ eventSchema.pre("deleteOne", { document: true }, async function (next) {
 
 const Event = mongoose.models.Event || mongoose.model("Event", eventSchema);
 
-export default Event;
+module.exports = Event;

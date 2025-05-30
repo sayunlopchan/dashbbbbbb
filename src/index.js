@@ -1,9 +1,9 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import memberRoutes from "./routes/members.routes.js";
-import paymentRoutes from "./routes/payments.routes.js";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const memberRoutes = require("./routes/members.routes");
+const paymentRoutes = require("./routes/payments.routes");
 
 dotenv.config();
 
@@ -31,4 +31,6 @@ mongoose
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-}); 
+});
+
+module.exports = app; 
