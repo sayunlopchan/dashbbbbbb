@@ -1,4 +1,4 @@
-const Membership = require("../models/membership.model");
+const Membership = require("../models/Membership.model");
 
 /**
  * Create a new membership

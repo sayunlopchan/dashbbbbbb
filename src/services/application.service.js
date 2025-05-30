@@ -1,4 +1,4 @@
-const Application = require("../models/application.model");
+const Application = require("../models/Application.model");
 const Member = require("../models/member.model");
 const memberService = require("./member.service");
 const applicationHistoryService = require("./applicationHistory.service");

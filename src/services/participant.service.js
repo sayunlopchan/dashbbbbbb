@@ -1,5 +1,5 @@
-const Participant = require("../models/participant.model");
-const Event = require("../models/event.model");
+const Participant = require("../models/Participant.model");
+const Event = require("../models/Event.model");
 
 const addParticipantService = async (eventId, participantInfo) => {
   // Check if event exists

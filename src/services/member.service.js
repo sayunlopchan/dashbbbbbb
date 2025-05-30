@@ -1,4 +1,4 @@
-const Member = require("../models/member.model");
+const Member = require("../models/Member.model");
 const dayjs = require("dayjs");
 const { sendMembershipExpiryReminder } = require("../utils/emailService");
 const { createPaymentService } = require("./payment.service");

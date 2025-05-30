@@ -1,5 +1,5 @@
-const Payment = require("../models/payment.model");
-const Member = require("../models/member.model");
+const Payment = require("../models/Payment.model");
+const Member = require("../models/Member.model");
 const generatePaymentId = require("../utils/idgenerator/generatePaymentId");
 const mongoose = require("mongoose");
 

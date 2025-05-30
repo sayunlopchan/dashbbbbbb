@@ -1,4 +1,4 @@
-const Employee = require("../models/employee.model");
+const Employee = require("../models/Employee.model");
 const { generateEmployeeId } = require("../utils/idgenerator/generateEmployeeId");
 
 /**

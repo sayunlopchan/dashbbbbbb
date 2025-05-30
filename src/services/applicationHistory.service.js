@@ -1,4 +1,4 @@
-const ApplicationHistory = require("../models/applicationHistory.model");
+const ApplicationHistory = require("../models/ApplicationHistory.model");
 
 // Get all application history
 const getAllApplicationHistoryService = async () => {

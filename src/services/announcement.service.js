@@ -1,4 +1,4 @@
-const Announcement = require("../models/announcement.model");
+const Announcement = require("../models/Announcement.model");
 const generateAnnouncementId = require("../utils/idgenerator/generateAnnouncementId");
 const mongoose = require("mongoose");
 

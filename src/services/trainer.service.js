@@ -1,5 +1,5 @@
 // services/trainer.service.js
-const Trainer = require("../models/trainer.model");
+const Trainer = require("../models/Trainer.model");
 const { generateTrainerId } = require("../utils/idgenerator/generateTrainerId");
 
 // Custom error class for service-level errors
