@@ -1,5 +1,4 @@
 const Announcement = require("../models/Announcement.model");
-const generateAnnouncementId = require("../utils/idgenerator/generateAnnouncementId");
 const mongoose = require("mongoose");
 
 // Get all announcements

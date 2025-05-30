@@ -1,5 +1,5 @@
 // utils/generateMemberId.js
-const Counter = require("../../models/counter.model");
+const Counter = require("../../models/Counter.model");
 
 /**
  * Generate a new unique member ID with prefix "KB-M"

@@ -5,7 +5,6 @@ const { pendingMembershipPaymentTemplate } = require('./emailTemplates/pendingMe
 const { membershipExpiryReminderTemplate } = require('./emailTemplates/membershipExpiryReminder');
 const { membershipExpiryTemplate } = require('./emailTemplates/membershipExpiry');
 const { membershipCancellationTemplate } = require('./emailTemplates/membershipCancellation');
-const dayjs = require('dayjs');
 
 // Create a transporter using the default SMTP transport
 const createTransporter = () => {

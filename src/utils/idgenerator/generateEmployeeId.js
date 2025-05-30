@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Counter = require("../../models/counter.model");
+const Counter = require("../../models/Counter.model");
 
 /**
  * Generate a new unique employee ID with prefix "EMP"

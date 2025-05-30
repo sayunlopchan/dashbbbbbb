@@ -1,4 +1,4 @@
-const Counter = require('../../models/counter.model');
+const Counter = require('../../models/Counter.model');
 
 const generateEventId = async () => {
   try {
