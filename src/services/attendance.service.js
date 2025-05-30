@@ -1,5 +1,5 @@
 const Attendance = require("../models/Attendance.model");
-const Member = require("../models/Aember.model");
+const Member = require("../models/Member.model");
 
 /**
  * Check-in a member

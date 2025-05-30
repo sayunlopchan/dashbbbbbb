@@ -1,10 +1,10 @@
+const mongoose = require("mongoose");
 const Application = require("../models/Application.model");
-const Member = require("../models/member.model");
+const Member = require("../models/Member.model");
 const memberService = require("./member.service");
 const applicationHistoryService = require("./applicationHistory.service");
 const { generateMemberId } = require("../utils/idgenerator/generateMemberId");
 const notificationService = require("./notification.service");
-const mongoose = require("mongoose");
 const {
   sendWelcomeEmail,
   sendMembershipAcceptanceEmail,
