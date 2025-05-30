@@ -1,4 +1,4 @@
-const Event = require("../models/event.model");
+const Event = require("../models/Event.model");
 const asyncHandler = require("../utils/asyncHandler");
 const generateEventId = require("../utils/idgenerator/generateEventId");
 const fs = require('fs');

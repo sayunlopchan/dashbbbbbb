@@ -1,5 +1,5 @@
 const { validationResult, body, param } = require("express-validator");
-const Event = require("../models/event.model");
+const Event = require("../models/Event.model");
 const mongoose = require("mongoose");
 
 // Middleware to run validation checks

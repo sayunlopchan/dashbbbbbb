@@ -1,6 +1,6 @@
 const memberService = require("../services/member.service");
 const generateMemberId = require("../utils/idgenerator/generateMemberId");
-const Member = require("../models/member.model");
+const Member = require("../models/Member.model");
 
 // Create Member
 const createMember = async (req, res) => {
