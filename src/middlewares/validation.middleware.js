@@ -1,13 +1,9 @@
-import {
-  validationResult,
-  body as expressBody,
-  param as expressParam,
-} from "express-validator";
-import Event from "../models/event.model.js";
-import mongoose from "mongoose";
+const { validationResult, body, param } = require("express-validator");
+const Event = require("../models/Event.model");
+const mongoose = require("mongoose");
 
 // Middleware to run validation checks
-export const validate = (validations) => {
+const validate = (validations) => {
   return async (req, res, next) => {
     // Run all validations
     await Promise.all(validations.map((validation) => validation.run(req)));
@@ -27,16 +23,16 @@ export const validate = (validations) => {
 };
 
 // Wrapper for express-validator methods to maintain compatibility
-export const body = (field) => {
-  return expressBody(field);
+const bodyValidator = (field) => {
+  return body(field);
 };
 
-export const param = (field) => {
-  return expressParam(field);
+const paramValidator = (field) => {
+  return param(field);
 };
 
 // Middleware to validate if an event exists
-export const validateEventExists = async (req, res, next) => {
+const validateEventExists = async (req, res, next) => {
   try {
     const eventId = req.params.eventId;
     const event = await Event.findById(eventId);
@@ -61,7 +57,7 @@ export const validateEventExists = async (req, res, next) => {
 };
 
 // Middleware to validate MongoDB ObjectId
-export const validateObjectId = (paramName) => {
+const validateObjectId = (paramName) => {
   return async (req, res, next) => {
     const id = req.params[paramName];
     
@@ -74,4 +70,12 @@ export const validateObjectId = (paramName) => {
     
     next();
   };
+};
+
+module.exports = {
+  validate,
+  body: bodyValidator,
+  param: paramValidator,
+  validateEventExists,
+  validateObjectId
 };

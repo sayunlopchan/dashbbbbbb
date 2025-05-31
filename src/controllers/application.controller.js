@@ -1,8 +1,8 @@
-import * as applicationService from "../services/application.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+const applicationService = require("../services/application.service");
+const asyncHandler = require("../utils/asyncHandler");
 
 // Get all applications
-export const getAllApplications = asyncHandler(async (req, res) => {
+const getAllApplications = asyncHandler(async (req, res) => {
   const result = await applicationService.getAllApplicationsService(req.query);
 
   res.status(200).json({
@@ -13,7 +13,7 @@ export const getAllApplications = asyncHandler(async (req, res) => {
 });
 
 // Get a single application by ID
-export const getApplicationById = asyncHandler(async (req, res) => {
+const getApplicationById = asyncHandler(async (req, res) => {
   const { applicationId } = req.params;
 
   const application = await applicationService.getApplicationByIdService(
@@ -27,7 +27,7 @@ export const getApplicationById = asyncHandler(async (req, res) => {
 });
 
 // Create a new application
-export const createApplication = asyncHandler(async (req, res) => {
+const createApplication = asyncHandler(async (req, res) => {
   // Remove user extraction, as we no longer need it
   const applicationData = req.body;
 
@@ -42,7 +42,7 @@ export const createApplication = asyncHandler(async (req, res) => {
 });
 
 // Accept an application
-export const acceptApplication = asyncHandler(async (req, res) => {
+const acceptApplication = asyncHandler(async (req, res) => {
   const { applicationId } = req.params;
 
   const member = await applicationService.acceptApplicationService(
@@ -56,7 +56,7 @@ export const acceptApplication = asyncHandler(async (req, res) => {
 });
 
 // Delete an application
-export const deleteApplication = asyncHandler(async (req, res) => {
+const deleteApplication = asyncHandler(async (req, res) => {
   const { applicationId } = req.params;
 
   await applicationService.deleteApplicationService(applicationId);
@@ -66,3 +66,11 @@ export const deleteApplication = asyncHandler(async (req, res) => {
     message: "Application deleted successfully",
   });
 });
+
+module.exports = {
+  getAllApplications,
+  getApplicationById,
+  createApplication,
+  acceptApplication,
+  deleteApplication,
+};

@@ -1,6 +1,6 @@
-import Joi from "joi";
+const Joi = require("joi");
 
-export const validateNotification = (req, res, next) => {
+const validateNotification = (req, res, next) => {
   const schema = Joi.object({
     recipient: Joi.string().required(),
     type: Joi.string()
@@ -31,4 +31,8 @@ export const validateNotification = (req, res, next) => {
   }
 
   next();
+};
+
+module.exports = {
+  validateNotification
 }; 

@@ -1,11 +1,11 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import User from "../models/user.model.js";
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User.model");
 
 /**
  * Register a new user
  */
-export const registerUserService = async (data) => {
+const registerUserService = async (data) => {
   const { username, email, password } = data;
 
   // Validate input
@@ -45,7 +45,7 @@ export const registerUserService = async (data) => {
 /**
  * Login user
  */
-export const loginUserService = async (data) => {
+const loginUserService = async (data) => {
   const { email, password } = data;
 
   // Validate input
@@ -94,4 +94,9 @@ export const loginUserService = async (data) => {
       email: user.email,
     },
   };
+};
+
+module.exports = {
+  registerUserService,
+  loginUserService
 };

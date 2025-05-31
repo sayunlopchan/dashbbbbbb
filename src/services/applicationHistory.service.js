@@ -1,7 +1,7 @@
-import ApplicationHistory from "../models/applicationHistory.model.js";
+const ApplicationHistory = require("../models/ApplicationHistory.model");
 
 // Get all application history
-export const getAllApplicationHistoryService = async () => {
+const getAllApplicationHistoryService = async () => {
   try {
     return await ApplicationHistory.find().sort({ createdAt: -1 });
   } catch (error) {
@@ -11,7 +11,7 @@ export const getAllApplicationHistoryService = async () => {
 };
 
 // Get application history by applicationId
-export const getApplicationHistoryByIdService = async (applicationId) => {
+const getApplicationHistoryByIdService = async (applicationId) => {
   const history = await ApplicationHistory.findOne({ applicationId });
   if (!history) {
     throw new Error("Application history not found");
@@ -20,7 +20,7 @@ export const getApplicationHistoryByIdService = async (applicationId) => {
 };
 
 // Create application history record
-export const createApplicationHistoryService = async (applicationData) => {
+const createApplicationHistoryService = async (applicationData) => {
   try {
     const historyData = {
       applicationId: applicationData.applicationId,
@@ -44,10 +44,17 @@ export const createApplicationHistoryService = async (applicationData) => {
 };
 
 // Delete application history
-export const deleteApplicationHistoryService = async (applicationId) => {
+const deleteApplicationHistoryService = async (applicationId) => {
   const history = await ApplicationHistory.findOneAndDelete({ applicationId });
   if (!history) {
     throw new Error("Application history not found");
   }
   return history;
+};
+
+module.exports = {
+  getAllApplicationHistoryService,
+  getApplicationHistoryByIdService,
+  createApplicationHistoryService,
+  deleteApplicationHistoryService
 };

@@ -1,7 +1,7 @@
-import * as authService from "../services/auth.service.js";
+const authService = require("../services/auth.service");
 
 // Register
-export const register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const user = await authService.registerUserService(req.body);
     res.status(201).json({
@@ -22,7 +22,7 @@ export const register = async (req, res) => {
 };
 
 // login
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { token, user } = await authService.loginUserService(req.body);
 
@@ -56,7 +56,7 @@ export const login = async (req, res) => {
 };
 
 // Logout
-export const logout = (req, res) => {
+const logout = (req, res) => {
   res.clearCookie("token");
   res.status(200).json({
     success: true,
@@ -65,7 +65,7 @@ export const logout = (req, res) => {
 };
 
 // Verify Token
-export const verifyToken = (req, res) => {
+const verifyToken = (req, res) => {
   // If the request reaches here, it means the token is valid
   // The authenticate middleware would have already checked the token
   res.status(200).json({
@@ -77,4 +77,11 @@ export const verifyToken = (req, res) => {
       email: req.user.email,
     },
   });
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  verifyToken,
 };

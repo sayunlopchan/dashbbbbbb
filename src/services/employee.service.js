@@ -1,10 +1,10 @@
-import Employee from "../models/employee.model.js";
-import { generateEmployeeId } from "../utils/idgenerator/generateEmployeeId.js";
+const Employee = require("../models/Employee.model");
+const { generateEmployeeId } = require("../utils/idgenerator/generateEmployeeId");
 
 /**
  * Create a new employee
  */
-export const createEmployee = async (employeeData) => {
+const createEmployee = async (employeeData) => {
   try {
     // First check if email already exists
     const existingEmployee = await Employee.findOne({
@@ -56,7 +56,7 @@ export const createEmployee = async (employeeData) => {
 /**
  * Get all employees with pagination and filters
  */
-export const getAllEmployees = async (query = {}) => {
+const getAllEmployees = async (query = {}) => {
   try {
     const {
       page = 1,
@@ -115,7 +115,7 @@ export const getAllEmployees = async (query = {}) => {
 /**
  * Get employee by ID
  */
-export const getEmployeeById = async (employeeId) => {
+const getEmployeeById = async (employeeId) => {
   try {
     const employee = await Employee.findOne({ employeeId });
     if (!employee) {
@@ -131,7 +131,7 @@ export const getEmployeeById = async (employeeId) => {
 /**
  * Update employee
  */
-export const updateEmployee = async (employeeId, updateData) => {
+const updateEmployee = async (employeeId, updateData) => {
   try {
     // Check if email is being updated and if it already exists
     if (updateData.email) {
@@ -186,7 +186,7 @@ export const updateEmployee = async (employeeId, updateData) => {
 /**
  * Delete employee
  */
-export const deleteEmployee = async (employeeId) => {
+const deleteEmployee = async (employeeId) => {
   try {
     const employee = await Employee.findOneAndDelete({ employeeId });
     if (!employee) {
@@ -197,4 +197,12 @@ export const deleteEmployee = async (employeeId) => {
     console.error("Error in deleteEmployee service:", error);
     throw error;
   }
+};
+
+module.exports = {
+  createEmployee,
+  getAllEmployees,
+  getEmployeeById,
+  updateEmployee,
+  deleteEmployee
 };

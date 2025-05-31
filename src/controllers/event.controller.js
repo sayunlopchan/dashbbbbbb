@@ -1,11 +1,11 @@
-import Event from "../models/event.model.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import generateEventId from "../utils/idgenerator/generateEventId.js";
-import fs from 'fs';
-import path from 'path';
+const Event = require("../models/Event.model");
+const asyncHandler = require("../utils/asyncHandler");
+const generateEventId = require("../utils/idgenerator/generateEventId");
+const fs = require('fs');
+const path = require('path');
 
 // Create a new event
-export const createEvent = asyncHandler(async (req, res) => {
+const createEvent = asyncHandler(async (req, res) => {
   // Ensure user is authenticated and has a username or email
   if (!req.user) {
     return res.status(401).json({
@@ -87,7 +87,7 @@ export const createEvent = asyncHandler(async (req, res) => {
 });
 
 // Get all events
-export const getAllEvents = asyncHandler(async (req, res) => {
+const getAllEvents = asyncHandler(async (req, res) => {
   // Get all events without pagination
   const events = await Event.find({}).sort({ startTime: -1 });
 
@@ -106,7 +106,7 @@ export const getAllEvents = asyncHandler(async (req, res) => {
 });
 
 // Get event by EventId
-export const getEventById = asyncHandler(async (req, res) => {
+const getEventById = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
 
   const event = await Event.findOne({ eventId });
@@ -125,7 +125,7 @@ export const getEventById = asyncHandler(async (req, res) => {
 });
 
 // Update event
-export const updateEvent = asyncHandler(async (req, res) => {
+const updateEvent = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
   const { 
     title, 
@@ -200,7 +200,7 @@ export const updateEvent = asyncHandler(async (req, res) => {
 });
 
 // Delete event
-export const deleteEvent = asyncHandler(async (req, res) => {
+const deleteEvent = asyncHandler(async (req, res) => {
   const { eventId } = req.params;
 
   const event = await Event.findOne({ eventId });
@@ -229,3 +229,11 @@ export const deleteEvent = asyncHandler(async (req, res) => {
     message: "Event deleted successfully",
   });
 });
+
+module.exports = {
+  createEvent,
+  getAllEvents,
+  getEventById,
+  updateEvent,
+  deleteEvent,
+};

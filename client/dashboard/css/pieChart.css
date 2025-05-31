@@ -50,7 +50,7 @@
 }
 
 .pie-chart-tooltip {
-    position: fixed; /* Change to fixed positioning */
+    position: absolute; /* Change from fixed to absolute */
     background: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 8px 12px;

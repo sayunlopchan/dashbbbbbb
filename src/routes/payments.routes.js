@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createPayment,
   getMemberPayments,
   getRevenueStats,
@@ -7,8 +7,8 @@ import {
   updatePaymentStatus,
   getAllPayments,
   deletePayment,
-} from "../controllers/payment.controller.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
+} = require("../controllers/payment.controller");
+const { authenticate } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -33,4 +33,4 @@ router.patch("/:paymentId/status", authenticate, updatePaymentStatus);
 // Delete payment
 router.delete("/:paymentId", authenticate, deletePayment);
 
-export default router;
+module.exports = router;

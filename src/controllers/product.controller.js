@@ -1,7 +1,7 @@
-import productService from '../services/product.service.js';
+const productService = require('../services/product.service');
 
 // Create a product
-export const create = async (req, res) => {
+const create = async (req, res) => {
   try {
     const product = await productService.createProduct(req.body);
     res.status(201).json({
@@ -19,7 +19,7 @@ export const create = async (req, res) => {
 };
 
 // Get all products with optional filtering
-export const getAll = async (req, res) => {
+const getAll = async (req, res) => {
   try {
     let products = await productService.getAllProducts();
     
@@ -76,7 +76,7 @@ export const getAll = async (req, res) => {
 };
 
 // Get a product by ID
-export const getById = async (req, res) => {
+const getById = async (req, res) => {
   try {
     const product = await productService.getProductById(req.params.id);
     if (!product) {
@@ -99,7 +99,7 @@ export const getById = async (req, res) => {
 };
 
 // Update a product
-export const update = async (req, res) => {
+const update = async (req, res) => {
   try {
     const product = await productService.updateProduct(req.params.id, req.body);
     if (!product) {
@@ -123,7 +123,7 @@ export const update = async (req, res) => {
 };
 
 // Delete a product
-export const remove = async (req, res) => {
+const remove = async (req, res) => {
   try {
     const product = await productService.deleteProduct(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
@@ -133,12 +133,12 @@ export const remove = async (req, res) => {
   }
 };
 
-export default {
+module.exports = {
   create,
   getAll,
   getById,
   update,
-  remove
+  remove,
 };
 
 

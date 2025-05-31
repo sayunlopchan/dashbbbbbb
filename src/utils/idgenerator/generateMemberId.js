@@ -1,11 +1,11 @@
 // utils/generateMemberId.js
-import Counter from "../../models/counter.model.js";
+const Counter = require("../../models/Counter.model");
 
 /**
  * Generate a new unique member ID with prefix "KB-M"
  * e.g., KB-M01, KB-M02, ...,
  */
-export const generateMemberId = async () => {
+const generateMemberId = async () => {
   try {
     const counter = await Counter.findOneAndUpdate(
       { name: "member" },
@@ -24,3 +24,5 @@ export const generateMemberId = async () => {
     throw new Error('Failed to generate member ID');
   }
 };
+
+module.exports = generateMemberId;

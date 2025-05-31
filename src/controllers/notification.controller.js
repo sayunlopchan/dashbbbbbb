@@ -1,7 +1,7 @@
-import * as notificationService from "../services/notification.service.js";
+const notificationService = require("../services/notification.service");
 
 // Get all notifications
-export const getAllNotifications = async (req, res) => {
+const getAllNotifications = async (req, res) => {
   try {
     const { page = 1, limit = 0, type, status } = req.query;
 
@@ -36,7 +36,7 @@ export const getAllNotifications = async (req, res) => {
 };
 
 // Get notifications for the current user
-export const getUserNotifications = async (req, res) => {
+const getUserNotifications = async (req, res) => {
   try {
     const { page = 1, limit = 0, ...filterQuery } = req.query;
 
@@ -66,7 +66,7 @@ export const getUserNotifications = async (req, res) => {
 };
 
 // Mark single notification as read
-export const markNotificationAsRead = async (req, res) => {
+const markNotificationAsRead = async (req, res) => {
   try {
     const { notificationId } = req.params;
 
@@ -89,7 +89,7 @@ export const markNotificationAsRead = async (req, res) => {
 };
 
 // Get unread notifications count
-export const getUnreadNotificationsCount = async (req, res) => {
+const getUnreadNotificationsCount = async (req, res) => {
   try {
     const count =
       await notificationService.getUnreadNotificationsCountService();
@@ -110,7 +110,7 @@ export const getUnreadNotificationsCount = async (req, res) => {
 };
 
 // Delete all notifications for the current user
-export const deleteAllNotifications = async (req, res) => {
+const deleteAllNotifications = async (req, res) => {
   try {
     const userId = req.user._id;
 
@@ -132,4 +132,12 @@ export const deleteAllNotifications = async (req, res) => {
       message: error.message || "Failed to delete all notifications",
     });
   }
+};
+
+module.exports = {
+  getAllNotifications,
+  getUserNotifications,
+  markNotificationAsRead,
+  getUnreadNotificationsCount,
+  deleteAllNotifications,
 };

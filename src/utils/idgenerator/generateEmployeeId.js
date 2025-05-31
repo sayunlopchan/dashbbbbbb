@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
-import Counter from "../../models/counter.model.js";
+const mongoose = require("mongoose");
+const Counter = require("../../models/Counter.model");
 
 /**
  * Generate a new unique employee ID with prefix "EMP"
  * e.g., KB-EMP001, KB-EMP002, ...
  */
-export const generateEmployeeId = async () => {
+const generateEmployeeId = async () => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -36,4 +36,6 @@ export const generateEmployeeId = async () => {
   } finally {
     session.endSession();
   }
-}; 
+};
+
+module.exports = generateEmployeeId; 

@@ -1,7 +1,7 @@
-import Notification from "../models/notification.model.js";
+const Notification = require("../models/Notification.model");
 
 // Create a new notification
-export const createNotificationService = async (notificationData) => {
+const createNotificationService = async (notificationData) => {
   try {
     return await Notification.createNotification(notificationData);
   } catch (error) {
@@ -10,7 +10,7 @@ export const createNotificationService = async (notificationData) => {
 };
 
 // Get all notifications with pagination and filtering
-export const getAllNotificationsService = async (query = {}) => {
+const getAllNotificationsService = async (query = {}) => {
   const page = parseInt(query.page) || 1;
   const limit = parseInt(query.limit) || 0;
   const skip = (page - 1) * limit;
@@ -53,7 +53,7 @@ export const getAllNotificationsService = async (query = {}) => {
 };
 
 // Get notifications for a specific recipient
-export const getNotificationsByRecipientService = async (
+const getNotificationsByRecipientService = async (
   recipientId,
   query = {}
 ) => {
@@ -68,7 +68,7 @@ export const getNotificationsByRecipientService = async (
 };
 
 // Mark a single notification as read
-export const markNotificationAsReadService = async (notificationId) => {
+const markNotificationAsReadService = async (notificationId) => {
   try {
     const notification = await Notification.findById(notificationId);
     if (!notification) {
@@ -81,7 +81,7 @@ export const markNotificationAsReadService = async (notificationId) => {
 };
 
 // Mark all notifications for a recipient as read
-export const markAllNotificationsAsReadService = async (recipientId) => {
+const markAllNotificationsAsReadService = async (recipientId) => {
   try {
     return await Notification.updateMany(
       { recipientId, isRead: false },
@@ -95,7 +95,7 @@ export const markAllNotificationsAsReadService = async (recipientId) => {
 };
 
 // Create notification for application events
-export const createApplicationNotificationService = async (applicationData) => {
+const createApplicationNotificationService = async (applicationData) => {
   try {
     // Check if a notification for this application already exists
     const existingNotification = await Notification.findOne({
@@ -128,7 +128,7 @@ export const createApplicationNotificationService = async (applicationData) => {
 };
 
 // Create notification for membership events
-export const createMembershipNotificationService = async (memberData, type) => {
+const createMembershipNotificationService = async (memberData, type) => {
   try {
     let title = "";
     let message = "";
@@ -173,7 +173,7 @@ export const createMembershipNotificationService = async (memberData, type) => {
 };
 
 // Restore the original createMemberStatusNotificationService function
-export const createMemberStatusNotificationService = async (
+const createMemberStatusNotificationService = async (
   member,
   notificationType
 ) => {
@@ -236,7 +236,7 @@ export const createMemberStatusNotificationService = async (
 };
 
 // Get unread notifications count
-export const getUnreadNotificationsCountService = async () => {
+const getUnreadNotificationsCountService = async () => {
   try {
     return await Notification.countDocuments({ status: "unread" });
   } catch (error) {
@@ -247,12 +247,14 @@ export const getUnreadNotificationsCountService = async () => {
   }
 };
 
-// Delete all notifications for a specific user
-export const deleteAllNotificationsService = async (userId) => {
-  try {
-    return await Notification.deleteMany({ recipientId: userId });
-  } catch (error) {
-    console.error("Error deleting all notifications:", error);
-    throw new Error(`Failed to delete all notifications: ${error.message}`);
-  }
+module.exports = {
+  createNotificationService,
+  getAllNotificationsService,
+  getNotificationsByRecipientService,
+  markNotificationAsReadService,
+  markAllNotificationsAsReadService,
+  createApplicationNotificationService,
+  createMembershipNotificationService,
+  createMemberStatusNotificationService,
+  getUnreadNotificationsCountService
 };

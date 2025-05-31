@@ -1,10 +1,7 @@
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
+const dotenv = require("dotenv");
+const path = require("path");
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export const loadEnv = () => {
+const loadEnv = () => {
   dotenv.config({ path: path.join(__dirname, "../../.env") });
 
   const required = [
@@ -24,3 +21,5 @@ export const loadEnv = () => {
     if (!process.env[key]) throw new Error(`Missing env var: ${key}`);
   });
 };
+
+module.exports = { loadEnv };

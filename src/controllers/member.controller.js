@@ -1,9 +1,9 @@
-import * as memberService from "../services/member.service.js";
-import { generateMemberId } from "../utils/idgenerator/generateMemberId.js";
-import Member from "../models/member.model.js";
+const memberService = require("../services/member.service");
+const generateMemberId = require("../utils/idgenerator/generateMemberId");
+const Member = require("../models/Member.model");
 
 // Create Member
-export const createMember = async (req, res) => {
+const createMember = async (req, res) => {
   try {
     // If memberId is not provided (e.g., normal form submission), generate it
     const memberId = req.body.memberId || (await generateMemberId());
@@ -47,7 +47,7 @@ export const createMember = async (req, res) => {
 };
 
 // Get All Members
-export const getAllMembers = async (req, res) => {
+const getAllMembers = async (req, res) => {
   try {
     const result = await memberService.getAllMembersService(req.query);
     res.status(200).json({
@@ -66,7 +66,7 @@ export const getAllMembers = async (req, res) => {
 };
 
 // Get Single Member by memberId
-export const getMemberById = async (req, res) => {
+const getMemberById = async (req, res) => {
   try {
     const member = await memberService.getMemberByMemberIdService(
       req.params.memberId
@@ -84,7 +84,7 @@ export const getMemberById = async (req, res) => {
 };
 
 // Update Member by memberId
-export const updateMember = async (req, res) => {
+const updateMember = async (req, res) => {
   try {
     // Validate address length if provided
     if (req.body.address && req.body.address.length > 200) {
@@ -126,7 +126,7 @@ export const updateMember = async (req, res) => {
 };
 
 // Delete Member by memberId
-export const deleteMember = async (req, res) => {
+const deleteMember = async (req, res) => {
   try {
     const member = await memberService.deleteMemberService(req.params.memberId);
     res.status(200).json({
@@ -143,7 +143,7 @@ export const deleteMember = async (req, res) => {
 };
 
 // Process Member Payment
-export const processMemberPayment = async (req, res) => {
+const processMemberPayment = async (req, res) => {
   try {
     const { memberId } = req.params;
     const paymentData = {
@@ -171,7 +171,7 @@ export const processMemberPayment = async (req, res) => {
 };
 
 // Renew Membership
-export const renewMembership = async (req, res) => {
+const renewMembership = async (req, res) => {
   try {
     const { memberId } = req.params;
     const renewalData = {
@@ -206,7 +206,7 @@ export const renewMembership = async (req, res) => {
 };
 
 // Get Payment History
-export const getMemberPaymentHistory = async (req, res) => {
+const getMemberPaymentHistory = async (req, res) => {
   try {
     const { memberId } = req.params;
 
@@ -227,7 +227,7 @@ export const getMemberPaymentHistory = async (req, res) => {
 };
 
 // Check Membership Status
-export const checkMembershipStatus = async (req, res) => {
+const checkMembershipStatus = async (req, res) => {
   try {
     const { memberId } = req.params;
 
@@ -245,30 +245,8 @@ export const checkMembershipStatus = async (req, res) => {
   }
 };
 
-// Update All Membership Statuses
-export const updateAllMembershipStatuses = async (req, res) => {
-  try {
-    const expiredMembers =
-      await memberService.updateAllMembershipStatusesService();
-
-    res.status(200).json({
-      success: true,
-      message: "Membership statuses updated",
-      data: {
-        expiredMembersCount: expiredMembers.length,
-        expiredMembers,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message || "Failed to update membership statuses",
-    });
-  }
-};
-
 // Cancel Membership
-export const cancelMembership = async (req, res) => {
+const cancelMembership = async (req, res) => {
   try {
     const { memberId } = req.params;
     const { reason } = req.body;
@@ -306,7 +284,7 @@ export const cancelMembership = async (req, res) => {
 };
 
 // Search Members
-export const searchMembers = async (req, res) => {
+const searchMembers = async (req, res) => {
   try {
     const { q } = req.query;
     if (!q) {
@@ -336,4 +314,18 @@ export const searchMembers = async (req, res) => {
       message: error.message || "Failed to search members",
     });
   }
+};
+
+module.exports = {
+  createMember,
+  getAllMembers,
+  getMemberById,
+  updateMember,
+  deleteMember,
+  processMemberPayment,
+  renewMembership,
+  getMemberPaymentHistory,
+  checkMembershipStatus,
+  cancelMembership,
+  searchMembers,
 };

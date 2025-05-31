@@ -1,4 +1,4 @@
-import Counter from '../../models/counter.model.js';
+const Counter = require('../../models/Counter.model');
 
 const generateApplicationId = async () => {
   const COUNTER_NAME = 'application_counter';
@@ -43,4 +43,4 @@ const generateApplicationId = async () => {
   }
 };
 
-export default generateApplicationId; 
+module.exports = generateApplicationId; 

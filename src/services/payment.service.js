@@ -1,10 +1,10 @@
-import Payment from "../models/payment.model.js";
-import Member from "../models/member.model.js";
-import generatePaymentId from "../utils/idgenerator/generatePaymentId.js";
-import mongoose from "mongoose";
+const Payment = require("../models/Payment.model");
+const Member = require("../models/Member.model");
+const generatePaymentId = require("../utils/idgenerator/generatePaymentId");
+const mongoose = require("mongoose");
 
 // Create a new payment
-export const createPaymentService = async (paymentData) => {
+const createPaymentService = async (paymentData) => {
   const session = await mongoose.startSession();
 
   try {
@@ -92,7 +92,7 @@ export const createPaymentService = async (paymentData) => {
 };
 
 // Get all payments for a member
-export const getMemberPaymentsService = async (memberId) => {
+const getMemberPaymentsService = async (memberId) => {
   try {
     const payments = await Payment.find({ memberId }).sort({ paymentDate: -1 });
 
@@ -104,7 +104,7 @@ export const getMemberPaymentsService = async (memberId) => {
 };
 
 // Get revenue statistics
-export const getRevenueStatsService = async () => {
+const getRevenueStatsService = async () => {
   try {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -227,7 +227,7 @@ export const getRevenueStatsService = async () => {
 };
 
 // Get payment by ID
-export const getPaymentByIdService = async (paymentId) => {
+const getPaymentByIdService = async (paymentId) => {
   try {
     const payment = await Payment.findOne({ paymentId });
     if (!payment) {
@@ -241,7 +241,7 @@ export const getPaymentByIdService = async (paymentId) => {
 };
 
 // Update payment status
-export const updatePaymentStatusService = async (paymentId, status) => {
+const updatePaymentStatusService = async (paymentId, status) => {
   try {
     const payment = await Payment.findOneAndUpdate(
       { paymentId },
@@ -260,8 +260,8 @@ export const updatePaymentStatusService = async (paymentId, status) => {
   }
 };
 
-// Get all payments with pagination and sorting
-export const getAllPaymentsService = async ({
+// Get all payments with filtering and pagination
+const getAllPaymentsService = async ({
   page,
   limit,
   sortBy = "paymentDate",
@@ -273,73 +273,61 @@ export const getAllPaymentsService = async ({
   type,
 }) => {
   try {
-    const skip = (page - 1) * limit;
+    const query = {};
     const sort = {};
-    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
 
-    // Build match conditions
-    const matchConditions = {};
-
-    // Add search condition if provided
+    // Add search filter
     if (search) {
-      matchConditions.$or = [
-        { memberId: { $regex: search, $options: "i" } },
+      query.$or = [
+        { paymentId: { $regex: search, $options: "i" } },
         { fullName: { $regex: search, $options: "i" } },
+        { memberId: { $regex: search, $options: "i" } },
       ];
     }
 
-    // Add date range conditions if provided
+    // Add date range filter
     if (startDate || endDate) {
-      matchConditions.paymentDate = {};
-      if (startDate) matchConditions.paymentDate.$gte = new Date(startDate);
-      if (endDate) matchConditions.paymentDate.$lte = new Date(endDate);
+      query.paymentDate = {};
+      if (startDate) {
+        query.paymentDate.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        query.paymentDate.$lte = new Date(endDate);
+      }
     }
 
-    // Add payment method filter if provided
+    // Add payment method filter
     if (method) {
-      matchConditions.paymentMethod = method;
+      query.paymentMethod = method;
     }
 
-    // Add payment type filter if provided
+    // Add payment type filter
     if (type) {
-      matchConditions.paymentType = type;
+      query.paymentType = type;
     }
 
-    // Get total count for pagination with filters
-    const total = await Payment.countDocuments(matchConditions);
+    // Set sort order
+    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
 
-    // Get payments with pagination, sorting, and filters
-    const payments = await Payment.find(matchConditions)
+    // Get total count
+    const total = await Payment.countDocuments(query);
+    const totalPages = Math.ceil(total / limit);
+
+    // Get paginated results
+    const docs = await Payment.find(query)
       .sort(sort)
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    // Get member details for each payment
-    const memberIds = [...new Set(payments.map((payment) => payment.memberId))];
-    const members = await Member.find({ memberId: { $in: memberIds } })
-      .select("memberId firstName lastName")
-      .lean();
-
-    // Create a map of member details
-    const memberMap = members.reduce((acc, member) => {
-      acc[member.memberId] = member;
-      return acc;
-    }, {});
-
-    // Combine payment data with member details
-    const paymentsWithMembers = payments.map((payment) => ({
-      ...payment,
-      member: memberMap[payment.memberId] || null,
-    }));
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     return {
-      payments: paymentsWithMembers,
+      docs,
       pagination: {
         total,
         page,
         limit,
-        totalPages: Math.ceil(total / limit),
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       },
     };
   } catch (error) {
@@ -349,47 +337,25 @@ export const getAllPaymentsService = async ({
 };
 
 // Delete payment
-export const deletePaymentService = async (paymentId) => {
-  const session = await mongoose.startSession();
-
+const deletePaymentService = async (paymentId) => {
   try {
-    session.startTransaction();
-
-    // Find the payment
-    const payment = await Payment.findOne({ paymentId });
+    const payment = await Payment.findOneAndDelete({ paymentId });
     if (!payment) {
       throw new Error("Payment not found");
     }
-
-    // Find the member and remove the payment from their history
-    const member = await Member.findOne({ memberId: payment.memberId });
-    if (member) {
-      // Remove the payment from member's payment history
-      member.payments = member.payments.filter(
-        (p) => p.paymentId !== paymentId
-      );
-
-      // Update last payment date if needed
-      if (member.payments.length > 0) {
-        member.lastPaymentDate =
-          member.payments[member.payments.length - 1].paymentDate;
-      } else {
-        member.lastPaymentDate = null;
-      }
-
-      await member.save({ session });
-    }
-
-    // Delete the payment
-    await Payment.deleteOne({ paymentId }, { session });
-
-    await session.commitTransaction();
-    return { success: true, message: "Payment deleted successfully" };
+    return payment;
   } catch (error) {
-    await session.abortTransaction();
     console.error("Error in deletePaymentService:", error);
     throw new Error(`Failed to delete payment: ${error.message}`);
-  } finally {
-    session.endSession();
   }
+};
+
+module.exports = {
+  createPaymentService,
+  getMemberPaymentsService,
+  getRevenueStatsService,
+  getPaymentByIdService,
+  updatePaymentStatusService,
+  getAllPaymentsService,
+  deletePaymentService
 };

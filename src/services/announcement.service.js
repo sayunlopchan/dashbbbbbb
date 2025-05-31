@@ -1,9 +1,8 @@
-import Announcement from "../models/announcement.model.js";
-import generateAnnouncementId from "../utils/idgenerator/generateAnnouncementId.js";
-import mongoose from "mongoose";
+const Announcement = require("../models/Announcement.model");
+const mongoose = require("mongoose");
 
 // Get all announcements
-export const getAllAnnouncementsService = async () => {
+const getAllAnnouncementsService = async () => {
   // Get all announcements without pagination
   const docs = await Announcement.find({}).sort({ createdAt: -1 });
 
@@ -21,7 +20,7 @@ export const getAllAnnouncementsService = async () => {
 };
 
 // Get announcement by announcementId
-export const getAnnouncementByIdService = async (announcementId) => {
+const getAnnouncementByIdService = async (announcementId) => {
   const announcement = await Announcement.findOne({ announcementId });
   if (!announcement) {
     throw new Error("Announcement not found");
@@ -30,7 +29,7 @@ export const getAnnouncementByIdService = async (announcementId) => {
 };
 
 // Create a new announcement
-export const createAnnouncementService = async (announcementData) => {
+const createAnnouncementService = async (announcementData) => {
   const session = await mongoose.startSession();
 
   try {
@@ -87,7 +86,7 @@ export const createAnnouncementService = async (announcementData) => {
 };
 
 // Update an announcement
-export const updateAnnouncementService = async (announcementId, updateData) => {
+const updateAnnouncementService = async (announcementId, updateData) => {
   try {
     const announcement = await Announcement.findOneAndUpdate(
       { announcementId },
@@ -107,7 +106,7 @@ export const updateAnnouncementService = async (announcementId, updateData) => {
 };
 
 // Delete an announcement
-export const deleteAnnouncementService = async (announcementId) => {
+const deleteAnnouncementService = async (announcementId) => {
   try {
     const announcement = await Announcement.findOneAndDelete({
       announcementId,
@@ -122,4 +121,12 @@ export const deleteAnnouncementService = async (announcementId) => {
     console.error("Error in deleteAnnouncementService:", error);
     throw new Error(`Failed to delete announcement: ${error.message}`);
   }
+};
+
+module.exports = {
+  getAllAnnouncementsService,
+  getAnnouncementByIdService,
+  createAnnouncementService,
+  updateAnnouncementService,
+  deleteAnnouncementService
 };

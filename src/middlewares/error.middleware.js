@@ -40,4 +40,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-export { errorHandler };
+module.exports = { errorHandler };

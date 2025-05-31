@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const membershipSchema = new mongoose.Schema(
   {
@@ -30,4 +30,4 @@ membershipSchema.path("price").validate(function (value) {
 
 const Membership = mongoose.model("Membership", membershipSchema);
 
-export default Membership;
+module.exports = Membership;

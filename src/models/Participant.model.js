@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const ParticipantSchema = new mongoose.Schema(
   {
@@ -57,4 +57,4 @@ const Participant =
   mongoose.models.Participant ||
   mongoose.model("Participant", ParticipantSchema);
 
-export default Participant;
+module.exports = Participant;

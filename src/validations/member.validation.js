@@ -1,6 +1,6 @@
-import Joi from "joi";
+const Joi = require("joi");
 
-export const validateMember = (req, res, next) => {
+const validateMember = (req, res, next) => {
   const schema = Joi.object({
     fullName: Joi.string().max(100).required(),
     email: Joi.string().email().required(),
@@ -39,7 +39,7 @@ export const validateMember = (req, res, next) => {
 };
 
 // Payment validation
-export const validatePayment = (req, res, next) => {
+const validatePayment = (req, res, next) => {
   const schema = Joi.object({
     paymentAmount: Joi.number().positive().required(),
     paymentMethod: Joi.string()
@@ -62,7 +62,7 @@ export const validatePayment = (req, res, next) => {
 };
 
 // Membership Renewal Validation
-export const validateMembershipRenewal = (req, res, next) => {
+const validateMembershipRenewal = (req, res, next) => {
   const schema = Joi.object({
     paymentAmount: Joi.number().positive().required(),
     paymentMethod: Joi.string()
@@ -82,4 +82,10 @@ export const validateMembershipRenewal = (req, res, next) => {
   }
 
   next();
+};
+
+module.exports = {
+  validateMember,
+  validatePayment,
+  validateMembershipRenewal
 };

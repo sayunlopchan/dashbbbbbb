@@ -8,7 +8,7 @@
  * @param {Date} params.endDate - Membership end date
  * @returns {string} HTML email template
  */
-export const membershipAcceptanceTemplate = (params) => {
+const membershipAcceptanceTemplate = (params) => {
   const { 
     fullName = 'Member', 
     memberId = 'N/A', 
@@ -46,4 +46,8 @@ export const membershipAcceptanceTemplate = (params) => {
       <p>Best regards,<br/>Your Organization</p>
     </div>
   `;
+};
+
+module.exports = {
+  membershipAcceptanceTemplate
 }; 

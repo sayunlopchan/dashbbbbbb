@@ -1,4 +1,4 @@
-import Counter from '../../models/counter.model.js';
+const Counter = require('../../models/Counter.model');
 
 const generateEventId = async () => {
   try {
@@ -33,4 +33,4 @@ const generateEventId = async () => {
   }
 };
 
-export default generateEventId; 
+module.exports = generateEventId; 

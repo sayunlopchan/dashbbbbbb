@@ -1,11 +1,7 @@
-import {
-  validationResult,
-  body as expressBody,
-  param as expressParam,
-} from "express-validator";
+const { validationResult, body, param } = require("express-validator");
 
 // Middleware to run validation checks
-export const validate = (validations) => {
+const validate = (validations) => {
   return async (req, res, next) => {
     // Run all validations
     await Promise.all(validations.map((validation) => validation.run(req)));
@@ -25,10 +21,16 @@ export const validate = (validations) => {
 };
 
 // Wrapper for express-validator methods to maintain compatibility
-export const body = (field) => {
-  return expressBody(field);
+const bodyValidator = (field) => {
+  return body(field);
 };
 
-export const param = (field) => {
-  return expressParam(field);
+const paramValidator = (field) => {
+  return param(field);
+};
+
+module.exports = {
+  validate,
+  body: bodyValidator,
+  param: paramValidator
 };

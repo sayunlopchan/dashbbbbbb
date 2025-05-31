@@ -1,4 +1,4 @@
-import Counter from '../../models/counter.model.js';
+const Counter = require('../../models/Counter.model');
 
 const generateAnnouncementId = async () => {
   const COUNTER_NAME = 'announcement_counter';
@@ -43,4 +43,4 @@ const generateAnnouncementId = async () => {
   }
 };
 
-export default generateAnnouncementId; 
+module.exports = generateAnnouncementId; 

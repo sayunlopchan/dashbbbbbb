@@ -1,9 +1,9 @@
 // controllers/trainer.controller.js
-import * as trainerService from "../services/trainer.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
+const trainerService = require("../services/trainer.service");
+const asyncHandler = require("../utils/asyncHandler");
 
 // Create Trainer
-export const createTrainer = asyncHandler(async (req, res) => {
+const createTrainer = asyncHandler(async (req, res) => {
   const trainer = await trainerService.createTrainerService(req.body);
 
   res.status(201).json({
@@ -14,7 +14,7 @@ export const createTrainer = asyncHandler(async (req, res) => {
 });
 
 // Get All Trainers with Pagination
-export const getAllTrainers = asyncHandler(async (req, res) => {
+const getAllTrainers = asyncHandler(async (req, res) => {
   // Parse query parameters with defaults
   const { page = 1, sort = "-createdAt", status, ...filter } = req.query;
 
@@ -37,7 +37,7 @@ export const getAllTrainers = asyncHandler(async (req, res) => {
 });
 
 // Get Trainer by ID
-export const getTrainerById = asyncHandler(async (req, res) => {
+const getTrainerById = asyncHandler(async (req, res) => {
   const trainer = await trainerService.getTrainerByTrainerIdService(
     req.params.trainerId
   );
@@ -49,7 +49,7 @@ export const getTrainerById = asyncHandler(async (req, res) => {
 });
 
 // Update Trainer
-export const updateTrainer = asyncHandler(async (req, res) => {
+const updateTrainer = asyncHandler(async (req, res) => {
   const updated = await trainerService.updateTrainerByTrainerIdService(
     req.params.trainerId,
     req.body
@@ -63,7 +63,7 @@ export const updateTrainer = asyncHandler(async (req, res) => {
 });
 
 // Delete Trainer
-export const deleteTrainer = asyncHandler(async (req, res) => {
+const deleteTrainer = asyncHandler(async (req, res) => {
   await trainerService.deleteTrainerByTrainerIdService(req.params.trainerId);
 
   res.status(200).json({
@@ -71,3 +71,11 @@ export const deleteTrainer = asyncHandler(async (req, res) => {
     message: "Trainer deleted successfully",
   });
 });
+
+module.exports = {
+  createTrainer,
+  getAllTrainers,
+  getTrainerById,
+  updateTrainer,
+  deleteTrainer,
+};

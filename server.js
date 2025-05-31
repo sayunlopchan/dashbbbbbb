@@ -1,8 +1,8 @@
-import http from "http";
-import app from "./src/app.js";
-import { loadEnv } from "./src/config/env.js";
-import { connectDB } from "./src/config/db.js";
-import { startAllCronJobs } from "./src/cron/index.js";
+const http = require("http");
+const app = require("./src/app");
+const { loadEnv } = require("./src/config/env");
+const { connectDB } = require("./src/config/db");
+const { startAllCronJobs } = require("./src/cron");
 
 loadEnv();
 connectDB();

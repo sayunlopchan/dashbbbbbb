@@ -528,6 +528,7 @@
                     </tr>
                 `;
 
+                console.log('Fetching payments with params:', params.toString());
                 const response = await fetch(`${baseUrl}/api/payments?${params}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -539,10 +540,18 @@
                 }
 
                 const data = await response.json();
+                console.log('API Response:', data);
 
-                if (data.success) {
-                    const { payments, pagination } = data.data;
-                    
+                if (data.success && data.data) {
+                    // Extract payments and pagination from the correct structure
+                    const payments = data.data.docs || [];
+                    const pagination = data.data.pagination || {
+                        page: currentPage,
+                        totalPages: 1,
+                        total: 0,
+                        limit: itemsPerPage
+                    };
+
                     // Store all payments for download/print functionality
                     allPayments = payments;
                     
@@ -559,17 +568,22 @@
 
                     // Populate table with filtered data
                     payments.forEach((payment, index) => {
+                        if (!payment || typeof payment !== 'object') {
+                            console.warn('Invalid payment data:', payment);
+                            return;
+                        }
+
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>${(pagination.page - 1) * pagination.limit + index + 1}</td>
-                            <td>${payment.memberId}</td>
-                            <td>${payment.fullName}</td>
-                            <td>${formatCurrency(payment.amount)}</td>
-                            <td>${formatDate(payment.paymentDate)}</td>
-                            <td>${payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1)}</td>
-                            <td>${getPaymentMethodIcon(payment.paymentMethod)} ${payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1)}</td>
+                            <td>${payment.memberId || 'N/A'}</td>
+                            <td>${payment.fullName || 'N/A'}</td>
+                            <td>${formatCurrency(payment.amount || 0)}</td>
+                            <td>${formatDate(payment.paymentDate || new Date())}</td>
+                            <td>${payment.paymentType ? payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1) : 'N/A'}</td>
+                            <td>${getPaymentMethodIcon(payment.paymentMethod || 'cash')} ${payment.paymentMethod ? payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1) : 'N/A'}</td>
                             <td>
-                                <button class="action-btn delete" data-payment-id="${payment.paymentId}">
+                                <button class="action-btn delete" data-payment-id="${payment.paymentId || ''}">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </td>
@@ -583,6 +597,8 @@
 
                     // Update revenue stats after filtering
                     await fetchRevenueStats();
+                } else {
+                    throw new Error(data.message || 'Failed to fetch payments');
                 }
             } catch (error) {
                 console.error('Error applying filters:', error);
