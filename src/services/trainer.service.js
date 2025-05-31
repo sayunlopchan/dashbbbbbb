@@ -1,6 +1,6 @@
 // services/trainer.service.js
 const Trainer = require("../models/Trainer.model");
-const { generateTrainerId } = require("../utils/idgenerator/generateTrainerId");
+const generateTrainerId = require("../utils/idgenerator/generateTrainerId");
 
 // Custom error class for service-level errors
 class TrainerServiceError extends Error {
@@ -11,12 +11,6 @@ class TrainerServiceError extends Error {
   }
 }
 
-// Pagination default options
-const DEFAULT_PAGINATION_OPTIONS = {
-  page: 1,
-  sort: { createdAt: -1 },
-};
-
 // Create Trainer Service
 const createTrainerService = async (data) => {
   try {
@@ -24,7 +18,13 @@ const createTrainerService = async (data) => {
     const trainerId = await generateTrainerId();
 
     // Create trainer with generated ID
-    return await Trainer.create({ ...data, trainerId });
+    const trainerData = {
+      ...data,
+      trainerId,
+      joinDate: data.joinDate || new Date() // Ensure joinDate is set
+    };
+
+    return await Trainer.create(trainerData);
   } catch (error) {
     // Handle specific mongoose validation errors
     if (error.name === "ValidationError") {
