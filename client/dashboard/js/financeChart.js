@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 const data = await response.json();
+                console.log('Bar Chart API Response:', data);
 
                 if (!data.success) {
                     throw new Error(data.message || 'Failed to fetch payment data');
@@ -41,9 +42,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     product: 0
                 }));
 
-                // Process payment data
-                if (data.data.payments && Array.isArray(data.data.payments)) {
-                    data.data.payments.forEach(payment => {
+                // Process payment data from the correct structure (data.data.docs)
+                if (data.data && data.data.docs && Array.isArray(data.data.docs)) {
+                    data.data.docs.forEach(payment => {
                         const paymentDate = new Date(payment.paymentDate);
                         if (!isNaN(paymentDate) && paymentDate.getFullYear() === currentYear) {
                             const monthIndex = paymentDate.getMonth();
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error('Error creating finance bar chart:', error);
                 financeBarChart.innerHTML = `
                     <div style="text-align: center; width: 100%; color: #888;">
-                        Unable to load finance chart data
+                        Unable to load finance chart data: ${error.message}
                     </div>
                 `;
             }

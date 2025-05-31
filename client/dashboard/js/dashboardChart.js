@@ -184,6 +184,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Clear any existing chart
         membershipPieChart.innerHTML = '';
 
+        // Create tooltip container
+        const tooltipContainer = document.createElement('div');
+        tooltipContainer.classList.add('pie-chart-tooltip');
+        membershipPieChart.appendChild(tooltipContainer);
+
         // Create SVG container
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         svg.setAttribute('width', '100%');
@@ -243,36 +248,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             path.setAttribute('stroke', 'white');
             path.setAttribute('stroke-width', '1');
 
-            // Create tooltip
-            const tooltip = document.createElement('div');
-            tooltip.classList.add('pie-chart-tooltip');
-            tooltip.innerHTML = `
-                <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
-                ${count} members (100%)
-            `;
-
             // Add hover interactions
             path.addEventListener('mouseenter', (e) => {
                 path.setAttribute('filter', 'url(#shadow)');
-                tooltip.style.opacity = '1';
-                tooltip.style.left = (e.pageX + 10) + 'px';
-                tooltip.style.top = (e.pageY - 10) + 'px';
+                const rect = membershipPieChart.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                tooltipContainer.style.opacity = '1';
+                tooltipContainer.style.left = `${x}px`;
+                tooltipContainer.style.top = `${y}px`;
+                tooltipContainer.innerHTML = `
+                    <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                    ${count} members (100%)
+                `;
             });
 
             path.addEventListener('mouseleave', () => {
                 path.removeAttribute('filter');
-                tooltip.style.opacity = '0';
+                tooltipContainer.style.opacity = '0';
             });
 
             path.addEventListener('mousemove', (e) => {
-                tooltip.style.left = (e.pageX + 10) + 'px';
-                tooltip.style.top = (e.pageY - 10) + 'px';
+                const rect = membershipPieChart.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                tooltipContainer.style.left = `${x}px`;
+                tooltipContainer.style.top = `${y}px`;
             });
 
             svg.appendChild(path);
-            document.body.appendChild(tooltip);
         } else {
-            // Handle multiple data points as before
+            // Handle multiple data points
             let startAngle = 0;
             nonZeroData.forEach(([type, count]) => {
                 const percentage = count / totalMembers;
@@ -308,34 +314,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                 path.setAttribute('stroke', 'white');
                 path.setAttribute('stroke-width', '1');
 
-                // Create tooltip
-                const tooltip = document.createElement('div');
-                tooltip.classList.add('pie-chart-tooltip');
-                tooltip.innerHTML = `
-                    <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
-                    ${count} members (${(percentage * 100).toFixed(1)}%)
-                `;
-
                 // Add hover interactions
                 path.addEventListener('mouseenter', (e) => {
                     path.setAttribute('filter', 'url(#shadow)');
-                    tooltip.style.opacity = '1';
-                    tooltip.style.left = (e.pageX + 10) + 'px';
-                    tooltip.style.top = (e.pageY - 10) + 'px';
+                    const rect = membershipPieChart.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    tooltipContainer.style.opacity = '1';
+                    tooltipContainer.style.left = `${x}px`;
+                    tooltipContainer.style.top = `${y}px`;
+                    tooltipContainer.innerHTML = `
+                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                        ${count} members (${(percentage * 100).toFixed(1)}%)
+                    `;
                 });
 
                 path.addEventListener('mouseleave', () => {
                     path.removeAttribute('filter');
-                    tooltip.style.opacity = '0';
+                    tooltipContainer.style.opacity = '0';
                 });
 
                 path.addEventListener('mousemove', (e) => {
-                    tooltip.style.left = (e.pageX + 10) + 'px';
-                    tooltip.style.top = (e.pageY - 10) + 'px';
+                    const rect = membershipPieChart.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    tooltipContainer.style.left = `${x}px`;
+                    tooltipContainer.style.top = `${y}px`;
                 });
 
                 svg.appendChild(path);
-                document.body.appendChild(tooltip);
                 
                 // Update start angle for next slice
                 startAngle = endAngle;
