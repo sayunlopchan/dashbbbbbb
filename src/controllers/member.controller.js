@@ -316,6 +316,23 @@ const searchMembers = async (req, res) => {
   }
 };
 
+// Get Member Alerts
+const getMemberAlerts = async (req, res) => {
+  try {
+    const { filter = 'all' } = req.query;
+    const alerts = await memberService.getMemberAlertsService(filter);
+    res.status(200).json({
+      success: true,
+      data: alerts
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch member alerts"
+    });
+  }
+};
+
 module.exports = {
   createMember,
   getAllMembers,
@@ -328,4 +345,5 @@ module.exports = {
   checkMembershipStatus,
   cancelMembership,
   searchMembers,
+  getMemberAlerts
 };

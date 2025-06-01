@@ -80,6 +80,15 @@ const MemberSchema = new mongoose.Schema(
       enum: ["active", "inactive", "pending", "cancelled", "expiring", "expired"],
       default: "pending",
     },
+    cancellationDate: {
+      type: Date,
+      default: null
+    },
+    cancellationReason: {
+      type: String,
+      trim: true,
+      default: null
+    },
     payments: [
       {
         amount: {

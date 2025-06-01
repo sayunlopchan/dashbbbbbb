@@ -136,7 +136,7 @@ const createMembershipNotificationService = async (memberData, type) => {
     switch (type) {
       case "MEMBERSHIP_CANCELLED":
         title = "Membership Cancelled";
-        message = `Your membership has been cancelled${
+        message = `${memberData.fullName}'s membership has been cancelled${
           memberData.cancellationReason
             ? ` due to: ${memberData.cancellationReason}`
             : " due to non-payment"
@@ -144,11 +144,15 @@ const createMembershipNotificationService = async (memberData, type) => {
         break;
       case "MEMBERSHIP_EXPIRING":
         title = "Membership Expiring Soon";
-        message = `Your membership will expire in ${Math.ceil((new Date(memberData.endDate) - new Date()) / (1000 * 60 * 60 * 24))} days. Please renew to continue accessing our services.`;
+        message = `${memberData.fullName}'s membership will expire in ${Math.ceil((new Date(memberData.endDate) - new Date()) / (1000 * 60 * 60 * 24))} days.`;
         break;
       case "MEMBERSHIP_EXPIRED":
         title = "Membership Expired";
-        message = "Your membership has expired. Please renew to continue accessing our services.";
+        message = `${memberData.fullName}'s membership has expired.`;
+        break;
+      case "MEMBERSHIP_PAYMENT_PENDING":
+        title = "Payment Pending";
+        message = `${memberData.fullName} has not made their membership payment yet.`;
         break;
       default:
         throw new Error(`Invalid membership notification type: ${type}`);
@@ -195,15 +199,15 @@ const createMemberStatusNotificationService = async (
     switch (notificationType) {
       case "MEMBER_START_PENDING":
         title = "Membership Start Pending";
-        message = `Your membership is pending and about to start. Please complete any remaining steps.`;
+        message = `${member.fullName}'s membership is pending and about to start.`;
         break;
       case "MEMBERSHIP_EXPIRING":
         title = "Membership Expiring Soon";
-        message = `Your membership is about to expire. Please renew to continue enjoying our services.`;
+        message = `${member.fullName}'s membership is about to expire.`;
         break;
       case "MEMBERSHIP_EXPIRED":
         title = "Membership Expired";
-        message = "Your membership has expired. Please renew to continue accessing our services.";
+        message = `${member.fullName}'s membership has expired.`;
         break;
       default:
         throw new Error("Invalid notification type");

@@ -35,7 +35,7 @@
             </li>
             <li>
                 <a href="/application">
-                    <i class="fas fa-user"></i>
+                    <i class="fa-solid fa-file-lines"></i>
                     <span>Application</span>
                     <div class="tooltip">Application</div>
                 </a>
@@ -437,7 +437,6 @@
                     <td>${employee.position || 'N/A'}</td>
                     <td>
                         <span class="status ${employee.status || 'active'}">
-                            <i class="fa-solid fa-${employee.status === 'inactive' ? 'xmark' : 'circle-check'}"></i> 
                             ${employee.status ? employee.status.charAt(0).toUpperCase() + employee.status.slice(1) : 'Active'}
                         </span>
                     </td>

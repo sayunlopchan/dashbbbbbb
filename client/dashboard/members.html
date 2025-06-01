@@ -6,6 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knox Barbell - Members</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Add these styles in the head section */
+        .status.new-member {
+            background-color: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        /* Status styles for member alerts */
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: white;
+        }
+        .status.pending {
+            background-color: #f1c40f;
+        }
+        .status.active {
+            background-color: #2ecc71;
+        }
+        .status.inactive {
+            background-color: #95a5a6;
+        }
+        .status.cancelled {
+            background-color: #e74c3c;
+        }
+        .status.expiring {
+            background-color: #e67e22;
+        }
+        .status.expired {
+            background-color: #c0392b;
+        }
+    </style>
     <link rel="stylesheet" href="/css/base.css">
     <link rel="stylesheet" href="/css/members.css">
 </head>
@@ -35,7 +70,7 @@
             </li>
             <li>
                 <a href="/application">
-                    <i class="fas fa-user"></i>
+                    <i class="fa-solid fa-file-lines"></i>
                     <span>Application</span>
                     <div class="tooltip">Application</div>
                 </a>
@@ -193,7 +228,7 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search Member..." autocomplete="off">
                 </div>
-                <!-- download filter -->
+                <!-- day filter -->
                 <div class="filter-group download-filter">
                     <select name="download-filter" id="filterDownload">
                         <option value="today" selected>Today</option>
@@ -201,6 +236,8 @@
                         <option value="30">Last 30 days</option>
                         <option value="365">Last 12 Months</option>
                     </select>
+
+                    <!-- download and print buttons -->
                     <button class="download" id="downloadMembers"><i class="fa-solid fa-download"></i></button>
                     <button class="print" id="printMembers"><i class="fa-solid fa-print"></i></button>
                     <button class="reset" id="resetFilters" title="Reset Filters">
@@ -221,7 +258,7 @@
                             <th>Email</th>
                             <th>Contact</th>
                             <th>Emergency No.</th>
-                            <th>Joined Date</th>
+                            <th>Start Date</th>
                             <th>Membership</th>
                             <th>Action</th>
                         </tr>
@@ -258,6 +295,38 @@
                     Next <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
+
+
+            <!-- Member Alert Table -->
+            <div class="member-alerts">
+                <div class="section-header">
+                    <span class="section-title">Expiry Alert</span>
+                    <a href="/notifications" class="section-view-all">View All</a>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member Id</th>
+                            <th>Members</th>
+                            <th>Email Address</th>
+                            <th>Status</th>
+                            <th>Days</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberAlertTableBody">
+                        <tr>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
     </div>
@@ -590,7 +659,7 @@
                     <h2>Renew Member</h2>
                     <p>Search and select a member to renew their membership.</p>
                 </div>
-                <button class="close-button" id="renewCancelBtn">
+                <button class="close-button" id="renewModalCloseBtn">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -600,8 +669,7 @@
                         <label for="renewMemberId">Search Member</label>
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" id="renewMemberSearch" placeholder="Search by name or ID..."
-                                autocomplete="off">
+                            <input type="text" id="renewMemberSearch" placeholder="Search by name or ID..." autocomplete="off">
                             <div class="search-result-container"></div>
                         </div>
                         <input type="hidden" id="renewMemberId" required>
@@ -632,7 +700,7 @@
                     </div>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="renewCancelBtn">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="renewFormCancelBtn">Cancel</button>
                     <button type="submit" class="btn btn-primary">Renew Membership</button>
                 </div>
             </form>
@@ -1011,19 +1079,31 @@
                     return;
                 }
 
+                const currentDate = new Date();
+
                 members.forEach((member, index) => {
                     if (!member) return; // Skip invalid members
 
                     const tr = document.createElement("tr");
                     const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
 
-                    // Format dates safely
+                    // Format dates safely with validation
                     const startDate = member.startDate ?
-                        new Date(member.startDate).toLocaleDateString() : 'N/A';
+                        (() => {
+                            const date = new Date(member.startDate);
+                            return !isNaN(date.getTime()) ? date.toLocaleDateString() : 'N/A';
+                        })() 
+                        : 'N/A';
 
                     // Safely access nested properties with optional chaining
                     const membershipType = member.membershipType?.toLowerCase() || 'silver';
                     const membershipDisplay = member.membershipType || 'N/A';
+
+                    // Add status class based on member status
+                    const statusClass = member.memberStatus === 'cancelled' ? 'cancelled' : membershipType;
+
+                    // For the main table, just show 'Cancelled' without time information
+                    const statusDisplay = member.memberStatus === 'cancelled' ? 'Cancelled' : membershipDisplay;
 
                     tr.innerHTML = `
                         <td>${rowNumber}</td>
@@ -1033,7 +1113,11 @@
                         <td>${member.contact || 'N/A'}</td>
                         <td>${member.emergencyNumber || 'N/A'}</td>
                         <td>${startDate}</td>
-                        <td><span class="membership-type ${membershipType}">${membershipDisplay}</span></td>
+                        <td>
+                            <span class="membership-type ${statusClass}">
+                                ${statusDisplay}
+                            </span>
+                        </td>
                         <td>
                             <button class="action-btn edit" data-id="${member.memberId || ''}" ${!member.memberId ? 'disabled' : ''}>
                                 <i class="fa-solid fa-pen"></i>
@@ -1544,12 +1628,23 @@
                 document.body.style.overflow = 'hidden';
             });
 
-            // Close renew modal when clicking cancel button
-            const renewCancelBtn = renewMemberModal.querySelector('#renewCancelBtn');
-            if (renewCancelBtn) {
-                renewCancelBtn.addEventListener('click', function () {
+            // Close renew modal when clicking header close button
+            const renewModalCloseBtn = document.getElementById('renewModalCloseBtn');
+            if (renewModalCloseBtn) {
+                renewModalCloseBtn.addEventListener('click', function () {
                     renewMemberModal.classList.remove('active');
                     document.body.style.overflow = '';
+                    document.getElementById('renewMemberForm').reset();
+                });
+            }
+
+            // Close renew modal when clicking form cancel button
+            const renewFormCancelBtn = document.getElementById('renewFormCancelBtn');
+            if (renewFormCancelBtn) {
+                renewFormCancelBtn.addEventListener('click', function () {
+                    renewMemberModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    document.getElementById('renewMemberForm').reset();
                 });
             }
 
@@ -1558,6 +1653,7 @@
                 if (e.target === renewMemberModal) {
                     renewMemberModal.classList.remove('active');
                     document.body.style.overflow = '';
+                    document.getElementById('renewMemberForm').reset();
                 }
             });
 
@@ -1574,7 +1670,7 @@
                 }
 
                 try {
-                    const response = await fetch(`${baseUrl}/members/search?q=${encodeURIComponent(searchTerm)}`);
+                    const response = await fetch(`/api/members/search?q=${encodeURIComponent(searchTerm)}`);
                     const result = await response.json();
 
                     if (result.success) {
@@ -1635,10 +1731,15 @@
 
                     const membershipType = document.getElementById('renewMembershipType').value;
                     const paymentMethod = document.getElementById('renewPaymentMethod').value;
-                    const amount = document.getElementById('renewAmount').value;
+                    const paymentAmount = document.getElementById('renewAmount').value;
+
+                    if (!paymentAmount || paymentAmount <= 0) {
+                        window.toast('Please enter a valid payment amount', 'error');
+                        return;
+                    }
 
                     try {
-                        const response = await fetch(`${baseUrl}/members/${memberId}/renew`, {
+                        const response = await fetch(`/api/members/${memberId}/renew`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1647,7 +1748,7 @@
                             body: JSON.stringify({
                                 membershipType,
                                 paymentMethod,
-                                amount: parseFloat(amount)
+                                paymentAmount: parseFloat(paymentAmount)
                             })
                         });
 
@@ -2215,148 +2316,303 @@
                     }
                 }
             });
-        });
 
-        // Notification Modal Logic
-        document.addEventListener('DOMContentLoaded', function() {
-            const notificationIcon = document.querySelector('.notification');
-            const notificationModal = document.querySelector('.notification-modal');
-            const closeNotifications = document.querySelector('.close-notifications');
-            const notificationList = document.querySelector('.notification-list');
-            const notificationBadge = document.querySelector('.notification-badge');
-
-            // Toggle notification modal
-            notificationIcon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                notificationModal.classList.toggle('active');
-                if (notificationModal.classList.contains('active')) {
-                    fetchNotifications();
-                }
-            });
-
-            // Close notification modal
-            closeNotifications.addEventListener('click', function(e) {
-                e.stopPropagation();
-                notificationModal.classList.remove('active');
-            });
-
-            // Close modal when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
-                    notificationModal.classList.remove('active');
-                }
-            });
-
-            // Fetch unread count
-            async function fetchUnreadCount() {
+            // Function to fetch and display member alerts
+            async function fetchMemberAlerts() {
                 try {
-                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
-                    const data = await response.json();
-                    if (data.success) {
-                        notificationBadge.textContent = data.data.unreadCount;
-                        // Show/hide badge based on count
-                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                    const response = await fetch("/api/members");
+                    const result = await response.json();
+
+                    // Check if the response has the expected structure
+                    if (!result.success || !Array.isArray(result.data)) {
+                        console.error('Invalid members data format:', result);
+                        return;
                     }
-                } catch (error) {
-                    console.error('Error fetching unread count:', error);
-                }
-            }
 
-            // Fetch notifications from API
-            async function fetchNotifications() {
-                try {
-                    notificationList.innerHTML = `
-                        <div class="notification-loading">
-                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-                        </div>
-                    `;
+                    const members = result.data;
 
-                    const response = await fetch(`${baseUrl}/api/notifications`);
-                    const data = await response.json();
+                    // Filter members based on start date and status
+                    const filteredMembers = members.filter((member) => {
+                        if (!member || !member.startDate) return false;
 
-                    if (data.success) {
-                        const notifications = data.data;
+                        const startDate = new Date(member.startDate);
+                        const currentDate = new Date();
+                        const memberStatus = member.memberStatus?.toLowerCase();
+
+                        // Include members whose start date is before current date
+                        const hasStarted = startDate < currentDate;
+
+                        // Include members with specific statuses
+                        const hasRelevantStatus = ['expiring', 'expired', 'cancelled'].includes(memberStatus);
+
+                        return hasStarted || hasRelevantStatus;
+                    });
+
+                    // Sort members by priority
+                    const statusPriority = {
+                        'cancelled': 1,
+                        'expired': 2,
+                        'expiring': 3,
+                        'active': 4,
+                        'inactive': 5,
+                        'pending': 6
+                    };
+
+                    filteredMembers.sort((a, b) => {
+                        // First sort by status priority
+                        const statusA = a.memberStatus?.toLowerCase() || '';
+                        const statusB = b.memberStatus?.toLowerCase() || '';
+                        const statusDiff = (statusPriority[statusA] || 999) - (statusPriority[statusB] || 999);
                         
-                        if (notifications.length === 0) {
-                            notificationList.innerHTML = `
-                                <div class="notification-empty">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <p>No new notifications</p>
-                                </div>
-                            `;
-                            return;
+                        if (statusDiff !== 0) return statusDiff;
+
+                        // For expiring members, sort by days until expiry
+                        if (statusA === 'expiring' && statusB === 'expiring') {
+                            const daysUntilExpiryA = Math.ceil((new Date(a.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+                            const daysUntilExpiryB = Math.ceil((new Date(b.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+                            return daysUntilExpiryA - daysUntilExpiryB;
                         }
 
-                        // Render notifications
-                        notificationList.innerHTML = notifications.map(notif => `
-                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
-                                 data-notification-id="${notif._id}">
-                                <div class="notification-title">
-                                    ${notif.title}
-                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
-                                </div>
-                                <div class="notification-message">${notif.message}</div>
-                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
-                            </div>
-                        `).join('');
+                        // For expired members, sort by days since expiry (most recent first)
+                        if (statusA === 'expired' && statusB === 'expired') {
+                            const daysSinceExpiryA = Math.ceil((new Date() - new Date(a.endDate)) / (1000 * 60 * 60 * 24));
+                            const daysSinceExpiryB = Math.ceil((new Date() - new Date(b.endDate)) / (1000 * 60 * 60 * 24));
+                            return daysSinceExpiryA - daysSinceExpiryB;
+                        }
 
-                        // Add click handler to mark notifications as read
-                        const notificationItems = document.querySelectorAll('.notification-item');
-                        notificationItems.forEach(item => {
-                            item.addEventListener('click', async () => {
-                                const notificationId = item.dataset.notificationId;
-                                if (item.classList.contains('unread')) {
-                                    try {
-                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
-                                            method: 'PATCH',
-                                            credentials: 'include'
-                                        });
-                                        
-                                        if (response.ok) {
-                                            // Update UI
-                                            item.classList.remove('unread');
-                                            const unreadDot = item.querySelector('.unread-dot');
-                                            if (unreadDot) unreadDot.remove();
-                                            
-                                            // Update unread count
-                                            await fetchUnreadCount();
-                                        } else {
-                                            window.toast('Failed to mark notification as read', 'error');
-                                        }
-                                    } catch (error) {
-                                        console.error('Error marking notification as read:', error);
-                                        window.toast('Error marking notification as read', 'error');
-                                    }
+                        // For members who have started, sort by start date (most recent first)
+                        if (a.startDate && b.startDate) {
+                            return new Date(b.startDate) - new Date(a.startDate);
+                        }
+
+                        return 0;
+                    });
+
+                    // Get top 5 most relevant alerts
+                    const topAlerts = filteredMembers.slice(0, 5);
+
+                    // Update the table
+                    const tbody = document.querySelector("#memberAlertTableBody");
+                    if (!tbody) {
+                        console.error('Member alerts table body not found');
+                        return;
+                    }
+
+                    tbody.innerHTML = "";
+
+                    if (topAlerts.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center">No member alerts found</td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    topAlerts.forEach((member) => {
+                        const row = document.createElement("tr");
+                        const status = member.memberStatus?.toLowerCase() || 'pending';
+                        const startDate = new Date(member.startDate);
+                        const endDate = new Date(member.endDate);
+                        const currentDate = new Date();
+                        const daysUntilExpiry = Math.ceil((endDate - currentDate) / (1000 * 60 * 60 * 24));
+                        const daysSinceExpiry = Math.ceil((currentDate - endDate) / (1000 * 60 * 60 * 24));
+
+                        let statusText = status.charAt(0).toUpperCase() + status.slice(1);
+                        let daysDisplay = "";
+
+                        if (status === 'expiring') {
+                            daysDisplay = `${daysUntilExpiry} days left`;
+                        } else if (status === 'expired') {
+                            daysDisplay = `${daysSinceExpiry} days ago`;
+                        } else if (status === 'cancelled') {
+                            daysDisplay = "N/A";
+                        } else {
+                            daysDisplay = `${Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24))} days active`;
+                        }
+
+                        row.innerHTML = `
+                            <td>${member.memberId || 'N/A'}</td>
+                            <td>${member.fullName || 'N/A'}</td>
+                            <td>${member.email || 'N/A'}</td>
+                            <td><span class="status ${status}">${statusText}</span></td>
+                            <td>${daysDisplay}</td>
+                            <td>
+                                ${status === 'cancelled' ? 
+                                    `<span class="status cancelled">Cancelled</span>` :
+                                    `<button class="action-btn cancel" data-member-id="${member.memberId}" title="Cancel Membership">
+                                        <i class="fa-solid fa-ban"></i>
+                                    </button>`
                                 }
+                            </td>
+                        `;
 
-                                // Close notification modal
-                                notificationModal.classList.remove('active');
+                        tbody.appendChild(row);
+                    });
 
-                                // Redirect to application page
-                                window.location.href = '/application';
-                            });
-                        });
-                    } else {
-                        throw new Error(data.message || 'Failed to fetch notifications');
+                    // Update the count badge
+                    const countBadge = document.querySelector("#memberAlertsBadge");
+                    if (countBadge) {
+                        countBadge.textContent = filteredMembers.length;
+                        countBadge.style.display = filteredMembers.length > 0 ? "inline" : "none";
                     }
                 } catch (error) {
-                    console.error('Error fetching notifications:', error);
-                    window.toast('Failed to load notifications', 'error');
-                    notificationList.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Failed to load notifications</p>
-                        </div>
-                    `;
+                    console.error("Error fetching member alerts:", error);
+                    const tbody = document.querySelector("#memberAlertTableBody");
+                    if (tbody) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center">Error loading member alerts: ${error.message}</td>
+                            </tr>
+                        `;
+                    }
                 }
             }
 
-            // Initial fetch of notifications and unread count
-            fetchNotifications();
-            fetchUnreadCount();
+            // Initial fetch of member alerts
+            fetchMemberAlerts();
 
-            // Refresh unread count periodically
-            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+            // Notification Modal Logic
+            document.addEventListener('DOMContentLoaded', function() {
+                const notificationIcon = document.querySelector('.notification');
+                const notificationModal = document.querySelector('.notification-modal');
+                const closeNotifications = document.querySelector('.close-notifications');
+                const notificationList = document.querySelector('.notification-list');
+                const notificationBadge = document.querySelector('.notification-badge');
+
+                // Toggle notification modal
+                notificationIcon.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationModal.classList.toggle('active');
+                    if (notificationModal.classList.contains('active')) {
+                        fetchNotifications();
+                    }
+                });
+
+                // Close notification modal
+                closeNotifications.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationModal.classList.remove('active');
+                });
+
+                // Close modal when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+                        notificationModal.classList.remove('active');
+                    }
+                });
+
+                // Fetch unread count
+                async function fetchUnreadCount() {
+                    try {
+                        const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
+                        const data = await response.json();
+                        if (data.success) {
+                            notificationBadge.textContent = data.data.unreadCount;
+                            // Show/hide badge based on count
+                            notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+                        }
+                    } catch (error) {
+                        console.error('Error fetching unread count:', error);
+                    }
+                }
+
+                // Fetch notifications from API
+                async function fetchNotifications() {
+                    try {
+                        notificationList.innerHTML = `
+                            <div class="notification-loading">
+                                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                            </div>
+                        `;
+
+                        const response = await fetch(`${baseUrl}/api/notifications`);
+                        const data = await response.json();
+
+                        if (data.success) {
+                            const notifications = data.data;
+                            
+                            if (notifications.length === 0) {
+                                notificationList.innerHTML = `
+                                    <div class="notification-empty">
+                                        <i class="fas fa-bell-slash"></i>
+                                        <p>No new notifications</p>
+                                    </div>
+                                `;
+                                return;
+                            }
+
+                            // Render notifications
+                            notificationList.innerHTML = notifications.map(notif => `
+                                <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                                     data-notification-id="${notif._id}">
+                                    <div class="notification-title">
+                                        ${notif.title}
+                                        ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                                    </div>
+                                    <div class="notification-message">${notif.message}</div>
+                                    <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+                                </div>
+                            `).join('');
+
+                            // Add click handler to mark notifications as read
+                            const notificationItems = document.querySelectorAll('.notification-item');
+                            notificationItems.forEach(item => {
+                                item.addEventListener('click', async () => {
+                                    const notificationId = item.dataset.notificationId;
+                                    if (item.classList.contains('unread')) {
+                                        try {
+                                            const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+                                                method: 'PATCH',
+                                                credentials: 'include'
+                                            });
+                                            
+                                            if (response.ok) {
+                                                // Update UI
+                                                item.classList.remove('unread');
+                                                const unreadDot = item.querySelector('.unread-dot');
+                                                if (unreadDot) unreadDot.remove();
+                                                
+                                                // Update unread count
+                                                await fetchUnreadCount();
+                                            } else {
+                                                window.toast('Failed to mark notification as read', 'error');
+                                            }
+                                        } catch (error) {
+                                            console.error('Error marking notification as read:', error);
+                                            window.toast('Error marking notification as read', 'error');
+                                        }
+                                    }
+
+                                    // Close notification modal
+                                    notificationModal.classList.remove('active');
+
+                                    // Redirect to application page
+                                    window.location.href = '/application';
+                                });
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to fetch notifications');
+                        }
+                    } catch (error) {
+                        console.error('Error fetching notifications:', error);
+                        window.toast('Failed to load notifications', 'error');
+                        notificationList.innerHTML = `
+                            <div class="notification-empty">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Failed to load notifications</p>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Initial fetch of notifications and unread count
+                fetchNotifications();
+                fetchUnreadCount();
+
+                // Refresh unread count periodically
+                setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+            });
         });
     </script>
 </body>

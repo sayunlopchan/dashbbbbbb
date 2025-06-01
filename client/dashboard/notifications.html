@@ -36,11 +36,11 @@
       </li>
       <li>
         <a href="/application">
-            <i class="fas fa-user"></i>
-            <span>Application</span>
-            <div class="tooltip">Application</div>
+          <i class="fa-solid fa-file-lines"></i>
+          <span>Application</span>
+          <div class="tooltip">Application</div>
         </a>
-    </li>
+      </li>
       <li>
         <a href="/membership">
           <i class="fas fa-id-card"></i>
@@ -99,11 +99,11 @@
       </li>
       <li class="logout-item">
         <a href="#" id="logoutButton">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-            <div class="tooltip">Logout</div>
+          <i class="fas fa-sign-out-alt"></i>
+          <span>Logout</span>
+          <div class="tooltip">Logout</div>
         </a>
-    </li>
+      </li>
     </ul>
   </div>
 
@@ -138,15 +138,216 @@
           <button class="tab" data-type="unread">Unread (0)</button>
           <button class="tab" data-type="expiry">Membership Expiry (0)</button>
         </div>
+        <div class="notification-list">
+          <!-- Notifications will be populated here -->
+          <div class="notification-loading">
+            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+          </div>
+        </div>
       </div>
 
     </div>
   </div>
 
-
-
   <script src="/js/main.js"></script>
   <script src="./js/logout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const notificationList = document.querySelector('.notification-list');
+      const tabs = document.querySelectorAll('.tab');
+      let currentFilter = 'all';
+      let allNotifications = [];
+
+      // Function to format date
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
+        });
+      }
+
+      // Function to get notification tag based on type
+      function getNotificationTag(type) {
+        switch (type) {
+          case 'MEMBERSHIP_EXPIRING':
+            return 'Expiring Soon';
+          case 'MEMBERSHIP_EXPIRED':
+            return 'Expired';
+          case 'MEMBERSHIP_RENEWED':
+            return 'Renewed';
+          case 'MEMBERSHIP_CANCELLED':
+            return 'Cancelled';
+          case 'PAYMENT_RECEIVED':
+            return 'Payment';
+          default:
+            return 'General';
+        }
+      }
+
+      // Function to update tab counts
+      function updateTabCounts() {
+        const unreadCount = allNotifications.filter(n => n.status === 'unread').length;
+        const expiryCount = allNotifications.filter(n => n.type === 'MEMBERSHIP_EXPIRING').length;
+        
+        document.querySelector('[data-type="all"]').textContent = `All (${allNotifications.length})`;
+        document.querySelector('[data-type="unread"]').textContent = `Unread (${unreadCount})`;
+        document.querySelector('[data-type="expiry"]').textContent = `Membership Expiry (${expiryCount})`;
+      }
+
+      // Function to render notifications
+      function renderNotifications(notifications) {
+        if (notifications.length === 0) {
+          notificationList.innerHTML = `
+            <div class="notification-empty">
+              <i class="fas fa-bell-slash"></i>
+              <p>No notifications found</p>
+            </div>
+          `;
+          return;
+        }
+
+        notificationList.innerHTML = `
+          <div class="notification" data-type="${currentFilter}">
+            ${notifications.map(notification => `
+              <div class="notification-card ${notification.status === 'unread' ? 'new' : ''}">
+                <div class="notification-title">
+                  <h4>
+                    ${notification.title}
+                    ${notification.status === 'unread' ? '<span class="new-tag">New</span>' : ''}
+                  </h4>
+                  <span class="tag">${getNotificationTag(notification.type)}</span>
+                </div>
+                <div class="date-time">${formatDate(notification.createdAt)}</div>
+                <div class="content">
+                  ${notification.message}
+                </div>
+                <div class="actions">
+                  ${notification.status === 'unread' ? `
+                    <span class="mark-read" data-notification-id="${notification._id}">
+                      <i class="fa-solid fa-check-double"></i> Mark as read
+                    </span>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+
+        // Add event listeners for mark as read buttons
+        document.querySelectorAll('.mark-read').forEach(button => {
+          button.addEventListener('click', async (e) => {
+            const notificationId = e.currentTarget.dataset.notificationId;
+            await markAsRead(notificationId);
+          });
+        });
+      }
+
+      // Function to mark notification as read
+      async function markAsRead(notificationId) {
+        try {
+          const response = await fetch(`/api/notifications/${notificationId}/read`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          if (response.ok) {
+            // Update local state
+            const notification = allNotifications.find(n => n._id === notificationId);
+            if (notification) {
+              notification.status = 'read';
+              updateTabCounts();
+              renderNotifications(filterNotifications(currentFilter));
+            }
+          } else {
+            throw new Error('Failed to mark notification as read');
+          }
+        } catch (error) {
+          console.error('Error marking notification as read:', error);
+          window.toast('Failed to mark notification as read', 'error');
+        }
+      }
+
+      // Function to filter notifications
+      function filterNotifications(filter) {
+        switch (filter) {
+          case 'unread':
+            return allNotifications.filter(n => n.status === 'unread');
+          case 'expiry':
+            return allNotifications.filter(n => n.type === 'MEMBERSHIP_EXPIRING');
+          default:
+            return allNotifications;
+        }
+      }
+
+      // Function to fetch notifications
+      async function fetchNotifications() {
+        try {
+          notificationList.innerHTML = `
+            <div class="notification-loading">
+              <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+            </div>
+          `;
+
+          const response = await fetch('/api/notifications', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch notifications');
+          }
+
+          const result = await response.json();
+          
+          if (result.success) {
+            allNotifications = result.data;
+            updateTabCounts();
+            renderNotifications(filterNotifications(currentFilter));
+          } else {
+            throw new Error(result.message || 'Failed to fetch notifications');
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+          notificationList.innerHTML = `
+            <div class="notification-error">
+              <i class="fas fa-exclamation-circle"></i>
+              <p>Failed to load notifications: ${error.message}</p>
+              <button onclick="fetchNotifications()" class="btn-retry">
+                <i class="fas fa-sync-alt"></i> Retry
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      // Add click handlers for tabs
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Update active tab
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          // Update current filter and render notifications
+          currentFilter = tab.dataset.type;
+          renderNotifications(filterNotifications(currentFilter));
+        });
+      });
+
+      // Initial fetch
+      fetchNotifications();
+
+      // Refresh notifications every minute
+      setInterval(fetchNotifications, 60000);
+    });
+  </script>
 </body>
 
 </html>

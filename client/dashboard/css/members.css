@@ -76,6 +76,11 @@
   color: #3498db;
 }
 
+.cancelled {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
 /* Add Member Button */
 .add-member-btn {
   background-color: var(--accent-color);
@@ -553,4 +558,169 @@
   .column textarea {
     padding: 0.4rem;
   }
+}
+
+/* Member Alert Table Styles */
+.member-alerts {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 25px;
+    padding: 20px;
+}
+
+.member-alerts .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.member-alerts .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.member-alerts .section-view-all {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.member-alerts .section-view-all:hover {
+    color: #2980b9;
+}
+
+.member-alerts table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.member-alerts th {
+    text-align: left;
+    padding: 12px;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.member-alerts td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    color: #2c3e50;
+}
+
+.member-alerts tr:last-child td {
+    border-bottom: none;
+}
+
+.member-alerts tr:hover {
+    background-color: #f8f9fa;
+}
+
+.member-alerts .status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.member-alerts .status.expired {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.member-alerts .status.expiring {
+    background-color: rgba(241, 196, 15, 0.1);
+    color: #f39c12;
+}
+
+.member-alerts .status.cancelled {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.member-alerts .loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #95a5a6;
+}
+
+.member-alerts .loading-spinner i {
+    margin-right: 8px;
+}
+
+.member-alerts .text-center {
+    text-align: center;
+}
+
+/* Responsive styles for member alerts */
+@media (max-width: 768px) {
+    .member-alerts {
+        margin-top: 15px;
+        padding: 15px;
+    }
+
+    .member-alerts th,
+    .member-alerts td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .member-alerts .section-title {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .member-alerts {
+        padding: 10px;
+    }
+
+    .member-alerts th,
+    .member-alerts td {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .member-alerts .status {
+        padding: 3px 6px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Member Alert Table Action Button */
+.member-alerts .action-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.member-alerts .action-btn.cancel {
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.member-alerts .action-btn.cancel:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.member-alerts .action-btn i {
+    transition: transform 0.2s ease;
+}
+
+.member-alerts .action-btn:hover i {
+    transform: scale(1.1);
 }

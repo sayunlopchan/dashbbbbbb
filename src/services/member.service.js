@@ -280,42 +280,53 @@ const renewMembershipService = async (memberId, renewalData) => {
       throw new Error("Member not found");
     }
 
-    // Calculate new end date
-    const currentEndDate = new Date(member.endDate);
-    const newEndDate = new Date(currentEndDate);
-    newEndDate.setMonth(newEndDate.getMonth() + renewalData.duration);
+    // Set start date to current date
+    const startDate = new Date();
 
-    // Update member's end date
+    // Calculate new end date based on membership type
+    const newEndDate = new Date(startDate);
+    const membershipDurationMap = {
+      silver: 1,
+      gold: 3,
+      diamond: 6,
+      platinum: 12
+    };
+
+    const duration = membershipDurationMap[renewalData.membershipType] || 1;
+    newEndDate.setMonth(newEndDate.getMonth() + duration);
+
+    // Update member's dates and status
+    member.startDate = startDate;
     member.endDate = newEndDate;
-    member.membershipDuration = renewalData.duration;
+    member.membershipType = renewalData.membershipType;
+    member.membershipDuration = duration;
     member.memberStatus = "active";
 
-    // Create payment record if payment is included
-    if (renewalData.payment) {
-      const paymentRecordData = {
-        memberId: member.memberId,
-        amount: renewalData.payment.amount,
-        paymentType: "renewal",
-        paymentMethod: renewalData.payment.method,
-        description: `Renewal payment for ${member.membershipType} membership`,
-        paymentDate: new Date(),
-        status: "completed",
-      };
-
-      const payment = await createPaymentService(paymentRecordData);
-
-      // Add payment to member's payment history
-      member.payments.push({
-        amount: renewalData.payment.amount,
-        paymentMethod: renewalData.payment.method,
-        paymentDate: new Date(),
-        status: "completed",
-        paymentId: payment._id,
-      });
-    }
-
+    // Save member updates
     await member.save({ session });
     await session.commitTransaction();
+
+    // Create payment record in a separate transaction if payment is included
+    if (renewalData.paymentAmount && renewalData.paymentMethod) {
+      try {
+        const paymentRecordData = {
+          memberId: member.memberId,
+          amount: renewalData.paymentAmount,
+          paymentType: "membership",
+          paymentMethod: renewalData.paymentMethod,
+          description: `Renewal payment for ${renewalData.membershipType} membership`,
+          paymentDate: new Date(),
+          status: "completed"
+        };
+
+        // Create payment in a separate transaction
+        await createPaymentService(paymentRecordData);
+      } catch (paymentError) {
+        console.error("Error creating payment record:", paymentError);
+        // Don't throw the error since the renewal was successful
+        // Just log it and continue
+      }
+    }
 
     return member;
   } catch (error) {
@@ -383,6 +394,191 @@ const sendExpiryReminderSequence = async (member) => {
   }
 };
 
+// Get Member Alerts
+const getMemberAlertsService = async (filter = 'all') => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const sevenDaysFromNow = new Date(today);
+  sevenDaysFromNow.setDate(today.getDate() + 7);
+
+  console.log('Fetching member alerts with dates:', {
+    today: today.toISOString(),
+    sevenDaysFromNow: sevenDaysFromNow.toISOString()
+  });
+
+  // Base query to find members with end dates
+  const query = {
+    endDate: { $exists: true },
+    memberStatus: { $nin: ['cancelled'] } // Exclude cancelled members
+  };
+
+  // Add filter conditions
+  switch (filter) {
+    case 'expiring':
+      // Members expiring in the next 7 days
+      query.endDate = {
+        $gte: today,
+        $lte: sevenDaysFromNow
+      };
+      break;
+    case 'expired':
+      // Members whose membership has expired
+      query.endDate = { $lt: today };
+      break;
+    case 'all':
+    default:
+      // All members with end dates (both expired and expiring)
+      query.endDate = { $exists: true };
+      break;
+  }
+
+  console.log('Query for member alerts:', JSON.stringify(query, null, 2));
+
+  // Get members with their membership details
+  const members = await Member.find(query)
+    .select('memberId fullName membershipType startDate endDate memberStatus')
+    .sort({ endDate: 1 }); // Sort by end date ascending
+
+  console.log(`Found ${members.length} members matching query`);
+
+  // Update member statuses based on end dates
+  const updatePromises = members.map(async (member) => {
+    const currentDate = new Date();
+    let newStatus = member.memberStatus;
+
+    // Only update status if it's not already cancelled
+    if (member.memberStatus !== 'cancelled') {
+      const daysUntilExpiry = Math.ceil((member.endDate - currentDate) / (1000 * 60 * 60 * 24));
+      
+      console.log(`Processing member ${member.memberId}:`, {
+        currentStatus: member.memberStatus,
+        startDate: member.startDate.toISOString(),
+        endDate: member.endDate.toISOString(),
+        daysUntilExpiry,
+        currentDate: currentDate.toISOString()
+      });
+
+      if (currentDate > member.endDate) {
+        newStatus = 'expired';
+      } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
+        // If within 7 days of expiry, mark as expiring
+        if (daysUntilExpiry <= 7) {
+          newStatus = 'expiring';
+        } else {
+          newStatus = 'active';
+        }
+      } else if (currentDate < member.startDate) {
+        newStatus = 'pending';
+      }
+
+      console.log(`Status update for member ${member.memberId}:`, {
+        oldStatus: member.memberStatus,
+        newStatus,
+        willUpdate: newStatus !== member.memberStatus
+      });
+
+      // Only update if status has changed
+      if (newStatus !== member.memberStatus) {
+        try {
+          const updateResult = await Member.updateOne(
+            { _id: member._id },
+            { $set: { memberStatus: newStatus } }
+          );
+          console.log(`Update result for member ${member.memberId}:`, {
+            matchedCount: updateResult.matchedCount,
+            modifiedCount: updateResult.modifiedCount
+          });
+          member.memberStatus = newStatus; // Update the returned object
+        } catch (error) {
+          console.error(`Failed to update status for member ${member.memberId}:`, error);
+        }
+      }
+    }
+
+    return member;
+  });
+
+  // Wait for all status updates to complete
+  await Promise.all(updatePromises);
+
+  // Verify final statuses
+  const finalMembers = await Member.find({ _id: { $in: members.map(m => m._id) } })
+    .select('memberId memberStatus');
+  
+  console.log('Final member statuses:', 
+    finalMembers.map(m => ({ memberId: m.memberId, status: m.memberStatus }))
+  );
+
+  return members;
+};
+
+// Update member statuses automatically
+const updateMemberStatusesService = async () => {
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  console.log('Running automatic member status update at:', currentDate.toISOString());
+
+  try {
+    // Find all members that need status update (excluding cancelled members)
+    const members = await Member.find({
+      memberStatus: { $nin: ['cancelled'] },
+      endDate: { $exists: true }
+    }).select('memberId fullName membershipType startDate endDate memberStatus');
+
+    console.log(`Found ${members.length} members to check for status updates`);
+
+    const updatePromises = members.map(async (member) => {
+      let newStatus = member.memberStatus;
+      const daysUntilExpiry = Math.ceil((member.endDate - currentDate) / (1000 * 60 * 60 * 24));
+
+      // Determine new status based on dates
+      if (currentDate > member.endDate) {
+        newStatus = 'expired';
+      } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
+        if (daysUntilExpiry <= 7) {
+          newStatus = 'expiring';
+        } else {
+          newStatus = 'active';
+        }
+      } else if (currentDate < member.startDate) {
+        newStatus = 'pending';
+      }
+
+      // Only update if status has changed
+      if (newStatus !== member.memberStatus) {
+        console.log(`Updating member ${member.memberId} status:`, {
+          oldStatus: member.memberStatus,
+          newStatus,
+          daysUntilExpiry
+        });
+
+        try {
+          await Member.updateOne(
+            { _id: member._id },
+            { $set: { memberStatus: newStatus } }
+          );
+          return { memberId: member.memberId, oldStatus: member.memberStatus, newStatus };
+        } catch (error) {
+          console.error(`Failed to update status for member ${member.memberId}:`, error);
+          return null;
+        }
+      }
+      return null;
+    });
+
+    const results = await Promise.all(updatePromises);
+    const updates = results.filter(r => r !== null);
+
+    console.log(`Status update complete. Updated ${updates.length} members:`, updates);
+    return updates;
+  } catch (error) {
+    console.error('Error in updateMemberStatusesService:', error);
+    throw error;
+  }
+};
+
 module.exports = {
   createMemberService,
   getAllMembersService,
@@ -394,5 +590,7 @@ module.exports = {
   getMemberPaymentHistoryService,
   checkMembershipStatusService,
   cancelMembershipService,
-  sendExpiryReminderSequence
+  sendExpiryReminderSequence,
+  getMemberAlertsService,
+  updateMemberStatusesService
 };

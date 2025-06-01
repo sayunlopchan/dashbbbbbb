@@ -35,7 +35,7 @@
             </li>
             <li>
                 <a href="/application" class="active">
-                    <i class="fas fa-user"></i>
+                    <i class="fa-solid fa-file-lines"></i>
                     <span>Application</span>
                     <div class="tooltip">Application</div>
                 </a>
@@ -476,7 +476,6 @@
                     <td>${startDate}</td>
                     <td>
                         <span class="status ${application.applicationStatus || 'pending'}">
-                            <i class="fa-solid fa-${application.applicationStatus === 'rejected' ? 'xmark' : 'circle-check'}"></i> 
                             ${application.applicationStatus ? application.applicationStatus.charAt(0).toUpperCase() + application.applicationStatus.slice(1) : 'Pending'}
                         </span>
                     </td>

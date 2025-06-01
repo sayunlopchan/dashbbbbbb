@@ -9,6 +9,7 @@ const {
   renewMembership,
   cancelMembership,
   searchMembers,
+  getMemberAlerts,
 } = require("../controllers/member.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
 const {
@@ -49,5 +50,8 @@ router.post(
 
 // Cancel Membership
 router.post("/:memberId/cancel", authenticate, cancelMembership);
+
+// Get Member Alerts
+router.get("/alerts", authenticate, getMemberAlerts);
 
 module.exports = router;

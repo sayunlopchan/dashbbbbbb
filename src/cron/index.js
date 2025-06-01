@@ -7,6 +7,7 @@ const {
   sendMembershipExpiryReminder,
 } = require("../utils/emailService");
 const { createMemberStatusNotificationService, createMembershipNotificationService } = require("../services/notification.service");
+const { updateMemberStatusesService } = require("../services/member.service");
 
 // Extend dayjs with UTC plugin
 dayjs.extend(utc);
@@ -148,10 +149,23 @@ const startAllCronJobs = () => {
 
   // Use environment variables for cron schedules with fallback to default
   const DAILY_CRON_SCHEDULE = process.env.CRON_DAILY_SCHEDULE || "0 0 * * *";
+  const HOURLY_CRON_SCHEDULE = "0 * * * *"; // Run every hour
 
-  // Log the cron schedule
+  // Log the cron schedules
   console.log(`🕰️ CRON_DAILY_SCHEDULE: ${DAILY_CRON_SCHEDULE}`);
+  console.log(`🕰️ HOURLY_CRON_SCHEDULE: ${HOURLY_CRON_SCHEDULE}`);
   console.log(`🌍 Current Timezone: ${process.env.TZ}`);
+
+  // ⏰ Runs every hour to update member statuses
+  cron.schedule(HOURLY_CRON_SCHEDULE, async () => {
+    try {
+      console.log("🕒 Running hourly member status updates...");
+      const updates = await updateMemberStatusesService();
+      console.log(`✅ Hourly member status updates completed. Updated ${updates.length} members.`);
+    } catch (error) {
+      console.error("❌ Error in hourly member status updates:", error);
+    }
+  });
 
   // ⏰ Runs every day at midnight UTC (configurable via env)
   cron.schedule(DAILY_CRON_SCHEDULE, async () => {
@@ -166,7 +180,14 @@ const startAllCronJobs = () => {
       console.error("❌ Error in daily cron jobs:", error);
     }
   });
+
+  // Run initial status update when server starts
+  updateMemberStatusesService()
+    .then(updates => console.log(`✅ Initial member status update completed. Updated ${updates.length} members.`))
+    .catch(error => console.error("❌ Error in initial member status update:", error));
 };
+
+// checkMemberStatusNotifications()
 
 module.exports = {
   checkMemberStatusNotifications,

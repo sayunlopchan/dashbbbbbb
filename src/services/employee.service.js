@@ -1,5 +1,5 @@
 const Employee = require("../models/Employee.model");
-const { generateEmployeeId } = require("../utils/idgenerator/generateEmployeeId");
+const generateEmployeeId = require("../utils/idgenerator/generateEmployeeId");
 
 /**
  * Create a new employee

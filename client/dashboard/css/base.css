@@ -534,6 +534,11 @@ body {
   color: #ffffff;
 }
 
+.status.pending {
+  background-color: var(--warning-color);
+  color: #ffffff;
+}
+
 
 
 /* Modal Overlay */
@@ -1005,7 +1010,7 @@ textarea {
 }
 
 .notification-list {
-  max-height: 400px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
