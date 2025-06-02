@@ -370,8 +370,10 @@
         <div class="modal-content">
             <!-- header -->
             <div class="modal-header">
-                <h2>Add New Record</h2>
-                <p>Fill in the details to mark a new payment record.</p>
+                <div>
+                    <h2>Add New Record</h2>
+                    <p>Fill in the details to mark a new payment record.</p>
+                </div>
             </div>
             <!-- form -->
             <form id="recordForm">
@@ -413,6 +415,19 @@
                             <option value="online_payment">Online Payment</option>
                         </select>
                     </div>
+                    <!-- Product-specific fields -->
+                    <div class="form-group full-width product-search-field" style="display: none;">
+                        <label for="productSearch">Product</label>
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="productSearch" name="productSearch" placeholder="Search by product name or ID" autocomplete="off">
+                            <div class="product-search-result-container"></div>
+                        </div>
+                    </div>
+                    <div class="form-group full-width product-quantity-field" style="display: none;">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" id="quantity" name="quantity" min="1" value="1">
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
@@ -433,54 +448,88 @@
             }).format(amount);
         }
 
-        // Function to format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-        }
+        // Function to fetch revenue statistics
+        async function fetchRevenueStats() {
+            try {
+                const response = await fetch(`${baseUrl}/api/payments/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
 
-        // Function to get payment method icon
-        function getPaymentMethodIcon(method) {
-            switch (method) {
-                case 'cash':
-                    return '<i class="fa-solid fa-money-bill"></i>';
-                case 'card':
-                    return '<i class="fa-solid fa-credit-card"></i>';
-                case 'bank':
-                    return '<i class="fa-solid fa-university"></i>';
-                case 'online_payment':
-                    return '<i class="fa-solid fa-globe"></i>';
-                default:
-                    return '<i class="fa-solid fa-money-bill"></i>';
+                if (!response.ok) {
+                    throw new Error('Failed to fetch revenue statistics');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.data;
+                    
+                    // Update Total Revenue
+                    const totalRevenueElement = document.querySelector('.info-box:nth-child(1) .info-box-number');
+                    if (totalRevenueElement) {
+                        totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
+                    }
+
+                    // Update Monthly Revenue with comparison
+                    const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
+                    if (monthlyRevenueElement) {
+                        const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
+                        numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
+                        updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
+                    }
+
+                    // Update Membership Revenue with comparison
+                    const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
+                    if (membershipRevenueElement) {
+                        const numberElement = membershipRevenueElement.querySelector('.info-box-number');
+                        numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
+                        updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
+                    }
+
+                    // Update Product Revenue with comparison
+                    const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
+                    if (productRevenueElement) {
+                        const numberElement = productRevenueElement.querySelector('.info-box-number');
+                        numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
+                        updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
+                    }
+
+                    // Update charts if they exist
+                    if (typeof updateCharts === 'function') {
+                        updateCharts(stats);
+                    }
+                } else {
+                    throw new Error(data.message || 'Failed to fetch revenue statistics');
+                }
+            } catch (error) {
+                console.error('Error fetching revenue statistics:', error);
+                toast('Failed to load revenue statistics', 'error');
             }
         }
 
-        // Pagination state
-        let currentPage = 1;
-        let totalPages = 1;
-        const itemsPerPage = 10;
-        let allPayments = [];
+        // Function to calculate percentage change
+        function calculatePercentageChange(current, previous) {
+            if (!previous) return 0;
+            return ((current - previous) / previous) * 100;
+        }
 
-        // Function to update pagination controls
-        function updatePaginationControls(pagination) {
-            const prevPageBtn = document.getElementById('prevPage');
-            const nextPageBtn = document.getElementById('nextPage');
-            const pageInfo = document.getElementById('pageInfo');
-
-            // Update page info with proper number formatting
-            pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages} (Total: ${pagination.total} payments)`;
-
-            // Update button states
-            prevPageBtn.disabled = pagination.page <= 1;
-            nextPageBtn.disabled = pagination.page >= pagination.totalPages;
-
-            // Add visual feedback for disabled state
-            prevPageBtn.classList.toggle('disabled', pagination.page <= 1);
-            nextPageBtn.classList.toggle('disabled', pagination.page >= pagination.totalPages);
+        // Function to update revenue change indicator
+        function updateRevenueChange(element, currentValue, previousValue) {
+            const changeElement = element.querySelector('.revenue-change');
+            const percentageElement = element.querySelector('.change-percentage');
+            const iconElement = element.querySelector('.revenue-change i');
+            
+            const percentageChange = calculatePercentageChange(currentValue, previousValue);
+            const isPositive = percentageChange >= 0;
+            
+            // Update classes
+            changeElement.classList.toggle('negative', !isPositive);
+            iconElement.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
+            
+            // Update percentage text
+            percentageElement.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
         }
 
         // Function to handle all filtering
@@ -670,13 +719,28 @@
 
             // Reset filters button
             document.getElementById('resetFilters').addEventListener('click', () => {
-                currentPage = 1;
+                // Reset all filter values
                 document.querySelector('.search-box input').value = '';
                 document.getElementById('filterDay').value = 'today';
                 document.getElementById('filterMethod').value = '';
                 document.getElementById('filterType').value = '';
+                
+                // Reset pagination
+                currentPage = 1;
+                
+                // Reset form data if any
+                if (recordForm) {
+                    recordForm.reset();
+                    delete recordForm.dataset.selectedMemberId;
+                    delete recordForm.dataset.paymentId;
+                }
+                
+                // Refresh the data
                 applyFilters(1);
-                toast('Filters have been reset', 'info');
+                fetchRevenueStats();
+                
+                // Show success message
+                toast('Filters have been reset', 'success');
             });
 
             // Pagination controls
@@ -763,79 +827,54 @@
 
         // revenue logic 
 
-        // Function to calculate percentage change
-        function calculatePercentageChange(current, previous) {
-            if (!previous) return 0;
-            return ((current - previous) / previous) * 100;
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
         }
 
-        // Function to update revenue change indicator
-        function updateRevenueChange(element, currentValue, previousValue) {
-            const changeElement = element.querySelector('.revenue-change');
-            const percentageElement = element.querySelector('.change-percentage');
-            const iconElement = element.querySelector('.revenue-change i');
-            
-            const percentageChange = calculatePercentageChange(currentValue, previousValue);
-            const isPositive = percentageChange >= 0;
-            
-            // Update classes
-            changeElement.classList.toggle('negative', !isPositive);
-            iconElement.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
-            
-            // Update percentage text
-            percentageElement.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
-        }
-
-        // Function to update info boxes
-        async function updateInfoBoxes() {
-            try {
-                // Fetch revenue data
-                const response = await fetch(`${baseUrl}/api/payments/stats`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    const stats = data.data;
-                    
-                    // Update Total Revenue
-                    const totalRevenueElement = document.querySelector('.info-box:nth-child(1) .info-box-number');
-                    if (totalRevenueElement) {
-                        totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
-                    }
-
-                    // Update Monthly Revenue with comparison
-                    const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
-                    if (monthlyRevenueElement) {
-                        const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
-                        numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
-                        updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
-                    }
-
-                    // Update Membership Revenue with comparison
-                    const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
-                    if (membershipRevenueElement) {
-                        const numberElement = membershipRevenueElement.querySelector('.info-box-number');
-                        numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
-                        updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
-                    }
-
-                    // Update Product Revenue with comparison
-                    const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
-                    if (productRevenueElement) {
-                        const numberElement = productRevenueElement.querySelector('.info-box-number');
-                        numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
-                        updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
-                    }
-                } else {
-                    throw new Error(data.message || 'Failed to fetch revenue data');
-                }
-            } catch (error) {
-                console.error('Error fetching revenue data:', error);
-                window.toast('Failed to load revenue data', 'error');
+        // Function to get payment method icon
+        function getPaymentMethodIcon(method) {
+            switch (method) {
+                case 'cash':
+                    return '<i class="fa-solid fa-money-bill"></i>';
+                case 'card':
+                    return '<i class="fa-solid fa-credit-card"></i>';
+                case 'bank':
+                    return '<i class="fa-solid fa-university"></i>';
+                case 'online_payment':
+                    return '<i class="fa-solid fa-globe"></i>';
+                default:
+                    return '<i class="fa-solid fa-money-bill"></i>';
             }
+        }
+
+        // Pagination state
+        let currentPage = 1;
+        let totalPages = 1;
+        const itemsPerPage = 10;
+        let allPayments = [];
+
+        // Function to update pagination controls
+        function updatePaginationControls(pagination) {
+            const prevPageBtn = document.getElementById('prevPage');
+            const nextPageBtn = document.getElementById('nextPage');
+            const pageInfo = document.getElementById('pageInfo');
+
+            // Update page info with proper number formatting
+            pageInfo.textContent = `Page ${pagination.page} of ${pagination.totalPages} (Total: ${pagination.total} payments)`;
+
+            // Update button states
+            prevPageBtn.disabled = pagination.page <= 1;
+            nextPageBtn.disabled = pagination.page >= pagination.totalPages;
+
+            // Add visual feedback for disabled state
+            prevPageBtn.classList.toggle('disabled', pagination.page <= 1);
+            nextPageBtn.classList.toggle('disabled', pagination.page >= pagination.totalPages);
         }
 
         // Modal state management
@@ -845,6 +884,23 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const memberSearch = document.getElementById('memberSearch');
         const searchResults = document.querySelector('.search-result-container');
+
+        // Function to reset form
+        function resetForm() {
+            recordForm.reset();
+            // Set current date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            memberSearch.value = '';
+            delete recordForm.dataset.selectedMemberId;
+            delete recordForm.dataset.paymentId;
+            document.querySelector('#recordModal .modal-header h2').textContent = 'Add New Record';
+            document.querySelector('#recordForm button[type="submit"]').textContent = 'Add Record';
+            recordForm.dataset.mode = 'add';
+            // Re-enable submit button
+            const submitBtn = recordForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+        }
 
         // Function to toggle modal
         function toggleModal(show = true) {
@@ -858,33 +914,6 @@
                 // Clear search results when closing
                 searchResults.innerHTML = '';
             }
-        }
-
-        // Function to reset form
-        function resetForm() {
-            recordForm.reset();
-            memberSearch.value = '';
-            delete recordForm.dataset.selectedMemberId;
-            delete recordForm.dataset.paymentId;
-            document.querySelector('#recordModal .modal-header h2').textContent = 'Add New Record';
-            document.querySelector('#recordForm button[type="submit"]').textContent = 'Add Record';
-            recordForm.dataset.mode = 'add';
-        }
-
-        // Function to populate form for editing
-        function populateFormForEdit(payment) {
-            recordForm.dataset.mode = 'edit';
-            recordForm.dataset.paymentId = payment.paymentId;
-            recordForm.dataset.selectedMemberId = payment.memberId;
-
-            memberSearch.value = payment.fullName;
-            document.getElementById('amount').value = payment.amount;
-            document.getElementById('date').value = payment.paymentDate.split('T')[0];
-            document.getElementById('paymentType').value = payment.paymentType;
-            document.getElementById('method').value = payment.paymentMethod;
-
-            document.querySelector('#recordModal .modal-header h2').textContent = 'Update Payment Record';
-            document.querySelector('#recordForm button[type="submit"]').textContent = 'Update Record';
         }
 
         // Event Listeners for Modal
@@ -905,11 +934,121 @@
             }
         });
 
-        // Form submission handler
+        // Add event listener for payment type change
+        document.getElementById('paymentType').addEventListener('change', function(e) {
+            const productSearchField = document.querySelector('.product-search-field');
+            const productQuantityField = document.querySelector('.product-quantity-field');
+            const quantityInput = document.getElementById('quantity');
+            const productSearch = document.getElementById('productSearch');
+            
+            if (e.target.value === 'product') {
+                productSearchField.style.display = 'block';
+                productQuantityField.style.display = 'block';
+                quantityInput.setAttribute('required', '');
+                productSearch.setAttribute('required', '');
+            } else {
+                productSearchField.style.display = 'none';
+                productQuantityField.style.display = 'none';
+                quantityInput.removeAttribute('required');
+                productSearch.removeAttribute('required');
+                quantityInput.value = '1';
+                productSearch.value = '';
+                delete recordForm.dataset.selectedProductId;
+            }
+        });
+
+        // Product search functionality
+        let productSearchTimeout;
+        document.getElementById('productSearch').addEventListener('input', async (e) => {
+            clearTimeout(productSearchTimeout);
+            const query = e.target.value.trim();
+            const searchResults = document.querySelector('.product-search-result-container');
+            
+            if (query.length < 2) {
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            productSearchTimeout = setTimeout(async () => {
+                try {
+                    // First, search for products using the search endpoint
+                    const searchResponse = await fetch(`${baseUrl}/api/products/search?q=${encodeURIComponent(query)}`, {
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (!searchResponse.ok) throw new Error('Failed to search products');
+
+                    const searchData = await searchResponse.json();
+                    
+                    if (searchData.success && searchData.data.length > 0) {
+                        searchResults.innerHTML = searchData.data.map(product => `
+                            <div class="search-result-item" data-product-id="${product.productId}">
+                                <strong>${product.name}</strong>
+                                <span>${product.productId}</span>
+                                <span>Stock: ${product.stock}</span>
+                                <span>Price: ${formatCurrency(product.price)}</span>
+                            </div>
+                        `).join('');
+
+                        // Add click handlers to search results
+                        document.querySelectorAll('.product-search-result-container .search-result-item').forEach(item => {
+                            item.addEventListener('click', async () => {
+                                const productId = item.dataset.productId;
+                                
+                                try {
+                                    // Fetch detailed product information using the productId endpoint
+                                    const detailResponse = await fetch(`${baseUrl}/api/products/${productId}`, {
+                                        headers: {
+                                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                        }
+                                    });
+
+                                    if (!detailResponse.ok) throw new Error('Failed to fetch product details');
+
+                                    const detailData = await detailResponse.json();
+                                    
+                                    if (detailData.success) {
+                                        const product = detailData.data;
+                                        document.getElementById('productSearch').value = `${product.name} (${product.productId})`;
+                                        document.getElementById('amount').value = product.price;
+                                        recordForm.dataset.selectedProductId = product.productId;
+                                        searchResults.innerHTML = '';
+                                    } else {
+                                        throw new Error(detailData.message || 'Failed to fetch product details');
+                                    }
+                                } catch (error) {
+                                    console.error('Error fetching product details:', error);
+                                    toast('Failed to fetch product details', 'error');
+                                }
+                            });
+                        });
+                    } else {
+                        searchResults.innerHTML = '<div class="no-results">No products found</div>';
+                    }
+                } catch (error) {
+                    console.error('Error searching products:', error);
+                    searchResults.innerHTML = '<div class="no-results">Error searching products</div>';
+                }
+            }, 300);
+        });
+
+        // Update form submission to prevent double submission
         recordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Get submit button and check if form is already submitting
+            const submitBtn = recordForm.querySelector('button[type="submit"]');
+            if (submitBtn.disabled) {
+                return; // Prevent double submission
+            }
+
             try {
+                // Disable submit button immediately
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing...';
+
                 const formData = {
                     amount: parseFloat(document.getElementById('amount').value),
                     paymentDate: document.getElementById('date').value,
@@ -917,6 +1056,19 @@
                     paymentMethod: document.getElementById('method').value,
                     status: 'completed'
                 };
+
+                // Add product-specific data if payment type is product
+                if (formData.paymentType === 'product') {
+                    const productId = recordForm.dataset.selectedProductId;
+                    const quantity = parseInt(document.getElementById('quantity').value);
+
+                    if (!productId) {
+                        throw new Error('Please select a product');
+                    }
+
+                    formData.productId = productId;
+                    formData.quantity = quantity;
+                }
 
                 const mode = recordForm.dataset.mode || 'add';
                 const memberId = recordForm.dataset.selectedMemberId;
@@ -931,12 +1083,6 @@
 
                 const method = mode === 'add' ? 'POST' : 'PUT';
 
-                // Show loading state
-                const submitBtn = recordForm.querySelector('button[type="submit"]');
-                const originalBtnText = submitBtn.textContent;
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Processing...';
-
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -950,22 +1096,29 @@
 
                 if (response.ok) {
                     toast(`Payment ${mode === 'add' ? 'added' : 'updated'} successfully!`, 'success');
-                    // Refresh the page after a short delay to show the notification
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1000);
+                    // Close modal and refresh data
+                    toggleModal(false);
+                    // Refresh the payments table and revenue stats
+                    await Promise.all([
+                        applyFilters(),
+                        fetchRevenueStats()
+                    ]);
                 } else {
                     throw new Error(result.message || `Failed to ${mode} payment`);
                 }
             } catch (error) {
                 console.error('Error:', error);
                 toast(error.message, 'error');
-            } finally {
-                // Reset button state
-                const submitBtn = recordForm.querySelector('button[type="submit"]');
+                // Re-enable submit button on error
                 submitBtn.disabled = false;
                 submitBtn.textContent = recordForm.dataset.mode === 'edit' ? 'Update Record' : 'Add Record';
             }
+        });
+
+        // Set current date when modal opens
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
         });
 
         // Member search functionality with debounce

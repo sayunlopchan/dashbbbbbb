@@ -1,5 +1,6 @@
 const Payment = require("../models/Payment.model");
 const Member = require("../models/Member.model");
+const Product = require("../models/product.model");
 const generatePaymentId = require("../utils/idgenerator/generatePaymentId");
 const mongoose = require("mongoose");
 
@@ -16,8 +17,38 @@ const createPaymentService = async (paymentData) => {
       throw new Error("Member not found");
     }
 
+    // If this is a product payment, validate and update stock
+    if (paymentData.paymentType === "product") {
+      if (!paymentData.productId || !paymentData.quantity) {
+        throw new Error("Product ID and quantity are required for product payments");
+      }
+
+      // Find the product and check stock
+      const product = await Product.findOne({ productId: paymentData.productId });
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      if (product.stock < paymentData.quantity) {
+        throw new Error(`Insufficient stock. Only ${product.stock} items available.`);
+      }
+
+      // Update product stock
+      product.stock -= paymentData.quantity;
+      await product.save({ session });
+
+      // Update payment description to include product details
+      paymentData.description = paymentData.description || 
+        `Purchase of ${paymentData.quantity} ${product.name} (${product.productId}) by ${member.fullName}`;
+
+      // Validate that the payment amount matches the product price * quantity
+      const expectedAmount = product.price * paymentData.quantity;
+      if (paymentData.amount !== expectedAmount) {
+        throw new Error(`Invalid payment amount. Expected ${expectedAmount} for ${paymentData.quantity} items at ${product.price} each.`);
+      }
+    }
+
     // Check if payment already exists for this member with same amount and date
-    // Only check for exact duplicates (same amount, date, and type within 1 minute)
     const oneMinuteAgo = new Date(Date.now() - 60000);
     const existingPayment = await Payment.findOne({
       memberId: paymentData.memberId,
@@ -36,9 +67,6 @@ const createPaymentService = async (paymentData) => {
     // Generate unique payment ID
     const paymentId = await generatePaymentId();
 
-    // Check if this is the member's first payment
-    const isFirstPayment = !member.payments || member.payments.length === 0;
-
     // Get member's full name
     const fullName = member.fullName ? `${member.fullName}` : "Unknown Member";
 
@@ -48,8 +76,7 @@ const createPaymentService = async (paymentData) => {
       paymentId,
       fullName,
       paymentDate: paymentData.paymentDate || new Date(),
-      description:
-        paymentData.description ||
+      description: paymentData.description || 
         `${paymentData.paymentType} payment by ${fullName}`,
     });
 
@@ -61,8 +88,10 @@ const createPaymentService = async (paymentData) => {
       paymentMethod: paymentData.paymentMethod,
       paymentDate: payment.paymentDate,
       status: payment.status,
-      type: paymentData.paymentType, // Use the actual payment type instead of first_payment/additional
+      type: paymentData.paymentType,
       paymentId: payment.paymentId,
+      quantity: paymentData.quantity,
+      productId: paymentData.productId
     };
 
     // Add payment to member's payment history

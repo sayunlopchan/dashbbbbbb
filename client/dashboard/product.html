@@ -302,6 +302,22 @@
     </div>
   </div>
 
+  <!-- Confirmation Dialog Modal -->
+  <div class="modal-overlay" id="confirmationModal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2 id="confirmationTitle">Confirm Action</h2>
+      </div>
+      <div class="modal-body" style="padding: 20px;">
+        <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+      </div>
+      <div class="form-actions" style="justify-content: center; gap: 20px;">
+        <button type="button" class="btn btn-secondary" id="cancelAction">Cancel</button>
+        <button type="button" class="btn" id="confirmAction" style="transition: all 0.3s ease;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // DOM Elements
     const addProductBtn = document.getElementById('addProductBtn');
@@ -319,6 +335,16 @@
     const itemsPerPage = 10;
     let allProducts = []; // Store all products
     let filteredProducts = []; // Store filtered products
+
+    // Add these variables at the top with other DOM elements
+    const confirmationModal = document.getElementById('confirmationModal');
+    const confirmationTitle = document.getElementById('confirmationTitle');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    const confirmActionBtn = document.getElementById('confirmAction');
+    const cancelActionBtn = document.getElementById('cancelAction');
+
+    let currentAction = null;
+    let currentProductId = null;
 
     // Utility Functions
     const toast = (message, type = 'success') => {
@@ -485,8 +511,8 @@
         const tr = document.createElement("tr");
         const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
 
-        // Use MongoDB _id as product ID
-        const productId = product._id || 'N/A';
+        // Use productId instead of MongoDB _id
+        const productId = product.productId || 'N/A';
 
         // Determine stock status
         let stockStatus = 'Out of Stock';
@@ -505,7 +531,7 @@
 
         tr.innerHTML = `
           <td>${rowNumber}</td>
-          <td title="${productId}">${productId.substring(0, 8)}...</td>
+          <td>${productId}</td>
           <td>${product.name || 'N/A'}</td>
           <td>${product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : 'N/A'}</td>
           <td>$${product.price ? product.price.toFixed(2) : '0.00'}</td>
@@ -545,7 +571,12 @@
       document.querySelectorAll('.action-btn.delete').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const productId = e.currentTarget.dataset.productId;
-          await deleteProduct(productId);
+          showConfirmationDialog(
+            'Delete Product',
+            'Are you sure you want to delete this product? This action cannot be undone.',
+            'delete',
+            productId
+          );
         });
       });
     }
@@ -583,29 +614,71 @@
       }
     }
 
-    // Delete product function
-    async function deleteProduct(productId) {
-      if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-        return;
+    // Show Confirmation Dialog
+    function showConfirmationDialog(title, message, action, productId) {
+      confirmationTitle.textContent = title;
+      confirmationMessage.textContent = message;
+      currentAction = action;
+      currentProductId = productId;
+
+      // Update confirm button color based on action
+      const confirmBtn = document.getElementById('confirmAction');
+      if (action === 'delete') {
+        confirmBtn.style.backgroundColor = '#e74c3c';
+        confirmBtn.style.borderColor = '#e74c3c';
+        confirmBtn.style.color = 'white';
       }
 
-      try {
-        const response = await fetch(`/api/products/${productId}`, {
-          method: 'DELETE'
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to delete product');
-        }
-
-        toast('Product deleted successfully!');
-        fetchProducts(currentPage);
-
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        toast('Failed to delete product', 'error');
-      }
+      confirmationModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
     }
+
+    // Hide Confirmation Dialog
+    function hideConfirmationDialog() {
+      confirmationModal.classList.remove('active');
+      document.body.style.overflow = '';
+      currentAction = null;
+      currentProductId = null;
+
+      // Reset confirm button color
+      const confirmBtn = document.getElementById('confirmAction');
+      confirmBtn.style.backgroundColor = '';
+      confirmBtn.style.borderColor = '';
+      confirmBtn.style.color = '';
+    }
+
+    // Confirmation Dialog Event Listeners
+    confirmActionBtn.addEventListener('click', async () => {
+      if (currentAction === 'delete' && currentProductId) {
+        try {
+          // Use productId in the API endpoint
+          const response = await fetch(`/api/products/${currentProductId}`, {
+            method: 'DELETE'
+          });
+
+          if (response.ok) {
+            toast('Product deleted successfully!');
+            hideConfirmationDialog();
+            fetchProducts(currentPage);
+          } else {
+            const error = await response.json();
+            toast(error.message || 'Failed to delete product', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+          toast('Error: ' + error.message, 'error');
+        }
+      }
+    });
+
+    cancelActionBtn.addEventListener('click', hideConfirmationDialog);
+
+    // Close modal when clicking outside
+    confirmationModal.addEventListener('click', (e) => {
+      if (e.target === confirmationModal) {
+        hideConfirmationDialog();
+      }
+    });
 
     // Event Listeners
     prevPageBtn.addEventListener("click", () => {
@@ -673,7 +746,7 @@
         const mode = productForm.dataset.mode || 'add';
         const url = mode === 'add'
           ? '/api/products'
-          : `/api/products/${productForm.dataset.productId}`;
+          : `/api/products/product/${productForm.dataset.productId}`;
 
         const method = mode === 'add' ? 'POST' : 'PUT';
 
@@ -742,145 +815,143 @@
     // Initial fetch
     fetchProducts(1);
 
+    // Notification Modal Logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const notificationIcon = document.querySelector('.notification');
+      const notificationModal = document.querySelector('.notification-modal');
+      const closeNotifications = document.querySelector('.close-notifications');
+      const notificationList = document.querySelector('.notification-list');
+      const notificationBadge = document.querySelector('.notification-badge');
 
-            // Notification Modal Logic
-            document.addEventListener('DOMContentLoaded', function() {
-            const notificationIcon = document.querySelector('.notification');
-            const notificationModal = document.querySelector('.notification-modal');
-            const closeNotifications = document.querySelector('.close-notifications');
-            const notificationList = document.querySelector('.notification-list');
-            const notificationBadge = document.querySelector('.notification-badge');
+      // Toggle notification modal
+      notificationIcon.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationModal.classList.toggle('active');
+        if (notificationModal.classList.contains('active')) {
+          fetchNotifications();
+        }
+      });
 
-            // Toggle notification modal
-            notificationIcon.addEventListener('click', function(e) {
-                e.stopPropagation();
-                notificationModal.classList.toggle('active');
-                if (notificationModal.classList.contains('active')) {
-                    fetchNotifications();
+      // Close notification modal
+      closeNotifications.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationModal.classList.remove('active');
+      });
+
+      // Close modal when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+          notificationModal.classList.remove('active');
+        }
+      });
+
+      // Fetch unread count
+      async function fetchUnreadCount() {
+        try {
+          const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
+          const data = await response.json();
+          if (data.success) {
+            notificationBadge.textContent = data.data.unreadCount;
+            // Show/hide badge based on count
+            notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+          }
+        } catch (error) {
+          console.error('Error fetching unread count:', error);
+        }
+      }
+
+      // Fetch notifications from API
+      async function fetchNotifications() {
+        try {
+          notificationList.innerHTML = `
+            <div class="notification-loading">
+              <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+            </div>
+          `;
+
+          const response = await fetch(`${baseUrl}/api/notifications`);
+          const data = await response.json();
+
+          if (data.success) {
+            const notifications = data.data;
+            
+            if (notifications.length === 0) {
+              notificationList.innerHTML = `
+                <div class="notification-empty">
+                  <i class="fas fa-bell-slash"></i>
+                  <p>No new notifications</p>
+                </div>
+              `;
+              return;
+            }
+
+            // Render notifications
+            notificationList.innerHTML = notifications.map(notif => `
+              <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
+                   data-notification-id="${notif._id}">
+                <div class="notification-title">
+                  ${notif.title}
+                  ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
+                </div>
+                <div class="notification-message">${notif.message}</div>
+                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
+              </div>
+            `).join('');
+
+            // Add click handler to mark notifications as read
+            const notificationItems = document.querySelectorAll('.notification-item');
+            notificationItems.forEach(item => {
+              item.addEventListener('click', async () => {
+                const notificationId = item.dataset.notificationId;
+                if (item.classList.contains('unread')) {
+                  try {
+                    const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+                      method: 'PATCH',
+                      credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                      // Update UI
+                      item.classList.remove('unread');
+                      const unreadDot = item.querySelector('.unread-dot');
+                      if (unreadDot) unreadDot.remove();
+                      
+                      // Update unread count
+                      await fetchUnreadCount();
+                    }
+                  } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                  }
                 }
-            });
 
-            // Close notification modal
-            closeNotifications.addEventListener('click', function(e) {
-                e.stopPropagation();
+                // Close notification modal
                 notificationModal.classList.remove('active');
+
+                // Redirect to application page
+                window.location.href = '/application';
+              });
             });
+          } else {
+            throw new Error(data.message || 'Failed to fetch notifications');
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+          notificationList.innerHTML = `
+            <div class="notification-empty">
+              <i class="fas fa-exclamation-circle"></i>
+              <p>Failed to load notifications</p>
+            </div>
+          `;
+        }
+      }
 
-            // Close modal when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
-                    notificationModal.classList.remove('active');
-                }
-            });
+      // Initial fetch of notifications and unread count
+      fetchNotifications();
+      fetchUnreadCount();
 
-            // Fetch unread count
-            async function fetchUnreadCount() {
-                try {
-                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
-                    const data = await response.json();
-                    if (data.success) {
-                        notificationBadge.textContent = data.data.unreadCount;
-                        // Show/hide badge based on count
-                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
-                    }
-                } catch (error) {
-                    console.error('Error fetching unread count:', error);
-                }
-            }
-
-            // Fetch notifications from API
-            async function fetchNotifications() {
-                try {
-                    notificationList.innerHTML = `
-                        <div class="notification-loading">
-                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-                        </div>
-                    `;
-
-                    const response = await fetch(`${baseUrl}/api/notifications`);
-                    const data = await response.json();
-
-                    if (data.success) {
-                        const notifications = data.data;
-                        
-                        if (notifications.length === 0) {
-                            notificationList.innerHTML = `
-                                <div class="notification-empty">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <p>No new notifications</p>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        // Render notifications
-                        notificationList.innerHTML = notifications.map(notif => `
-                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
-                                 data-notification-id="${notif._id}">
-                                <div class="notification-title">
-                                    ${notif.title}
-                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
-                                </div>
-                                <div class="notification-message">${notif.message}</div>
-                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
-                            </div>
-                        `).join('');
-
-                        // Add click handler to mark notifications as read
-                        const notificationItems = document.querySelectorAll('.notification-item');
-                        notificationItems.forEach(item => {
-                            item.addEventListener('click', async () => {
-                                const notificationId = item.dataset.notificationId;
-                                if (item.classList.contains('unread')) {
-                                    try {
-                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
-                                            method: 'PATCH',
-                                            credentials: 'include'
-                                        });
-                                        
-                                        if (response.ok) {
-                                            // Update UI
-                                            item.classList.remove('unread');
-                                            const unreadDot = item.querySelector('.unread-dot');
-                                            if (unreadDot) unreadDot.remove();
-                                            
-                                            // Update unread count
-                                            await fetchUnreadCount();
-                                        }
-                                    } catch (error) {
-                                        console.error('Error marking notification as read:', error);
-                                    }
-                                }
-
-                                // Close notification modal
-                                notificationModal.classList.remove('active');
-
-                                // Redirect to application page
-                                window.location.href = '/application';
-                            });
-                        });
-                    } else {
-                        throw new Error(data.message || 'Failed to fetch notifications');
-                    }
-                } catch (error) {
-                    console.error('Error fetching notifications:', error);
-                    notificationList.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Failed to load notifications</p>
-                        </div>
-                    `;
-                }
-            }
-
-            // Initial fetch of notifications and unread count
-            fetchNotifications();
-            fetchUnreadCount();
-
-            // Refresh unread count periodically
-            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
-        });
-    
+      // Refresh unread count periodically
+      setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+    });
   </script>
 
   <script src="/js/main.js"></script>

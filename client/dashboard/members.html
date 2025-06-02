@@ -228,7 +228,7 @@
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search Member..." autocomplete="off">
                 </div>
-                <!-- day filter -->
+                <!-- day and download filter -->
                 <div class="filter-group download-filter">
                     <select name="download-filter" id="filterDownload">
                         <option value="today" selected>Today</option>
@@ -828,6 +828,28 @@
                         } else {
                             const error = await response.json();
                             window.toast(error.message || 'Failed to delete payment', 'error');
+                        }
+                    } catch (error) {
+                        window.toast('Error: ' + error.message, 'error');
+                    }
+                } else if (currentAction === 'cancel_membership' && currentMemberId) {
+                    try {
+                        const response = await fetch(`/api/members/${currentMemberId}/cancel`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            }
+                        });
+
+                        if (response.ok) {
+                            window.toast('Membership cancelled successfully!', 'success');
+                            hideConfirmationDialog();
+                            fetchMemberAlerts(); // Refresh the alerts table
+                            fetchMembers(); // Refresh the main members table
+                        } else {
+                            const error = await response.json();
+                            window.toast(error.message || 'Failed to cancel membership', 'error');
                         }
                     } catch (error) {
                         window.toast('Error: ' + error.message, 'error');
@@ -2456,6 +2478,22 @@
                         countBadge.textContent = filteredMembers.length;
                         countBadge.style.display = filteredMembers.length > 0 ? "inline" : "none";
                     }
+
+                    // Add event listener for cancel buttons after rendering the table
+                    const cancelButtons = tbody.querySelectorAll('.cancel');
+                    cancelButtons.forEach(button => {
+                        button.addEventListener('click', async (e) => {
+                            const memberId = e.currentTarget.dataset.memberId;
+                            if (memberId) {
+                                showConfirmationDialog(
+                                    'Cancel Membership',
+                                    'Are you sure you want to cancel this member\'s membership? This action cannot be undone.',
+                                    'cancel_membership',
+                                    memberId
+                                );
+                            }
+                        });
+                    });
                 } catch (error) {
                     console.error("Error fetching member alerts:", error);
                     const tbody = document.querySelector("#memberAlertTableBody");
