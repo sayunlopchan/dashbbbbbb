@@ -181,8 +181,14 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">NPR 0</span>
-                        <p class="info-box-text">current month revenue</p>
+                        <div class="revenue-comparison">
+                            <span class="info-box-number">NPR 0</span>
+                            <span class="revenue-change">
+                                <i class="fas fa-caret-up"></i>
+                                <span class="change-percentage">0%</span>
+                            </span>
+                        </div>
+                        <p class="info-box-text">vs last month</p>
                     </div>
                 </div>
 
@@ -194,8 +200,14 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">NPR 0</span>
-                        <p class="info-box-text">this month's membership revenue</p>
+                        <div class="revenue-comparison">
+                            <span class="info-box-number">NPR 0</span>
+                            <span class="revenue-change">
+                                <i class="fas fa-caret-up"></i>
+                                <span class="change-percentage">0%</span>
+                            </span>
+                        </div>
+                        <p class="info-box-text">vs last month</p>
                     </div>
                 </div>
 
@@ -207,8 +219,14 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">NPR 0</span>
-                        <p class="info-box-text">this month's product sales</p>
+                        <div class="revenue-comparison">
+                            <span class="info-box-number">NPR 0</span>
+                            <span class="revenue-change">
+                                <i class="fas fa-caret-up"></i>
+                                <span class="change-percentage">0%</span>
+                            </span>
+                        </div>
+                        <p class="info-box-text">vs last month</p>
                     </div>
                 </div>
             </div>
@@ -745,54 +763,78 @@
 
         // revenue logic 
 
-        // Function to fetch and update revenue stats
-        async function fetchRevenueStats() {
+        // Function to calculate percentage change
+        function calculatePercentageChange(current, previous) {
+            if (!previous) return 0;
+            return ((current - previous) / previous) * 100;
+        }
+
+        // Function to update revenue change indicator
+        function updateRevenueChange(element, currentValue, previousValue) {
+            const changeElement = element.querySelector('.revenue-change');
+            const percentageElement = element.querySelector('.change-percentage');
+            const iconElement = element.querySelector('.revenue-change i');
+            
+            const percentageChange = calculatePercentageChange(currentValue, previousValue);
+            const isPositive = percentageChange >= 0;
+            
+            // Update classes
+            changeElement.classList.toggle('negative', !isPositive);
+            iconElement.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
+            
+            // Update percentage text
+            percentageElement.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
+        }
+
+        // Function to update info boxes
+        async function updateInfoBoxes() {
             try {
+                // Fetch revenue data
                 const response = await fetch(`${baseUrl}/api/payments/stats`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch revenue stats');
-                }
-
                 const data = await response.json();
 
                 if (data.success) {
                     const stats = data.data;
-
+                    
                     // Update Total Revenue
-                    document.querySelector('.info-box:nth-child(1) .info-box-number').textContent =
-                        formatCurrency(stats.totalRevenue);
-
-                    // Update Monthly Revenue
-                    document.querySelector('.info-box:nth-child(2) .info-box-number').textContent =
-                        formatCurrency(stats.monthlyRevenue);
-
-                    // Update Membership Revenue
-                    document.querySelector('.info-box:nth-child(3) .info-box-number').textContent =
-                        formatCurrency(stats.monthlyMembershipRevenue);
-
-                    // Update Product Revenue
-                    document.querySelector('.info-box:nth-child(4) .info-box-number').textContent =
-                        formatCurrency(stats.monthlyProductRevenue || 0);
-
-                    // Update info box text with percentages if available
-                    if (stats.monthlyRevenue > 0) {
-                        const membershipPercentage = ((stats.monthlyMembershipRevenue / stats.monthlyRevenue) * 100).toFixed(1);
-                        const productPercentage = ((stats.monthlyProductRevenue / stats.monthlyRevenue) * 100).toFixed(1);
-
-                        document.querySelector('.info-box:nth-child(3) .info-box-text').textContent = 
-                            `this month's membership revenue (${membershipPercentage}%)`;
-                        document.querySelector('.info-box:nth-child(4) .info-box-text').textContent = 
-                            `this month's product sales (${productPercentage}%)`;
+                    const totalRevenueElement = document.querySelector('.info-box:nth-child(1) .info-box-number');
+                    if (totalRevenueElement) {
+                        totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
                     }
+
+                    // Update Monthly Revenue with comparison
+                    const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
+                    if (monthlyRevenueElement) {
+                        const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
+                        numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
+                        updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
+                    }
+
+                    // Update Membership Revenue with comparison
+                    const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
+                    if (membershipRevenueElement) {
+                        const numberElement = membershipRevenueElement.querySelector('.info-box-number');
+                        numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
+                        updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
+                    }
+
+                    // Update Product Revenue with comparison
+                    const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
+                    if (productRevenueElement) {
+                        const numberElement = productRevenueElement.querySelector('.info-box-number');
+                        numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
+                        updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
+                    }
+                } else {
+                    throw new Error(data.message || 'Failed to fetch revenue data');
                 }
             } catch (error) {
-                console.error('Error fetching revenue stats:', error);
-                toast('Failed to load revenue statistics', 'error');
+                console.error('Error fetching revenue data:', error);
+                window.toast('Failed to load revenue data', 'error');
             }
         }
 
@@ -1300,22 +1342,28 @@
                             totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
                         }
 
-                        // Update Monthly Revenue
-                        const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2) .info-box-number');
+                        // Update Monthly Revenue with comparison
+                        const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
                         if (monthlyRevenueElement) {
-                            monthlyRevenueElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
+                            const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
+                            numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
+                            updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
                         }
 
-                        // Update Membership Revenue
-                        const membershipRevenueElement = document.querySelector('.info-box:nth-child(3) .info-box-number');
+                        // Update Membership Revenue with comparison
+                        const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
                         if (membershipRevenueElement) {
-                            membershipRevenueElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
+                            const numberElement = membershipRevenueElement.querySelector('.info-box-number');
+                            numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
+                            updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
                         }
 
-                        // Update Product Revenue
-                        const productRevenueElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
+                        // Update Product Revenue with comparison
+                        const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
                         if (productRevenueElement) {
-                            productRevenueElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
+                            const numberElement = productRevenueElement.querySelector('.info-box-number');
+                            numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
+                            updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
                         }
                     } else {
                         throw new Error(data.message || 'Failed to fetch revenue data');

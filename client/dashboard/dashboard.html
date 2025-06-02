@@ -200,8 +200,14 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">NPR 0</span>
-                        <span class="info-box-text">This Month</span>
+                        <div class="revenue-comparison">
+                            <span class="info-box-number">NPR 0</span>
+                            <span class="revenue-change">
+                                <i class="fas fa-caret-up"></i>
+                                <span class="change-percentage">0%</span>
+                            </span>
+                        </div>
+                        <p class="info-box-text">vs last month</p>
                         <a href="/finance" class="info-box-link">View revenue</a>
                     </div>
                 </div>
@@ -361,11 +367,14 @@
                         throw new Error('Invalid revenue data format');
                     }
 
-                    // Update Revenue info box
+                    // Update Revenue info box with comparison
                     const revenueBox = document.querySelector('.info-box:nth-child(3)');
                     if (revenueBox && revenueData.success) {
                         const revenueNumber = revenueBox.querySelector('.info-box-number');
                         const revenueText = revenueBox.querySelector('.info-box-text');
+                        const revenueChange = revenueBox.querySelector('.revenue-change');
+                        const changePercentage = revenueBox.querySelector('.change-percentage');
+                        const changeIcon = revenueBox.querySelector('.revenue-change i');
 
                         if (revenueNumber) {
                             const formattedRevenue = revenueData.data.monthlyRevenue.toLocaleString('en-IN', {
@@ -375,8 +384,22 @@
                             });
                             revenueNumber.textContent = formattedRevenue;
                         }
-                        if (revenueText) {
-                            revenueText.textContent = 'This Month';
+
+                        // Calculate and update percentage change
+                        if (revenueData.data.lastMonthRevenue !== undefined) {
+                            const currentRevenue = revenueData.data.monthlyRevenue || 0;
+                            const lastMonthRevenue = revenueData.data.lastMonthRevenue || 0;
+                            const percentageChange = lastMonthRevenue === 0 ? 0 : 
+                                ((currentRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+                            
+                            const isPositive = percentageChange >= 0;
+                            
+                            // Update classes
+                            revenueChange.classList.toggle('negative', !isPositive);
+                            changeIcon.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
+                            
+                            // Update percentage text
+                            changePercentage.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
                         }
                     }
 

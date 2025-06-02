@@ -109,6 +109,10 @@ const getRevenueStatsService = async () => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfYear = new Date(now.getFullYear(), 0, 1);
+    
+    // Calculate last month's date range
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
     // Get total revenue
     const totalRevenue = await Payment.aggregate([
@@ -124,6 +128,20 @@ const getRevenueStatsService = async () => {
           paymentDate: {
             $gte: startOfMonth,
             $lte: now,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get last month's revenue
+    const lastMonthRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentDate: {
+            $gte: lastMonth,
+            $lte: endOfLastMonth,
           },
         },
       },
@@ -156,6 +174,21 @@ const getRevenueStatsService = async () => {
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
+    // Get last month's membership revenue
+    const lastMonthMembershipRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentType: "membership",
+          paymentDate: {
+            $gte: lastMonth,
+            $lte: endOfLastMonth,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
     // Get this month's product revenue
     const monthlyProductRevenue = await Payment.aggregate([
       {
@@ -165,6 +198,21 @@ const getRevenueStatsService = async () => {
           paymentDate: {
             $gte: startOfMonth,
             $lte: now,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get last month's product revenue
+    const lastMonthProductRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentType: "product",
+          paymentDate: {
+            $gte: lastMonth,
+            $lte: endOfLastMonth,
           },
         },
       },
@@ -208,9 +256,12 @@ const getRevenueStatsService = async () => {
     return {
       totalRevenue: totalRevenue[0]?.total || 0,
       monthlyRevenue: monthlyRevenue[0]?.total || 0,
+      lastMonthRevenue: lastMonthRevenue[0]?.total || 0,
       membershipRevenue: membershipRevenue[0]?.total || 0,
       monthlyMembershipRevenue: monthlyMembershipRevenue[0]?.total || 0,
+      lastMonthMembershipRevenue: lastMonthMembershipRevenue[0]?.total || 0,
       monthlyProductRevenue: monthlyProductRevenue[0]?.total || 0,
+      lastMonthProductRevenue: lastMonthProductRevenue[0]?.total || 0,
       revenueByType: revenueByType.reduce((acc, curr) => {
         acc[curr._id] = curr.total;
         return acc;

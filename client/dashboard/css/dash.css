@@ -61,6 +61,41 @@
   flex-direction: column;
 }
 
+.revenue-comparison {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.revenue-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  padding: 2px 6px;
+  border-radius: 12px;
+  background-color: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+
+.revenue-change.negative {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.revenue-change i {
+  font-size: 0.8rem;
+}
+
+.revenue-change.negative i {
+  transform: rotate(180deg);
+}
+
+.change-percentage {
+  font-weight: 600;
+}
+
 .info-box-number {
   font-size: 1.8rem;
   font-weight: bold;
