@@ -1,158 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Knox Barbell - Product</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/css/base.css">
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knox Barbell - Product</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/base.css">
+  </head>
 
-<body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h3>Knox Barbell</h3>
-      <button class="toggle-btn" id="toggleSidebar">
-        <i class="fas fa-bars"></i>
-      </button>
-    </div>
-    <ul class="sidebar-menu">
-      <li>
-        <a href="/dashboard">
-          <i class="fas fa-tachometer-alt"></i>
-          <span>Dashboard</span>
-          <div class="tooltip">Dashboard</div>
-        </a>
-      </li>
-      <li>
-        <a href="/members">
-          <i class="fas fa-user"></i>
-          <span>Member</span>
-          <div class="tooltip">Member</div>
-        </a>
-      </li>
-      <li>
-        <a href="/application">
-          <i class="fa-solid fa-file-lines"></i>
-          <span>Application</span>
-          <div class="tooltip">Application</div>
-        </a>
-      </li>
-      <li>
-        <a href="/membership">
-          <i class="fas fa-id-card"></i>
-          <span>Membership</span>
-          <div class="tooltip">Membership</div>
-        </a>
-      </li>
-      <li>
-        <a href="/trainers">
-          <i class="fas fa-chalkboard-teacher"></i>
-          <span>Trainers</span>
-          <div class="tooltip">Trainers</div>
-        </a>
-      </li>
-      <li>
-        <a href="/employee">
-          <i class="fas fa-users"></i>
-          <span>Employee</span>
-          <div class="tooltip">Employee</div>
-        </a>
-      </li>
-      <li>
-        <a href="/notifications">
-          <i class="fas fa-bell"></i>
-          <span>Notifications</span>
-          <div class="tooltip">Notifications</div>
-        </a>
-      </li>
-      <li>
-        <a href="/attendance">
-          <i class="fas fa-calendar-check"></i>
-          <span>Attendance</span>
-          <div class="tooltip">Attendance</div>
-        </a>
-      </li>
-      <li>
-        <a href="/events">
-          <i class="fas fa-calendar-alt"></i>
-          <span>Events</span>
-          <div class="tooltip">Events</div>
-        </a>
-      </li>
-      <li>
-        <a href="/finance">
-          <i class="fas fa-wallet"></i>
-          <span>Finance</span>
-          <div class="tooltip">Finance</div>
-        </a>
-      </li>
-      <li>
-        <a href="/product" class="active">
-          <i class="fas fa-box"></i>
-          <span>Product</span>
-          <div class="tooltip">Product</div>
-        </a>
-      </li>
-      <li class="logout-item">
-        <a href="#" id="logoutButton">
-          <i class="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-          <div class="tooltip">Logout</div>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="mobile-toggle" id="mobileToggle">
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>Knox Barbell</h3>
+        <button class="toggle-btn" id="toggleSidebar">
           <i class="fas fa-bars"></i>
         </button>
-        <h3>Products</h3>
       </div>
-      <div class="topbar-right">
-        <!-- notification  -->
-        <div class="notification">
-          <i class="fas fa-bell"></i>
-          <span class="notification-badge">0</span>
+      <ul class="sidebar-menu">
+        <li>
+          <a href="/dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+            <div class="tooltip">Dashboard</div>
+          </a>
+        </li>
+        <li>
+          <a href="/members">
+            <i class="fas fa-user"></i>
+            <span>Member</span>
+            <div class="tooltip">Member</div>
+          </a>
+        </li>
+        <li>
+          <a href="/application">
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Application</span>
+            <div class="tooltip">Application</div>
+          </a>
+        </li>
+        <li>
+          <a href="/membership">
+            <i class="fas fa-id-card"></i>
+            <span>Membership</span>
+            <div class="tooltip">Membership</div>
+          </a>
+        </li>
+        <li>
+          <a href="/trainers">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <span>Trainers</span>
+            <div class="tooltip">Trainers</div>
+          </a>
+        </li>
+        <li>
+          <a href="/employee">
+            <i class="fas fa-users"></i>
+            <span>Employee</span>
+            <div class="tooltip">Employee</div>
+          </a>
+        </li>
+        <li>
+          <a href="/notifications">
+            <i class="fas fa-bell"></i>
+            <span>Notifications</span>
+            <div class="tooltip">Notifications</div>
+          </a>
+        </li>
+        <li>
+          <a href="/attendance">
+            <i class="fas fa-calendar-check"></i>
+            <span>Attendance</span>
+            <div class="tooltip">Attendance</div>
+          </a>
+        </li>
+        <li>
+          <a href="/events">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Events</span>
+            <div class="tooltip">Events</div>
+          </a>
+        </li>
+        <li>
+          <a href="/finance">
+            <i class="fas fa-wallet"></i>
+            <span>Finance</span>
+            <div class="tooltip">Finance</div>
+          </a>
+        </li>
+        <li>
+          <a href="/product" class="active">
+            <i class="fas fa-box"></i>
+            <span>Product</span>
+            <div class="tooltip">Product</div>
+          </a>
+        </li>
+        <li class="logout-item">
+          <a href="#" id="logoutButton">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+            <div class="tooltip">Logout</div>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-          <!-- Notification Modal -->
-          <div class="notification-modal">
-            <div class="notification-header">
-              <h3>Notifications</h3>
-              <div class="notification-actions">
-                <a href="/notifications" class="view-all-link">View All</a>
-                <button class="close-notifications">
-                  <i class="fas fa-times"></i>
-                </button>
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" id="mobileToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h3>Products</h3>
+        </div>
+        <div class="topbar-right">
+          <!-- notification  -->
+          <div class="notification">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">0</span>
+
+            <!-- Notification Modal -->
+            <div class="notification-modal">
+              <div class="notification-header">
+                <h3>Notifications</h3>
+                <div class="notification-actions">
+                  <a href="/notifications" class="view-all-link">View All</a>
+                  <button class="close-notifications">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
               </div>
-            </div>
-            <div class="notification-list">
-              <!-- Notifications will be populated here -->
-              <div class="notification-loading">
-                <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+              <div class="notification-list">
+                <!-- Notifications will be populated here -->
+                <div class="notification-loading">
+                  <i class="fas fa-spinner fa-spin"></i> Loading notifications...
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="user-greeting">
-          <img src="/img/Knox Logo-01.png" alt="User">
-          <span>Hello, Knox Barbell</span>
+          <div class="user-greeting">
+            <img src="/img/Knox Logo-01.png" alt="User">
+            <span>Hello, Knox Barbell</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Content -->
-    <div class="content">
-      <!-- Content Header -->
-      <div class="content-header">
-        <h1>Product Management</h1>
+      <!-- Content -->
+      <div class="content">
+        <!-- Content Header -->
+        <div class="content-header">
+          <h1>Product Management</h1>
+          <button id="addProductBtn">
+            <span>+</span>
+            <p>Add Product</p>
+          </button>
+        </div>
+
         <div class="header-actions">
           <button id="downloadProducts" title="Download CSV">
             <i class="fa-solid fa-download"></i>
@@ -160,199 +166,194 @@
           <button id="printProducts" title="Print">
             <i class="fa-solid fa-print"></i>
           </button>
-          <button id="addProductBtn">
-            <span>+</span>
-            <p>Add Product</p>
-          </button>
         </div>
-      </div>
 
-      <!-- Filters Section -->
-      <div class="filters">
-        <!-- search filter -->
-        <div class="filter-group search-box">
-          <i class="fas fa-search"></i>
-          <input type="text" id="productSearch" placeholder="Search products..." autocomplete="off">
-        </div>
-        <!-- stock filter -->
-        <div class="filter-group">
-          <label for="stockStatus">Stock Status:</label>
-          <select id="stockStatus">
-            <option value="">All</option>
-            <option value="in-stock">In Stock</option>
-            <option value="low-stock">Low Stock</option>
-            <option value="out-of-stock">Out of Stock</option>
-          </select>
-        </div>
-        <!-- price range filter -->
-        <div class="filter-group">
-          <label for="priceRange">Price Range:</label>
-          <select id="priceRange">
-            <option value="">All</option>
-            <option value="0-50">$0 - $50</option>
-            <option value="51-100">$51 - $100</option>
-            <option value="101-200">$101 - $200</option>
-            <option value="201+">$201+</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <select id="categoryFilter">
-            <option value="">All Categories</option>
-            <option value="supplements">Supplements</option>
-            <option value="equipment">Equipment</option>
-            <option value="clothing">Clothing</option>
-            <option value="accessories">Accessories</option>
-          </select>
-        </div>
-        <button id="resetProductFilters" title="Reset Filters">
-          <i class="fa-solid fa-rotate"></i>
-        </button>
-      </div>
-
-      <!-- Products Table -->
-      <div class="table-container">
-        <table class="members-table">
-          <thead>
-            <tr>
-              <th>S.N</th>
-              <th>Product ID</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>loading...</td>
-              <td>loading...</td>
-              <td>loading...</td>
-              <td>loading...</td>
-              <td>loading...</td>
-              <td><span class="status">loading...</span></td>
-              <td>
-                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination Controls -->
-      <div class="pagination-controls">
-        <button id="prevPage" class="pagination-btn" disabled>
-          <i class="fas fa-chevron-left"></i> Previous
-        </button>
-        <span id="pageInfo">Page 1</span>
-        <button id="nextPage" class="pagination-btn" disabled>
-          Next <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Add Product Modal -->
-  <div class="modal-overlay" id="addProductModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>
-          <h2>Add New Product</h2>
-          <p>Fill in the details to add a new product.</p>
-        </div>
-      </div>
-      <form id="productForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="productName">Product Name</label>
-            <input type="text" id="productName" required>
+        <!-- Filters Section -->
+        <div class="filters">
+          <!-- search filter -->
+          <div class="filter-group search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="productSearch" placeholder="Search products..." autocomplete="off">
           </div>
-          <div class="form-group">
-            <label for="productCategory">Category</label>
-            <select id="productCategory" required>
-              <option value="">Select Category</option>
+          <!-- stock filter -->
+          <div class="filter-group">
+            <label for="stockStatus">Stock Status:</label>
+            <select id="stockStatus">
+              <option value="">All</option>
+              <option value="in-stock">In Stock</option>
+              <option value="low-stock">Low Stock</option>
+              <option value="out-of-stock">Out of Stock</option>
+            </select>
+          </div>
+          <!-- price range filter -->
+          <div class="filter-group">
+            <label for="priceRange">Price Range:</label>
+            <select id="priceRange">
+              <option value="">All</option>
+              <option value="0-50">$0 - $50</option>
+              <option value="51-100">$51 - $100</option>
+              <option value="101-200">$101 - $200</option>
+              <option value="201+">$201+</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <select id="categoryFilter">
+              <option value="">All Categories</option>
               <option value="supplements">Supplements</option>
               <option value="equipment">Equipment</option>
               <option value="clothing">Clothing</option>
               <option value="accessories">Accessories</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="productPrice">Price</label>
-            <input type="number" id="productPrice" min="0" step="0.01" required>
-          </div>
-          <div class="form-group">
-            <label for="productStock">Stock Quantity</label>
-            <input type="number" id="productStock" min="0" required>
-          </div>
-          <div class="form-group full-width">
-            <label for="productDescription">Description</label>
-            <textarea id="productDescription" rows="3" required></textarea>
+          <button id="resetProductFilters" title="Reset Filters">
+            <i class="fa-solid fa-rotate"></i>
+          </button>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-container">
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th>S.N</th>
+                <th>Product ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td><span class="status">loading...</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <button id="prevPage" class="pagination-btn" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+          </button>
+          <span id="pageInfo">Page 1</span>
+          <button id="nextPage" class="pagination-btn" disabled>
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal-overlay" id="addProductModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <h2>Add New Product</h2>
+            <p>Fill in the details to add a new product.</p>
           </div>
         </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary">Add Product</button>
+        <form id="productForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="productName">Product Name</label>
+              <input type="text" id="productName" required>
+            </div>
+            <div class="form-group">
+              <label for="productCategory">Category</label>
+              <select id="productCategory" required>
+                <option value="">Select Category</option>
+                <option value="supplements">Supplements</option>
+                <option value="equipment">Equipment</option>
+                <option value="clothing">Clothing</option>
+                <option value="accessories">Accessories</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="productPrice">Price</label>
+              <input type="number" id="productPrice" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+              <label for="productStock">Stock Quantity</label>
+              <input type="number" id="productStock" min="0" required>
+            </div>
+            <div class="form-group full-width">
+              <label for="productDescription">Description</label>
+              <textarea id="productDescription" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Product</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Confirmation Dialog Modal -->
+    <div class="modal-overlay" id="confirmationModal">
+      <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2 id="confirmationTitle">Confirm Action</h2>
         </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Confirmation Dialog Modal -->
-  <div class="modal-overlay" id="confirmationModal">
-    <div class="modal-content" style="max-width: 400px;">
-      <div class="modal-header">
-        <h2 id="confirmationTitle">Confirm Action</h2>
-      </div>
-      <div class="modal-body" style="padding: 20px;">
-        <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
-      </div>
-      <div class="form-actions" style="justify-content: center; gap: 20px;">
-        <button type="button" class="btn btn-secondary" id="cancelAction">Cancel</button>
-        <button type="button" class="btn" id="confirmAction" style="transition: all 0.3s ease;">Confirm</button>
+        <div class="modal-body" style="padding: 20px;">
+          <p id="confirmationMessage">Are you sure you want to proceed with this action?</p>
+        </div>
+        <div class="form-actions" style="justify-content: center; gap: 20px;">
+          <button type="button" class="btn btn-secondary" id="cancelAction">Cancel</button>
+          <button type="button" class="btn" id="confirmAction" style="transition: all 0.3s ease;">Confirm</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    // DOM Elements
-    const addProductBtn = document.getElementById('addProductBtn');
-    const addProductModal = document.getElementById('addProductModal');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const productForm = document.getElementById('productForm');
-    const productTableBody = document.querySelector('.members-table tbody');
-    const prevPageBtn = document.getElementById("prevPage");
-    const nextPageBtn = document.getElementById("nextPage");
-    const pageInfo = document.getElementById("pageInfo");
+    <script>
+      // DOM Elements
+      const addProductBtn = document.getElementById('addProductBtn');
+      const addProductModal = document.getElementById('addProductModal');
+      const cancelBtn = document.getElementById('cancelBtn');
+      const productForm = document.getElementById('productForm');
+      const productTableBody = document.querySelector('.members-table tbody');
+      const prevPageBtn = document.getElementById("prevPage");
+      const nextPageBtn = document.getElementById("nextPage");
+      const pageInfo = document.getElementById("pageInfo");
 
-    // Pagination state
-    let currentPage = 1;
-    let totalPages = 1;
-    const itemsPerPage = 10;
-    let allProducts = []; // Store all products
-    let filteredProducts = []; // Store filtered products
+      // Pagination state
+      let currentPage = 1;
+      let totalPages = 1;
+      const itemsPerPage = 10;
+      let allProducts = []; // Store all products
+      let filteredProducts = []; // Store filtered products
 
-    // Add these variables at the top with other DOM elements
-    const confirmationModal = document.getElementById('confirmationModal');
-    const confirmationTitle = document.getElementById('confirmationTitle');
-    const confirmationMessage = document.getElementById('confirmationMessage');
-    const confirmActionBtn = document.getElementById('confirmAction');
-    const cancelActionBtn = document.getElementById('cancelAction');
+      // Add these variables at the top with other DOM elements
+      const confirmationModal = document.getElementById('confirmationModal');
+      const confirmationTitle = document.getElementById('confirmationTitle');
+      const confirmationMessage = document.getElementById('confirmationMessage');
+      const confirmActionBtn = document.getElementById('confirmAction');
+      const cancelActionBtn = document.getElementById('cancelAction');
 
-    let currentAction = null;
-    let currentProductId = null;
+      let currentAction = null;
+      let currentProductId = null;
 
-    // Utility Functions
-    const toast = (message, type = 'success') => {
-      // Simple toast implementation
-      const toastEl = document.createElement('div');
-      toastEl.className = `toast toast-${type}`;
-      toastEl.textContent = message;
-      toastEl.style.cssText = `
+      // Utility Functions
+      const toast = (message, type = 'success') => {
+        // Simple toast implementation
+        const toastEl = document.createElement('div');
+        toastEl.className = `toast toast-${type}`;
+        toastEl.textContent = message;
+        toastEl.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -362,174 +363,174 @@
         z-index: 10000;
         background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
       `;
-      document.body.appendChild(toastEl);
-      setTimeout(() => document.body.removeChild(toastEl), 3000);
-    };
+        document.body.appendChild(toastEl);
+        setTimeout(() => document.body.removeChild(toastEl), 3000);
+      };
 
-    const validateForm = (formData) => {
-      const errors = [];
+      const validateForm = (formData) => {
+        const errors = [];
 
-      if (!formData.name || formData.name.trim().length < 2) {
-        errors.push('Please enter a valid product name');
-      }
-
-      if (!formData.category) {
-        errors.push('Please select a category');
-      }
-
-      if (!formData.price || formData.price <= 0) {
-        errors.push('Please enter a valid price');
-      }
-
-      if (formData.stock === undefined || formData.stock < 0) {
-        errors.push('Please enter a valid stock quantity');
-      }
-
-      return errors;
-    };
-
-    const resetModal = () => {
-      productForm.reset();
-      document.querySelector('#addProductModal .modal-header h2').textContent = 'Add New Product';
-      document.querySelector('#productForm button[type="submit"]').textContent = 'Add Product';
-      productForm.dataset.mode = 'add';
-      delete productForm.dataset.productId;
-    };
-
-    // Apply filters to products
-    function applyFilters(products) {
-      const categoryFilter = document.getElementById('categoryFilter').value;
-      const stockStatus = document.getElementById('stockStatus').value;
-      const priceRange = document.getElementById('priceRange').value;
-      const searchQuery = document.getElementById('productSearch').value.toLowerCase();
-
-      return products.filter(product => {
-        // Category filter
-        if (categoryFilter && product.category !== categoryFilter) {
-          return false;
+        if (!formData.name || formData.name.trim().length < 2) {
+          errors.push('Please enter a valid product name');
         }
 
-        // Stock status filter
-        if (stockStatus) {
-          if (stockStatus === 'in-stock' && product.stock <= 0) return false;
-          if (stockStatus === 'out-of-stock' && product.stock > 0) return false;
-          if (stockStatus === 'low-stock' && (product.stock > 10 || product.stock <= 0)) return false;
+        if (!formData.category) {
+          errors.push('Please select a category');
         }
 
-        // Price range filter
-        if (priceRange) {
-          const price = product.price;
-          if (priceRange === '0-50' && (price < 0 || price > 50)) return false;
-          if (priceRange === '51-100' && (price < 51 || price > 100)) return false;
-          if (priceRange === '101-200' && (price < 101 || price > 200)) return false;
-          if (priceRange === '201+' && price < 201) return false;
+        if (!formData.price || formData.price <= 0) {
+          errors.push('Please enter a valid price');
         }
 
-        // Search filter
-        if (searchQuery) {
-          const searchFields = [
-            product.name?.toLowerCase() || '',
-            product.category?.toLowerCase() || '',
-            product.description?.toLowerCase() || ''
-          ];
-          if (!searchFields.some(field => field.includes(searchQuery))) {
+        if (formData.stock === undefined || formData.stock < 0) {
+          errors.push('Please enter a valid stock quantity');
+        }
+
+        return errors;
+      };
+
+      const resetModal = () => {
+        productForm.reset();
+        document.querySelector('#addProductModal .modal-header h2').textContent = 'Add New Product';
+        document.querySelector('#productForm button[type="submit"]').textContent = 'Add Product';
+        productForm.dataset.mode = 'add';
+        delete productForm.dataset.productId;
+      };
+
+      // Apply filters to products
+      function applyFilters(products) {
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const stockStatus = document.getElementById('stockStatus').value;
+        const priceRange = document.getElementById('priceRange').value;
+        const searchQuery = document.getElementById('productSearch').value.toLowerCase();
+
+        return products.filter(product => {
+          // Category filter
+          if (categoryFilter && product.category !== categoryFilter) {
             return false;
           }
-        }
 
-        return true;
-      });
-    }
+          // Stock status filter
+          if (stockStatus) {
+            if (stockStatus === 'in-stock' && product.stock <= 0) return false;
+            if (stockStatus === 'out-of-stock' && product.stock > 0) return false;
+            if (stockStatus === 'low-stock' && (product.stock > 10 || product.stock <= 0)) return false;
+          }
 
-    // Fetch and Display Products
-    async function fetchProducts(page = 1) {
-      try {
-        // Use the correct API endpoint based on your route setup
-        // Adjust this URL to match your backend route configuration
-        const response = await fetch('/api/products');
+          // Price range filter
+          if (priceRange) {
+            const price = product.price;
+            if (priceRange === '0-50' && (price < 0 || price > 50)) return false;
+            if (priceRange === '51-100' && (price < 51 || price > 100)) return false;
+            if (priceRange === '101-200' && (price < 101 || price > 200)) return false;
+            if (priceRange === '201+' && price < 201) return false;
+          }
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+          // Search filter
+          if (searchQuery) {
+            const searchFields = [
+              product.name?.toLowerCase() || '',
+              product.category?.toLowerCase() || '',
+              product.description?.toLowerCase() || ''
+            ];
+            if (!searchFields.some(field => field.includes(searchQuery))) {
+              return false;
+            }
+          }
 
-        const products = await response.json();
-
-        // Handle different response formats
-        let productData;
-        if (Array.isArray(products)) {
-          productData = products;
-        } else if (products.data && Array.isArray(products.data)) {
-          productData = products.data;
-        } else if (products.products && Array.isArray(products.products)) {
-          productData = products.products;
-        } else {
-          throw new Error('Invalid response format');
-        }
-
-        allProducts = productData;
-        filteredProducts = applyFilters(allProducts);
-
-        // Pagination
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-        totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-        displayProducts(paginatedProducts);
-        updatePagination({
-          currentPage: page,
-          totalPages: totalPages,
-          total: filteredProducts.length
+          return true;
         });
-
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        productTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: red;">Error loading products: ${error.message}</td></tr>`;
-        updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
-      }
-    }
-
-    function updatePagination(paginationData) {
-      currentPage = parseInt(paginationData.currentPage) || 1;
-      totalPages = parseInt(paginationData.totalPages) || 1;
-      pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} products)`;
-      prevPageBtn.disabled = currentPage <= 1;
-      nextPageBtn.disabled = currentPage >= totalPages;
-      prevPageBtn.classList.toggle('disabled', currentPage <= 1);
-      nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
-    }
-
-    function displayProducts(products) {
-      productTableBody.innerHTML = '';
-
-      if (!products || !Array.isArray(products) || products.length === 0) {
-        productTableBody.innerHTML = `<tr><td colspan="8" class="text-center">No products found.</td></tr>`;
-        return;
       }
 
-      products.forEach((product, index) => {
-        const tr = document.createElement("tr");
-        const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+      // Fetch and Display Products
+      async function fetchProducts(page = 1) {
+        try {
+          // Use the correct API endpoint based on your route setup
+          // Adjust this URL to match your backend route configuration
+          const response = await fetch('/api/products');
 
-        // Use productId instead of MongoDB _id
-        const productId = product.productId || 'N/A';
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
 
-        // Determine stock status
-        let stockStatus = 'Out of Stock';
-        let stockClass = 'inactive';
-        let stockIcon = 'xmark';
+          const products = await response.json();
 
-        if (product.stock > 10) {
-          stockStatus = 'In Stock';
-          stockClass = 'active';
-          stockIcon = 'circle-check';
-        } else if (product.stock > 0) {
-          stockStatus = 'Low Stock';
-          stockClass = 'warning';
-          stockIcon = 'triangle-exclamation';
+          // Handle different response formats
+          let productData;
+          if (Array.isArray(products)) {
+            productData = products;
+          } else if (products.data && Array.isArray(products.data)) {
+            productData = products.data;
+          } else if (products.products && Array.isArray(products.products)) {
+            productData = products.products;
+          } else {
+            throw new Error('Invalid response format');
+          }
+
+          allProducts = productData;
+          filteredProducts = applyFilters(allProducts);
+
+          // Pagination
+          const startIndex = (page - 1) * itemsPerPage;
+          const endIndex = startIndex + itemsPerPage;
+          const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+          totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+
+          displayProducts(paginatedProducts);
+          updatePagination({
+            currentPage: page,
+            totalPages: totalPages,
+            total: filteredProducts.length
+          });
+
+        } catch (error) {
+          console.error('Error fetching products:', error);
+          productTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: red;">Error loading products: ${error.message}</td></tr>`;
+          updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
+        }
+      }
+
+      function updatePagination(paginationData) {
+        currentPage = parseInt(paginationData.currentPage) || 1;
+        totalPages = parseInt(paginationData.totalPages) || 1;
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages} (Total: ${paginationData.total} products)`;
+        prevPageBtn.disabled = currentPage <= 1;
+        nextPageBtn.disabled = currentPage >= totalPages;
+        prevPageBtn.classList.toggle('disabled', currentPage <= 1);
+        nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
+      }
+
+      function displayProducts(products) {
+        productTableBody.innerHTML = '';
+
+        if (!products || !Array.isArray(products) || products.length === 0) {
+          productTableBody.innerHTML = `<tr><td colspan="8" class="text-center">No products found.</td></tr>`;
+          return;
         }
 
-        tr.innerHTML = `
+        products.forEach((product, index) => {
+          const tr = document.createElement("tr");
+          const rowNumber = ((currentPage - 1) * itemsPerPage) + index + 1;
+
+          // Use productId instead of MongoDB _id
+          const productId = product.productId || 'N/A';
+
+          // Determine stock status
+          let stockStatus = 'Out of Stock';
+          let stockClass = 'inactive';
+          let stockIcon = 'xmark';
+
+          if (product.stock > 10) {
+            stockStatus = 'In Stock';
+            stockClass = 'active';
+            stockIcon = 'circle-check';
+          } else if (product.stock > 0) {
+            stockStatus = 'Low Stock';
+            stockClass = 'warning';
+            stockIcon = 'triangle-exclamation';
+          }
+
+          tr.innerHTML = `
           <td>${rowNumber}</td>
           <td>${productId}</td>
           <td>${product.name || 'N/A'}</td>
@@ -551,342 +552,342 @@
             </button>
           </td>
         `;
-        productTableBody.appendChild(tr);
-      });
-
-      attachActionListeners();
-    }
-
-    // Attach event listeners to action buttons
-    function attachActionListeners() {
-      // Edit buttons
-      document.querySelectorAll('.action-btn.edit').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const productId = e.currentTarget.dataset.productId;
-          await editProduct(productId);
+          productTableBody.appendChild(tr);
         });
-      });
 
-      // Delete buttons
-      document.querySelectorAll('.action-btn.delete').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const productId = e.currentTarget.dataset.productId;
-          showConfirmationDialog(
-            'Delete Product',
-            'Are you sure you want to delete this product? This action cannot be undone.',
-            'delete',
-            productId
-          );
-        });
-      });
-    }
-
-    // Edit product function
-    async function editProduct(productId) {
-      try {
-        const response = await fetch(`/api/products/${productId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch product details');
-        }
-
-        const product = await response.json();
-
-        // Populate form with product data
-        document.getElementById('productName').value = product.name || '';
-        document.getElementById('productCategory').value = product.category || '';
-        document.getElementById('productPrice').value = product.price || '';
-        document.getElementById('productStock').value = product.stock || '';
-        document.getElementById('productDescription').value = product.description || '';
-
-        // Update modal for editing
-        document.querySelector('#addProductModal .modal-header h2').textContent = 'Edit Product';
-        document.querySelector('#productForm button[type="submit"]').textContent = 'Update Product';
-        productForm.dataset.mode = 'edit';
-        productForm.dataset.productId = productId;
-
-        // Show modal
-        addProductModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-
-      } catch (error) {
-        console.error('Error fetching product for edit:', error);
-        toast('Failed to load product for editing', 'error');
-      }
-    }
-
-    // Show Confirmation Dialog
-    function showConfirmationDialog(title, message, action, productId) {
-      confirmationTitle.textContent = title;
-      confirmationMessage.textContent = message;
-      currentAction = action;
-      currentProductId = productId;
-
-      // Update confirm button color based on action
-      const confirmBtn = document.getElementById('confirmAction');
-      if (action === 'delete') {
-        confirmBtn.style.backgroundColor = '#e74c3c';
-        confirmBtn.style.borderColor = '#e74c3c';
-        confirmBtn.style.color = 'white';
+        attachActionListeners();
       }
 
-      confirmationModal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    // Hide Confirmation Dialog
-    function hideConfirmationDialog() {
-      confirmationModal.classList.remove('active');
-      document.body.style.overflow = '';
-      currentAction = null;
-      currentProductId = null;
-
-      // Reset confirm button color
-      const confirmBtn = document.getElementById('confirmAction');
-      confirmBtn.style.backgroundColor = '';
-      confirmBtn.style.borderColor = '';
-      confirmBtn.style.color = '';
-    }
-
-    // Confirmation Dialog Event Listeners
-    confirmActionBtn.addEventListener('click', async () => {
-      if (currentAction === 'delete' && currentProductId) {
-        try {
-          // Use productId in the API endpoint
-          const response = await fetch(`/api/products/${currentProductId}`, {
-            method: 'DELETE'
+      // Attach event listeners to action buttons
+      function attachActionListeners() {
+        // Edit buttons
+        document.querySelectorAll('.action-btn.edit').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const productId = e.currentTarget.dataset.productId;
+            await editProduct(productId);
           });
-
-          if (response.ok) {
-            toast('Product deleted successfully!');
-            hideConfirmationDialog();
-            fetchProducts(currentPage);
-          } else {
-            const error = await response.json();
-            toast(error.message || 'Failed to delete product', 'error');
-          }
-        } catch (error) {
-          console.error('Error deleting product:', error);
-          toast('Error: ' + error.message, 'error');
-        }
-      }
-    });
-
-    cancelActionBtn.addEventListener('click', hideConfirmationDialog);
-
-    // Close modal when clicking outside
-    confirmationModal.addEventListener('click', (e) => {
-      if (e.target === confirmationModal) {
-        hideConfirmationDialog();
-      }
-    });
-
-    // Event Listeners
-    prevPageBtn.addEventListener("click", () => {
-      if (currentPage > 1) {
-        fetchProducts(currentPage - 1);
-      }
-    });
-
-    nextPageBtn.addEventListener("click", () => {
-      if (currentPage < totalPages) {
-        fetchProducts(currentPage + 1);
-      }
-    });
-
-    // Filter event listeners
-    document.getElementById('categoryFilter').addEventListener('change', () => {
-      currentPage = 1;
-      fetchProducts(currentPage);
-    });
-
-    document.getElementById('stockStatus').addEventListener('change', () => {
-      currentPage = 1;
-      fetchProducts(currentPage);
-    });
-
-    document.getElementById('priceRange').addEventListener('change', () => {
-      currentPage = 1;
-      fetchProducts(currentPage);
-    });
-
-    document.getElementById('productSearch').addEventListener('input', debounce(() => {
-      currentPage = 1;
-      fetchProducts(currentPage);
-    }, 500));
-
-    document.getElementById('resetProductFilters').addEventListener('click', () => {
-      currentPage = 1;
-      document.getElementById('categoryFilter').value = '';
-      document.getElementById('stockStatus').value = '';
-      document.getElementById('priceRange').value = '';
-      document.getElementById('productSearch').value = '';
-      fetchProducts(1);
-      toast('Filters have been reset', 'info');
-    });
-
-    // Form Submission
-    productForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const formData = {
-        name: document.getElementById('productName').value.trim(),
-        category: document.getElementById('productCategory').value,
-        price: parseFloat(document.getElementById('productPrice').value),
-        stock: parseInt(document.getElementById('productStock').value),
-        description: document.getElementById('productDescription').value.trim()
-      };
-
-      const validationErrors = validateForm(formData);
-      if (validationErrors.length > 0) {
-        toast(validationErrors.join(', '), 'error');
-        return;
-      }
-
-      try {
-        const mode = productForm.dataset.mode || 'add';
-        const url = mode === 'add'
-          ? '/api/products'
-          : `/api/products/product/${productForm.dataset.productId}`;
-
-        const method = mode === 'add' ? 'POST' : 'PUT';
-
-        const response = await fetch(url, {
-          method: method,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Failed to ${mode} product`);
+        // Delete buttons
+        document.querySelectorAll('.action-btn.delete').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const productId = e.currentTarget.dataset.productId;
+            showConfirmationDialog(
+              'Delete Product',
+              'Are you sure you want to delete this product? This action cannot be undone.',
+              'delete',
+              productId
+            );
+          });
+        });
+      }
+
+      // Edit product function
+      async function editProduct(productId) {
+        try {
+          const response = await fetch(`/api/products/${productId}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch product details');
+          }
+
+          const product = await response.json();
+
+          // Populate form with product data
+          document.getElementById('productName').value = product.name || '';
+          document.getElementById('productCategory').value = product.category || '';
+          document.getElementById('productPrice').value = product.price || '';
+          document.getElementById('productStock').value = product.stock || '';
+          document.getElementById('productDescription').value = product.description || '';
+
+          // Update modal for editing
+          document.querySelector('#addProductModal .modal-header h2').textContent = 'Edit Product';
+          document.querySelector('#productForm button[type="submit"]').textContent = 'Update Product';
+          productForm.dataset.mode = 'edit';
+          productForm.dataset.productId = productId;
+
+          // Show modal
+          addProductModal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+
+        } catch (error) {
+          console.error('Error fetching product for edit:', error);
+          toast('Failed to load product for editing', 'error');
+        }
+      }
+
+      // Show Confirmation Dialog
+      function showConfirmationDialog(title, message, action, productId) {
+        confirmationTitle.textContent = title;
+        confirmationMessage.textContent = message;
+        currentAction = action;
+        currentProductId = productId;
+
+        // Update confirm button color based on action
+        const confirmBtn = document.getElementById('confirmAction');
+        if (action === 'delete') {
+          confirmBtn.style.backgroundColor = '#e74c3c';
+          confirmBtn.style.borderColor = '#e74c3c';
+          confirmBtn.style.color = 'white';
         }
 
-        const result = await response.json();
-
-        // Close modal and refresh
-        addProductModal.classList.remove('active');
-        document.body.style.overflow = '';
-
-        resetModal();
-        fetchProducts(currentPage);
-
-        toast(`Product ${mode === 'add' ? 'added' : 'updated'} successfully!`);
-
-      } catch (error) {
-        console.error('Error:', error);
-        toast(error.message, 'error');
+        confirmationModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
-    });
 
-    // Modal Handling
-    addProductBtn.addEventListener('click', function () {
-      resetModal();
-      addProductModal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    });
-
-    cancelBtn.addEventListener('click', function () {
-      addProductModal.classList.remove('active');
-      document.body.style.overflow = '';
-    });
-
-    addProductModal.addEventListener('click', function (e) {
-      if (e.target === addProductModal) {
-        addProductModal.classList.remove('active');
+      // Hide Confirmation Dialog
+      function hideConfirmationDialog() {
+        confirmationModal.classList.remove('active');
         document.body.style.overflow = '';
+        currentAction = null;
+        currentProductId = null;
+
+        // Reset confirm button color
+        const confirmBtn = document.getElementById('confirmAction');
+        confirmBtn.style.backgroundColor = '';
+        confirmBtn.style.borderColor = '';
+        confirmBtn.style.color = '';
       }
-    });
 
-    // Utility function for debouncing search
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
+      // Confirmation Dialog Event Listeners
+      confirmActionBtn.addEventListener('click', async () => {
+        if (currentAction === 'delete' && currentProductId) {
+          try {
+            // Use productId in the API endpoint
+            const response = await fetch(`/api/products/${currentProductId}`, {
+              method: 'DELETE'
+            });
 
-    // Initial fetch
-    fetchProducts(1);
-
-    // Notification Modal Logic
-    document.addEventListener('DOMContentLoaded', function() {
-      const notificationIcon = document.querySelector('.notification');
-      const notificationModal = document.querySelector('.notification-modal');
-      const closeNotifications = document.querySelector('.close-notifications');
-      const notificationList = document.querySelector('.notification-list');
-      const notificationBadge = document.querySelector('.notification-badge');
-
-      // Toggle notification modal
-      notificationIcon.addEventListener('click', function(e) {
-        e.stopPropagation();
-        notificationModal.classList.toggle('active');
-        if (notificationModal.classList.contains('active')) {
-          fetchNotifications();
+            if (response.ok) {
+              toast('Product deleted successfully!');
+              hideConfirmationDialog();
+              fetchProducts(currentPage);
+            } else {
+              const error = await response.json();
+              toast(error.message || 'Failed to delete product', 'error');
+            }
+          } catch (error) {
+            console.error('Error deleting product:', error);
+            toast('Error: ' + error.message, 'error');
+          }
         }
       });
 
-      // Close notification modal
-      closeNotifications.addEventListener('click', function(e) {
-        e.stopPropagation();
-        notificationModal.classList.remove('active');
-      });
+      cancelActionBtn.addEventListener('click', hideConfirmationDialog);
 
       // Close modal when clicking outside
-      document.addEventListener('click', function(e) {
-        if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
-          notificationModal.classList.remove('active');
+      confirmationModal.addEventListener('click', (e) => {
+        if (e.target === confirmationModal) {
+          hideConfirmationDialog();
         }
       });
 
-      // Fetch unread count
-      async function fetchUnreadCount() {
-        try {
-          const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
-          const data = await response.json();
-          if (data.success) {
-            notificationBadge.textContent = data.data.unreadCount;
-            // Show/hide badge based on count
-            notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
-          }
-        } catch (error) {
-          console.error('Error fetching unread count:', error);
+      // Event Listeners
+      prevPageBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+          fetchProducts(currentPage - 1);
         }
+      });
+
+      nextPageBtn.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+          fetchProducts(currentPage + 1);
+        }
+      });
+
+      // Filter event listeners
+      document.getElementById('categoryFilter').addEventListener('change', () => {
+        currentPage = 1;
+        fetchProducts(currentPage);
+      });
+
+      document.getElementById('stockStatus').addEventListener('change', () => {
+        currentPage = 1;
+        fetchProducts(currentPage);
+      });
+
+      document.getElementById('priceRange').addEventListener('change', () => {
+        currentPage = 1;
+        fetchProducts(currentPage);
+      });
+
+      document.getElementById('productSearch').addEventListener('input', debounce(() => {
+        currentPage = 1;
+        fetchProducts(currentPage);
+      }, 500));
+
+      document.getElementById('resetProductFilters').addEventListener('click', () => {
+        currentPage = 1;
+        document.getElementById('categoryFilter').value = '';
+        document.getElementById('stockStatus').value = '';
+        document.getElementById('priceRange').value = '';
+        document.getElementById('productSearch').value = '';
+        fetchProducts(1);
+        toast('Filters have been reset', 'info');
+      });
+
+      // Form Submission
+      productForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = {
+          name: document.getElementById('productName').value.trim(),
+          category: document.getElementById('productCategory').value,
+          price: parseFloat(document.getElementById('productPrice').value),
+          stock: parseInt(document.getElementById('productStock').value),
+          description: document.getElementById('productDescription').value.trim()
+        };
+
+        const validationErrors = validateForm(formData);
+        if (validationErrors.length > 0) {
+          toast(validationErrors.join(', '), 'error');
+          return;
+        }
+
+        try {
+          const mode = productForm.dataset.mode || 'add';
+          const url = mode === 'add'
+            ? '/api/products'
+            : `/api/products/product/${productForm.dataset.productId}`;
+
+          const method = mode === 'add' ? 'POST' : 'PUT';
+
+          const response = await fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `Failed to ${mode} product`);
+          }
+
+          const result = await response.json();
+
+          // Close modal and refresh
+          addProductModal.classList.remove('active');
+          document.body.style.overflow = '';
+
+          resetModal();
+          fetchProducts(currentPage);
+
+          toast(`Product ${mode === 'add' ? 'added' : 'updated'} successfully!`);
+
+        } catch (error) {
+          console.error('Error:', error);
+          toast(error.message, 'error');
+        }
+      });
+
+      // Modal Handling
+      addProductBtn.addEventListener('click', function () {
+        resetModal();
+        addProductModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+
+      cancelBtn.addEventListener('click', function () {
+        addProductModal.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+
+      addProductModal.addEventListener('click', function (e) {
+        if (e.target === addProductModal) {
+          addProductModal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+
+      // Utility function for debouncing search
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
       }
 
-      // Fetch notifications from API
-      async function fetchNotifications() {
-        try {
-          notificationList.innerHTML = `
+      // Initial fetch
+      fetchProducts(1);
+
+      // Notification Modal Logic
+      document.addEventListener('DOMContentLoaded', function () {
+        const notificationIcon = document.querySelector('.notification');
+        const notificationModal = document.querySelector('.notification-modal');
+        const closeNotifications = document.querySelector('.close-notifications');
+        const notificationList = document.querySelector('.notification-list');
+        const notificationBadge = document.querySelector('.notification-badge');
+
+        // Toggle notification modal
+        notificationIcon.addEventListener('click', function (e) {
+          e.stopPropagation();
+          notificationModal.classList.toggle('active');
+          if (notificationModal.classList.contains('active')) {
+            fetchNotifications();
+          }
+        });
+
+        // Close notification modal
+        closeNotifications.addEventListener('click', function (e) {
+          e.stopPropagation();
+          notificationModal.classList.remove('active');
+        });
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function (e) {
+          if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
+            notificationModal.classList.remove('active');
+          }
+        });
+
+        // Fetch unread count
+        async function fetchUnreadCount() {
+          try {
+            const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
+            const data = await response.json();
+            if (data.success) {
+              notificationBadge.textContent = data.data.unreadCount;
+              // Show/hide badge based on count
+              notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
+            }
+          } catch (error) {
+            console.error('Error fetching unread count:', error);
+          }
+        }
+
+        // Fetch notifications from API
+        async function fetchNotifications() {
+          try {
+            notificationList.innerHTML = `
             <div class="notification-loading">
               <i class="fas fa-spinner fa-spin"></i> Loading notifications...
             </div>
           `;
 
-          const response = await fetch(`${baseUrl}/api/notifications`);
-          const data = await response.json();
+            const response = await fetch(`${baseUrl}/api/notifications`);
+            const data = await response.json();
 
-          if (data.success) {
-            const notifications = data.data;
-            
-            if (notifications.length === 0) {
-              notificationList.innerHTML = `
+            if (data.success) {
+              const notifications = data.data;
+
+              if (notifications.length === 0) {
+                notificationList.innerHTML = `
                 <div class="notification-empty">
                   <i class="fas fa-bell-slash"></i>
                   <p>No new notifications</p>
                 </div>
               `;
-              return;
-            }
+                return;
+              }
 
-            // Render notifications
-            notificationList.innerHTML = notifications.map(notif => `
+              // Render notifications
+              notificationList.innerHTML = notifications.map(notif => `
               <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
                    data-notification-id="${notif._id}">
                 <div class="notification-title">
@@ -898,64 +899,64 @@
               </div>
             `).join('');
 
-            // Add click handler to mark notifications as read
-            const notificationItems = document.querySelectorAll('.notification-item');
-            notificationItems.forEach(item => {
-              item.addEventListener('click', async () => {
-                const notificationId = item.dataset.notificationId;
-                if (item.classList.contains('unread')) {
-                  try {
-                    const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
-                      method: 'PATCH',
-                      credentials: 'include'
-                    });
-                    
-                    if (response.ok) {
-                      // Update UI
-                      item.classList.remove('unread');
-                      const unreadDot = item.querySelector('.unread-dot');
-                      if (unreadDot) unreadDot.remove();
-                      
-                      // Update unread count
-                      await fetchUnreadCount();
+              // Add click handler to mark notifications as read
+              const notificationItems = document.querySelectorAll('.notification-item');
+              notificationItems.forEach(item => {
+                item.addEventListener('click', async () => {
+                  const notificationId = item.dataset.notificationId;
+                  if (item.classList.contains('unread')) {
+                    try {
+                      const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
+                        method: 'PATCH',
+                        credentials: 'include'
+                      });
+
+                      if (response.ok) {
+                        // Update UI
+                        item.classList.remove('unread');
+                        const unreadDot = item.querySelector('.unread-dot');
+                        if (unreadDot) unreadDot.remove();
+
+                        // Update unread count
+                        await fetchUnreadCount();
+                      }
+                    } catch (error) {
+                      console.error('Error marking notification as read:', error);
                     }
-                  } catch (error) {
-                    console.error('Error marking notification as read:', error);
                   }
-                }
 
-                // Close notification modal
-                notificationModal.classList.remove('active');
+                  // Close notification modal
+                  notificationModal.classList.remove('active');
 
-                // Redirect to application page
-                window.location.href = '/application';
+                  // Redirect to application page
+                  window.location.href = '/application';
+                });
               });
-            });
-          } else {
-            throw new Error(data.message || 'Failed to fetch notifications');
-          }
-        } catch (error) {
-          console.error('Error fetching notifications:', error);
-          notificationList.innerHTML = `
+            } else {
+              throw new Error(data.message || 'Failed to fetch notifications');
+            }
+          } catch (error) {
+            console.error('Error fetching notifications:', error);
+            notificationList.innerHTML = `
             <div class="notification-empty">
               <i class="fas fa-exclamation-circle"></i>
               <p>Failed to load notifications</p>
             </div>
           `;
+          }
         }
-      }
 
-      // Initial fetch of notifications and unread count
-      fetchNotifications();
-      fetchUnreadCount();
+        // Initial fetch of notifications and unread count
+        fetchNotifications();
+        fetchUnreadCount();
 
-      // Refresh unread count periodically
-      setInterval(fetchUnreadCount, 30000); // Every 30 seconds
-    });
-  </script>
+        // Refresh unread count periodically
+        setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+      });
+    </script>
 
-  <script src="/js/main.js"></script>
-  <script src="./js/logout.js"></script>
-</body>
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
+  </body>
 
 </html>

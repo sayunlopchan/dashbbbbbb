@@ -278,14 +278,14 @@ body {
 /* Content Styles */
 .content {
   width: 100%;
-  flex: 1;
   padding: 25px;
   overflow-y: auto;
   position: relative;
+  display: grid;
+  gap: 1rem;
 }
 
 .content-header {
-  margin-bottom: 25px;
   display: flex;
   justify-content: space-between;
 }
@@ -679,7 +679,6 @@ textarea {
   align-items: center;
   flex-wrap: wrap;
   gap: 15px;
-  margin-bottom: 25px;
   padding: 15px;
   background-color: white;
   border-radius: 8px;
@@ -689,6 +688,7 @@ textarea {
 .filter-group {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .filter-group label {
@@ -963,6 +963,7 @@ textarea {
   font-size: 0.9rem;
   color: #666;
 }
+
 /* 
 /* Notification Modal Styles */
 .notification {
@@ -1056,8 +1057,9 @@ textarea {
   padding: 20px;
   text-align: center;
   color: #666;
-} */
+}
 
+*/
 /* global pop notification */
 
 /* Notification Modal Styles */
