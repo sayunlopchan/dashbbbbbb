@@ -36,7 +36,7 @@ connectDB();
 
 // Start cron jobs
 startAllCronJobs();
-console.log('🕒 Cron jobs initialized');
+console.log("🕒 Cron jobs initialized");
 
 dotenv.config();
 
@@ -44,34 +44,48 @@ dotenv.config();
 const app = express();
 
 // Get __dirname (already available in CommonJS)
-const clientPath = path.resolve(__dirname, '../client/dashboard');
+const clientPath = path.resolve(__dirname, "../client/dashboard");
 
 // Core middlewares
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://127.0.0.1:5501",
+    origin: process.env.CLIENT_URL || "https://dashbbbbbb-1.onrender.com",
     credentials: true,
   })
 );
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
 
 // Serve static files from client directory
 app.use(express.static(clientPath));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
 // Routes without .html extension
 const htmlPages = [
-  'dashboard', 'events', 'members', 'finance', 'membership', 
-  'attendance', 'employee', 'trainers', 'notifications', 'login', 'unauthorized', 
-  'spinner', 'membership', 'trainers', 'product','application-form','application'
+  "dashboard",
+  "events",
+  "members",
+  "finance",
+  "membership",
+  "attendance",
+  "employee",
+  "trainers",
+  "notifications",
+  "login",
+  "unauthorized",
+  "spinner",
+  "membership",
+  "trainers",
+  "product",
+  "application-form",
+  "application",
 ];
 
 // Unprotected pages
-const unprotectedPages = ['login', 'unauthorized'];
+const unprotectedPages = ["login", "unauthorized"];
 
 // Apply routes with protection
-htmlPages.forEach(page => {
+htmlPages.forEach((page) => {
   // If page is not in unprotected list, apply protection
   if (!unprotectedPages.includes(page)) {
     app.get(`/${page}`, protectRoute, (req, res) => {
@@ -86,8 +100,8 @@ htmlPages.forEach(page => {
 });
 
 // Default route to serve login.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(clientPath, 'login.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(clientPath, "login.html"));
 });
 
 // API routes
@@ -104,14 +118,14 @@ app.use("/api/attendances", attendanceRoutes);
 app.use("/api/memberships", membershipRoutes);
 app.use("/api/application-history", applicationHistoryRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use('/api/products', productRoutes);
+app.use("/api/products", productRoutes);
 
 // Debug route for authentication
-app.get('/debug-auth', (req, res) => {
+app.get("/debug-auth", (req, res) => {
   res.json({
     cookies: req.cookies,
     headers: req.headers,
-    token: req.cookies.token ? 'Present' : 'Not Present'
+    token: req.cookies.token ? "Present" : "Not Present",
   });
 });
 
