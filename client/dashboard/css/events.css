@@ -48,14 +48,15 @@
   border-radius: 5px;
 }
 
-/* .add-btn {
+.add-btn {
   padding: 0.5rem 1rem;
   background: var(--btn-primary);
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-} */
+}
+
 .card-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
