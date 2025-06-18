@@ -371,19 +371,54 @@ const deleteEvent = asyncHandler(async (req, res) => {
     });
   }
 
+  console.log('🗑️ Deleting event:', {
+    eventId: event.eventId,
+    title: event.title,
+    imageCount: event.images?.length || 0
+  });
+
   // Delete associated images from filesystem
   if (event.images && event.images.length > 0) {
-    event.images.forEach(image => {
+    console.log(`🗑️ Deleting ${event.images.length} images from filesystem`);
+    
+    const deletedImages = [];
+    const failedImages = [];
+
+    for (const image of event.images) {
       if (image.filename) {
-        const imagePath = path.join(process.cwd(), 'uploads', image.filename);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
+        try {
+          const imagePath = path.join(process.cwd(), 'uploads', image.filename);
+          console.log(`🗑️ Attempting to delete image: ${imagePath}`);
+          
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+            deletedImages.push(image.filename);
+            console.log(`✅ Successfully deleted image: ${image.filename}`);
+          } else {
+            console.warn(`⚠️ Image file not found: ${imagePath}`);
+            failedImages.push({ filename: image.filename, reason: 'File not found' });
+          }
+        } catch (error) {
+          console.error(`❌ Failed to delete image ${image.filename}:`, error.message);
+          failedImages.push({ filename: image.filename, reason: error.message });
         }
       }
+    }
+
+    console.log('📊 Image deletion summary:', {
+      total: event.images.length,
+      deleted: deletedImages.length,
+      failed: failedImages.length,
+      deletedFiles: deletedImages,
+      failedFiles: failedImages
     });
+  } else {
+    console.log('ℹ️ No images to delete for this event');
   }
 
+  // Delete the event from database
   await event.deleteOne();
+  console.log(`✅ Event deleted successfully: ${event.eventId}`);
 
   res.status(200).json({
     success: true,

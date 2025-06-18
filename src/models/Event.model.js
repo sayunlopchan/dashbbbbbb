@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const fs = require('fs');
+const path = require('path');
 
 const eventSchema = new mongoose.Schema(
   {
@@ -77,13 +79,37 @@ eventSchema.pre("save", function (next) {
 eventSchema.index({ startTime: 1 });
 eventSchema.index({ category: 1 });
 
-// Delete associated participants when an event is deleted
+// Delete associated participants and images when an event is deleted
 eventSchema.pre("deleteOne", { document: true }, async function (next) {
   try {
+    // Delete associated participants
     const Participant = mongoose.model("Participant");
     await Participant.deleteMany({ event: this._id });
+    
+    // Delete associated images from filesystem
+    if (this.images && this.images.length > 0) {
+      console.log(`🗑️ Model middleware: Deleting ${this.images.length} images for event ${this.eventId}`);
+      
+      for (const image of this.images) {
+        if (image.filename) {
+          try {
+            const imagePath = path.join(process.cwd(), 'uploads', image.filename);
+            if (fs.existsSync(imagePath)) {
+              fs.unlinkSync(imagePath);
+              console.log(`✅ Model middleware: Deleted image ${image.filename}`);
+            } else {
+              console.warn(`⚠️ Model middleware: Image file not found ${imagePath}`);
+            }
+          } catch (error) {
+            console.error(`❌ Model middleware: Failed to delete image ${image.filename}:`, error.message);
+          }
+        }
+      }
+    }
+    
     next();
   } catch (error) {
+    console.error('❌ Model middleware: Error in pre-delete:', error);
     next(error);
   }
 });

@@ -509,8 +509,8 @@
                     <p class="participants">👥 ${event.participantCount || 0} participants <br> 
                         <span class="instructor">with ${event.organizer}</span>
                     </p>
-                    <p class="edit" data-event-id="${event.eventId}" data-event='${JSON.stringify(event)}'><i class="fa-solid fa-pen"></i></p>
-                    <p class="delete" data-event-id="${event.eventId}" data-event='${JSON.stringify(event)}'><i class="fa-solid fa-trash"></i></p>
+                    <p class="edit" data-event-id="${event.eventId}"><i class="fa-solid fa-pen"></i></p>
+                    <p class="delete" data-event-id="${event.eventId}"><i class="fa-solid fa-trash"></i></p>
                 `;
                 eventsContainer.appendChild(eventCard);
             });
@@ -541,15 +541,28 @@
         }
 
         // Handle edit event
-        function handleEditEvent(event) {
-            const eventData = JSON.parse(event.currentTarget.dataset.event);
-            openEditEventModal(eventData);
+        async function handleEditEvent(event) {
+            const eventId = event.currentTarget.dataset.eventId;
+            try {
+                const response = await fetch(`/api/events/${eventId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch event details');
+                }
+                const data = await response.json();
+                if (data.success) {
+                    openEditEventModal(data.event);
+                } else {
+                    throw new Error(data.message || 'Failed to fetch event details');
+                }
+            } catch (error) {
+                console.error('Error fetching event details:', error);
+                window.toast('Failed to load event details', 'error');
+            }
         }
 
         // Handle delete event
         async function handleDeleteEvent(event) {
             const eventId = event.currentTarget.dataset.eventId;
-            const eventData = JSON.parse(event.currentTarget.closest('.card').querySelector('.edit').dataset.event);
             
             const confirmed = await window.confirmDialog({
                 title: 'Delete Event',
@@ -560,8 +573,8 @@
             if (!confirmed) return;
 
             try {
-                console.log('Attempting to delete event with ID:', eventData.eventId); // Debug log
-                const response = await fetch(`/api/events/${eventData.eventId}`, {
+                console.log('Attempting to delete event with ID:', eventId); // Debug log
+                const response = await fetch(`/api/events/${eventId}`, {
                     method: 'DELETE'
                 });
 
@@ -746,6 +759,12 @@
             const eventId = document.getElementById('editEventId').value;
             console.log('Attempting to edit event with ID:', eventId); // Debug log
 
+            // Get the submit button and disable it with loading state
+            const submitBtn = editEventForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
             // Create FormData object
             const formData = new FormData();
             
@@ -817,6 +836,10 @@
             } catch (error) {
                 console.error('Error updating event:', error);
                 window.toast('An error occurred while updating the event', 'error');
+            } finally {
+                // Re-enable the submit button and restore original text
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
 
@@ -926,6 +949,12 @@
 
             console.log('Form submission started');
 
+            // Get the submit button and disable it with loading state
+            const submitBtn = addEventForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
             // Create FormData object
             const formData = new FormData();
             
@@ -995,6 +1024,10 @@
             } catch (error) {
                 console.error('Error creating event:', error);
                 window.toast('An error occurred while creating the event', 'error');
+            } finally {
+                // Re-enable the submit button and restore original text
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
 
@@ -1242,6 +1275,12 @@
         addAnnouncementForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // Get the submit button and disable it with loading state
+            const submitBtn = addAnnouncementForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
             // Collect form data
             const formData = {
                 title: document.getElementById('announcementTitle').value,
@@ -1291,6 +1330,10 @@
             } catch (error) {
                 console.error('Error creating announcement:', error);
                 window.toast('An error occurred while creating the announcement', 'error');
+            } finally {
+                // Re-enable the submit button and restore original text
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
 
@@ -1397,6 +1440,12 @@
             const announcementId = document.getElementById('editAnnouncementId').value;
             console.log('Attempting to edit announcement with ID:', announcementId);
 
+            // Get the submit button and disable it with loading state
+            const submitBtn = editAnnouncementForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+
             const formData = {
                 title: document.getElementById('editAnnouncementTitle').value,
                 description: document.getElementById('editAnnouncementDescription').value
@@ -1439,6 +1488,10 @@
             } catch (error) {
                 console.error('Error updating announcement:', error);
                 window.toast('An error occurred while updating the announcement', 'error');
+            } finally {
+                // Re-enable the submit button and restore original text
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
     
