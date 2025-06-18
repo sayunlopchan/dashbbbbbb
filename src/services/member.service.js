@@ -1,6 +1,6 @@
 const Member = require("../models/Member.model");
 const dayjs = require("dayjs");
-const { sendMembershipExpiryReminder } = require("../utils/emailService");
+const { sendMembershipExpiryReminder, sendMemberCreationEmail } = require("../utils/emailService");
 const { createPaymentService } = require("./payment.service");
 const mongoose = require("mongoose");
 
@@ -67,6 +67,15 @@ const createMemberService = async (data, options = {}) => {
     }
 
     console.log("Member saved successfully:", savedMember);
+
+    // Send welcome email
+    try {
+      await sendMemberCreationEmail(savedMember);
+      console.log("Welcome email sent successfully to:", savedMember.email);
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError.message);
+      // Don't throw the error - member creation was successful, email failure is non-critical
+    }
   } catch (saveError) {
     console.error("Error saving member:", saveError);
     throw saveError;
@@ -240,6 +249,7 @@ const processMemberPaymentService = async (memberId, paymentData) => {
       description: `${paymentType} payment for ${member.membershipType} membership`,
       paymentDate: new Date(),
       status: "completed",
+      remark: paymentData.remark
     };
 
     const payment = await createPaymentService(paymentRecordData);
@@ -251,6 +261,7 @@ const processMemberPaymentService = async (memberId, paymentData) => {
       paymentDate: new Date(),
       status: "completed",
       paymentId: payment._id,
+      remark: paymentData.remark
     };
 
     // Update member's payment history
@@ -316,7 +327,8 @@ const renewMembershipService = async (memberId, renewalData) => {
           paymentMethod: renewalData.paymentMethod,
           description: `Renewal payment for ${renewalData.membershipType} membership`,
           paymentDate: new Date(),
-          status: "completed"
+          status: "completed",
+          remark: renewalData.remark
         };
 
         // Create payment in a separate transaction

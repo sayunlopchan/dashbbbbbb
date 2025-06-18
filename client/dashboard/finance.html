@@ -156,6 +156,11 @@
         <div class="content">
             <div class="content-header">
                 <h1>Finance Overview</h1>
+                <div class="toggle-container" id="revenueToggle">
+                    <div class="toggle-slider slide-daily" id="slider"></div>
+                    <div class="toggle-label toggle-active" id="dailyLabel">Daily</div>
+                    <div class="toggle-label" id="monthlyLabel">Monthly</div>
+                </div>
             </div>
 
             <!-- Info boxes -->
@@ -317,10 +322,8 @@
                     </button>
                 </div>
             </div>
-
-
+            
             <!-- Finance Table -->
-             
             <div class="table-container">
                 <table class="members-table">
                     <thead>
@@ -332,6 +335,7 @@
                             <th>Date</th>
                             <th>Type</th>
                             <th>Method </th>
+                            <th>Remark</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -344,6 +348,7 @@
                             <td>loading...</td>
                             <td>loading...</td>
                             <td><i class="fa-solid fa-money-bill"></i>loading...</td>
+                            <td>loading...</td>
                             <td>
                                 <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
                             </td>
@@ -376,7 +381,7 @@
                 </div>
             </div>
             <!-- form -->
-            <form id="recordForm">
+            <form id="recordForm" class="record-payment-container">
                 <div class="form-grid">
                     <div class="form-group full-width">
                         <label for="memberSearch">Member</label>
@@ -428,6 +433,10 @@
                         <label for="quantity">Quantity</label>
                         <input type="number" id="quantity" name="quantity" min="1" value="1">
                     </div>
+                    <div class="form-group full-width">
+                        <label for="remark">Remark</label>
+                        <textarea id="remark" name="remark" placeholder="Enter any additional notes or remarks (optional)" rows="3" maxlength="500"></textarea>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
@@ -448,64 +457,122 @@
             }).format(amount);
         }
 
-        // Function to fetch revenue statistics
-        async function fetchRevenueStats() {
+        // Global variable for toggle state
+        let isDaily = true;
+
+        // Function to update info boxes
+        async function updateInfoBoxes() {
             try {
+                console.log(`Updating info boxes for: ${isDaily ? 'Daily' : 'Monthly'} view`);
+                
+                // Fetch revenue data
                 const response = await fetch(`${baseUrl}/api/payments/stats`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch revenue statistics');
-                }
-
                 const data = await response.json();
 
                 if (data.success) {
                     const stats = data.data;
+                    console.log('Revenue data received:', stats);
                     
-                    // Update Total Revenue
+                    // Update Total Revenue (always shows total)
                     const totalRevenueElement = document.querySelector('.info-box:nth-child(1) .info-box-number');
                     if (totalRevenueElement) {
                         totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
                     }
 
-                    // Update Monthly Revenue with comparison
-                    const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
-                    if (monthlyRevenueElement) {
-                        const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
-                        numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
-                        updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
-                    }
+                    if (isDaily) {
+                        // Show daily revenue data
+                        console.log(`Daily Revenue: ${stats.dailyRevenue}, Yesterday Revenue: ${stats.yesterdayRevenue}`);
+                        
+                        // Update Monthly Revenue box to show Daily Revenue
+                        const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
+                        if (monthlyRevenueElement) {
+                            const titleElement = monthlyRevenueElement.querySelector('.info-box-title');
+                            const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
+                            const textElement = monthlyRevenueElement.querySelector('.info-box-text');
+                            titleElement.textContent = 'Daily Revenue';
+                            numberElement.textContent = formatCurrency(stats.dailyRevenue || 0);
+                            textElement.textContent = 'vs yesterday';
+                            updateRevenueChange(monthlyRevenueElement, stats.dailyRevenue, stats.yesterdayRevenue);
+                        }
 
-                    // Update Membership Revenue with comparison
-                    const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
-                    if (membershipRevenueElement) {
-                        const numberElement = membershipRevenueElement.querySelector('.info-box-number');
-                        numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
-                        updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
-                    }
+                        // Update Membership Revenue with daily comparison
+                        const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
+                        if (membershipRevenueElement) {
+                            const titleElement = membershipRevenueElement.querySelector('.info-box-title');
+                            const numberElement = membershipRevenueElement.querySelector('.info-box-number');
+                            const textElement = membershipRevenueElement.querySelector('.info-box-text');
+                            titleElement.textContent = 'Daily Membership Revenue';
+                            numberElement.textContent = formatCurrency(stats.dailyMembershipRevenue || 0);
+                            textElement.textContent = 'vs yesterday';
+                            updateRevenueChange(membershipRevenueElement, stats.dailyMembershipRevenue, stats.yesterdayMembershipRevenue);
+                        }
 
-                    // Update Product Revenue with comparison
-                    const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
-                    if (productRevenueElement) {
-                        const numberElement = productRevenueElement.querySelector('.info-box-number');
-                        numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
-                        updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
-                    }
+                        // Update Product Revenue with daily comparison
+                        const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
+                        if (productRevenueElement) {
+                            const titleElement = productRevenueElement.querySelector('.info-box-title');
+                            const numberElement = productRevenueElement.querySelector('.info-box-number');
+                            const textElement = productRevenueElement.querySelector('.info-box-text');
+                            titleElement.textContent = 'Daily Product Revenue';
+                            numberElement.textContent = formatCurrency(stats.dailyProductRevenue || 0);
+                            textElement.textContent = 'vs yesterday';
+                            updateRevenueChange(productRevenueElement, stats.dailyProductRevenue, stats.yesterdayProductRevenue);
+                        }
+                    } else {
+                        // Show monthly revenue data
+                        console.log(`Monthly Revenue: ${stats.monthlyRevenue}, Last Month Revenue: ${stats.lastMonthRevenue}`);
+                        
+                        // Update Monthly Revenue box to show Monthly Revenue
+                        const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
+                        if (monthlyRevenueElement) {
+                            const titleElement = monthlyRevenueElement.querySelector('.info-box-title');
+                            const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
+                            const textElement = monthlyRevenueElement.querySelector('.info-box-text');
+                            titleElement.textContent = 'Monthly Revenue';
+                            numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
+                            textElement.textContent = 'vs last month';
+                            updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
+                        }
 
+                        // Update Membership Revenue with monthly comparison
+                        const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
+                        if (membershipRevenueElement) {
+                            const titleElement = membershipRevenueElement.querySelector('.info-box-title');
+                            const numberElement = membershipRevenueElement.querySelector('.info-box-number');
+                            const textElement = membershipRevenueElement.querySelector('.info-box-text');
+                            titleElement.textContent = 'Membership Revenue';
+                            numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
+                            textElement.textContent = 'vs last month';
+                            updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
+                        }
+
+                        // Update Product Revenue with monthly comparison
+                        const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
+                        if (productRevenueElement) {
+                            const titleElement = productRevenueElement.querySelector('.info-box-title');
+                            const numberElement = productRevenueElement.querySelector('.info-box-number');
+                            const textElement = productRevenueElement.querySelector('.info-box-text');
+                            titleElement.textContent = 'Product Revenue';
+                            numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
+                            textElement.textContent = 'vs last month';
+                            updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
+                        }
+                    }
+                    
                     // Update charts if they exist
                     if (typeof updateCharts === 'function') {
                         updateCharts(stats);
                     }
                 } else {
-                    throw new Error(data.message || 'Failed to fetch revenue statistics');
+                    throw new Error(data.message || 'Failed to fetch revenue data');
                 }
             } catch (error) {
-                console.error('Error fetching revenue statistics:', error);
-                toast('Failed to load revenue statistics', 'error');
+                console.error('Error fetching revenue data:', error);
+                window.toast('Failed to load revenue data', 'error');
             }
         }
 
@@ -627,7 +694,7 @@
                     if (payments.length === 0) {
                         tbody.innerHTML = `
                             <tr>
-                                <td colspan="8" style="text-align: center;">No payments found</td>
+                                <td colspan="9" style="text-align: center;">No payments found</td>
                             </tr>
                         `;
                         return;
@@ -649,6 +716,7 @@
                             <td>${formatDate(payment.paymentDate || new Date())}</td>
                             <td>${payment.paymentType ? payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1) : 'N/A'}</td>
                             <td>${getPaymentMethodIcon(payment.paymentMethod || 'cash')} ${payment.paymentMethod ? payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1) : 'N/A'}</td>
+                            <td>${payment.remark || 'N/A'}</td>
                             <td>
                                 <button class="action-btn delete" data-payment-id="${payment.paymentId || ''}">
                                     <i class="fa-solid fa-trash"></i>
@@ -663,7 +731,7 @@
                     totalPages = pagination.totalPages;
 
                     // Update revenue stats after filtering
-                    await fetchRevenueStats();
+                    await updateInfoBoxes();
                 } else {
                     throw new Error(data.message || 'Failed to fetch payments');
                 }
@@ -675,7 +743,7 @@
                 const tbody = document.querySelector('.members-table tbody');
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" style="text-align: center; color: #dc3545;">
+                        <td colspan="9" style="text-align: center; color: #dc3545;">
                             Error loading data. Please try again.
                         </td>
                     </tr>
@@ -687,7 +755,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Initial load
             applyFilters();
-            fetchRevenueStats();
+            updateInfoBoxes();
 
             // Search input event listener with debounce
             let searchTimeout;
@@ -737,7 +805,7 @@
                 
                 // Refresh the data
                 applyFilters(1);
-                fetchRevenueStats();
+                updateInfoBoxes();
                 
                 // Show success message
                 toast('Filters have been reset', 'success');
@@ -775,6 +843,9 @@
             }, 3000);
         }
 
+        // Expose toast function to window object
+        window.toast = toast;
+
         // Function to delete payment
         async function deletePayment(paymentId) {
             try {
@@ -795,7 +866,7 @@
                     toast('Payment deleted successfully', 'success');
                     // Refresh the payments table and revenue stats
                     applyFilters();
-                    fetchRevenueStats();
+                    updateInfoBoxes();
                 } else {
                     throw new Error(data.message || 'Failed to delete payment');
                 }
@@ -892,8 +963,10 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').value = today;
             memberSearch.value = '';
+            document.getElementById('remark').value = '';
             delete recordForm.dataset.selectedMemberId;
             delete recordForm.dataset.paymentId;
+            delete recordForm.dataset.selectedProductId;
             document.querySelector('#recordModal .modal-header h2').textContent = 'Add New Record';
             document.querySelector('#recordForm button[type="submit"]').textContent = 'Add Record';
             recordForm.dataset.mode = 'add';
@@ -971,6 +1044,8 @@
 
             productSearchTimeout = setTimeout(async () => {
                 try {
+                    console.log('Searching for products with query:', query);
+                    
                     // First, search for products using the search endpoint
                     const searchResponse = await fetch(`${baseUrl}/api/products/search?q=${encodeURIComponent(query)}`, {
                         headers: {
@@ -978,9 +1053,17 @@
                         }
                     });
 
-                    if (!searchResponse.ok) throw new Error('Failed to search products');
+                    console.log('Product search response status:', searchResponse.status);
+
+                    if (!searchResponse.ok) {
+                        const errorText = await searchResponse.text();
+                        console.error('Product search response error:', errorText);
+                        throw new Error(`Failed to search products: ${searchResponse.status} ${searchResponse.statusText}`);
+                    }
 
                     const searchData = await searchResponse.json();
+                    
+                    console.log('Product search data:', searchData);
                     
                     if (searchData.success && searchData.data.length > 0) {
                         searchResults.innerHTML = searchData.data.map(product => `
@@ -998,6 +1081,8 @@
                                 const productId = item.dataset.productId;
                                 
                                 try {
+                                    console.log('Fetching product details for ID:', productId);
+                                    
                                     // Fetch detailed product information using the productId endpoint
                                     const detailResponse = await fetch(`${baseUrl}/api/products/${productId}`, {
                                         headers: {
@@ -1005,22 +1090,30 @@
                                         }
                                     });
 
-                                    if (!detailResponse.ok) throw new Error('Failed to fetch product details');
+                                    console.log('Product detail response status:', detailResponse.status);
+
+                                    if (!detailResponse.ok) {
+                                        const errorText = await detailResponse.text();
+                                        console.error('Product detail response error:', errorText);
+                                        throw new Error(`Failed to fetch product details: ${detailResponse.status} ${detailResponse.statusText}`);
+                                    }
 
                                     const detailData = await detailResponse.json();
+                                    console.log('Product detail data:', detailData);
                                     
-                                    if (detailData.success) {
+                                    if (detailData.success && detailData.data) {
                                         const product = detailData.data;
                                         document.getElementById('productSearch').value = `${product.name} (${product.productId})`;
                                         document.getElementById('amount').value = product.price;
                                         recordForm.dataset.selectedProductId = product.productId;
                                         searchResults.innerHTML = '';
+                                        toast('Product selected successfully', 'success');
                                     } else {
-                                        throw new Error(detailData.message || 'Failed to fetch product details');
+                                        throw new Error(detailData.message || detailData.error || 'Failed to fetch product details');
                                     }
                                 } catch (error) {
                                     console.error('Error fetching product details:', error);
-                                    toast('Failed to fetch product details', 'error');
+                                    toast(`Failed to fetch product details: ${error.message}`, 'error');
                                 }
                             });
                         });
@@ -1030,6 +1123,7 @@
                 } catch (error) {
                     console.error('Error searching products:', error);
                     searchResults.innerHTML = '<div class="no-results">Error searching products</div>';
+                    toast(`Error searching products: ${error.message}`, 'error');
                 }
             }, 300);
         });
@@ -1054,7 +1148,8 @@
                     paymentDate: document.getElementById('date').value,
                     paymentType: document.getElementById('paymentType').value,
                     paymentMethod: document.getElementById('method').value,
-                    status: 'completed'
+                    status: 'completed',
+                    remark: document.getElementById('remark').value.trim() || null
                 };
 
                 // Add product-specific data if payment type is product
@@ -1101,7 +1196,7 @@
                     // Refresh the payments table and revenue stats
                     await Promise.all([
                         applyFilters(),
-                        fetchRevenueStats()
+                        updateInfoBoxes()
                     ]);
                 } else {
                     throw new Error(result.message || `Failed to ${mode} payment`);
@@ -1282,7 +1377,7 @@
             }
 
             // Create CSV content
-            const headers = ['S.N', 'Member ID', 'Full Name', 'Amount', 'Date', 'Type', 'Method'];
+            const headers = ['S.N', 'Member ID', 'Full Name', 'Amount', 'Date', 'Type', 'Method', 'Remark'];
             const csvContent = [
                 headers.join(','),
                 ...filteredPayments.map((payment, index) => [
@@ -1292,7 +1387,8 @@
                     formatCurrency(payment.amount),
                     formatDate(payment.paymentDate),
                     payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1),
-                    payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1)
+                    payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1),
+                    payment.remark || ''
                 ].join(','))
             ].join('\n');
 
@@ -1423,6 +1519,7 @@
                                     <th>Date</th>
                                     <th>Type</th>
                                     <th>Method</th>
+                                    <th>Remark</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1435,6 +1532,7 @@
                                         <td>${formatDate(payment.paymentDate)}</td>
                                         <td>${payment.paymentType.charAt(0).toUpperCase() + payment.paymentType.slice(1)}</td>
                                         <td>${payment.paymentMethod.charAt(0).toUpperCase() + payment.paymentMethod.slice(1)}</td>
+                                        <td>${payment.remark || ''}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -1458,85 +1556,45 @@
 
             window.toast('Printing payment records...', 'success');
         });
-    </script>
 
-    <script src="./js/financeChart.js"></script>
-    <script src="/js/main.js"></script>
-    <script src="./js/logout.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Function to format currency
-            function formatCurrency(amount) {
-                return new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'NPR',
-                    maximumFractionDigits: 0
-                }).format(amount);
+        // Function to fetch revenue statistics (wrapper for updateInfoBoxes)
+        async function fetchRevenueStats() {
+            try {
+                await updateInfoBoxes();
+            } catch (error) {
+                console.error('Error fetching revenue statistics:', error);
+                toast('Failed to load revenue statistics', 'error');
             }
+        }
 
-            // Function to update info boxes
-            async function updateInfoBoxes() {
-                try {
-                    // Fetch revenue data
-                    const response = await fetch(`${baseUrl}/api/payments/stats`, {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-                    const data = await response.json();
+        // Toggle button functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById("revenueToggle");
+            const slider = document.getElementById("slider");
+            const dailyLabel = document.getElementById("dailyLabel");
+            const monthlyLabel = document.getElementById("monthlyLabel");
 
-                    if (data.success) {
-                        const stats = data.data;
-                        
-                        // Update Total Revenue
-                        const totalRevenueElement = document.querySelector('.info-box:nth-child(1) .info-box-number');
-                        if (totalRevenueElement) {
-                            totalRevenueElement.textContent = formatCurrency(stats.totalRevenue || 0);
-                        }
-
-                        // Update Monthly Revenue with comparison
-                        const monthlyRevenueElement = document.querySelector('.info-box:nth-child(2)');
-                        if (monthlyRevenueElement) {
-                            const numberElement = monthlyRevenueElement.querySelector('.info-box-number');
-                            numberElement.textContent = formatCurrency(stats.monthlyRevenue || 0);
-                            updateRevenueChange(monthlyRevenueElement, stats.monthlyRevenue, stats.lastMonthRevenue);
-                        }
-
-                        // Update Membership Revenue with comparison
-                        const membershipRevenueElement = document.querySelector('.info-box:nth-child(3)');
-                        if (membershipRevenueElement) {
-                            const numberElement = membershipRevenueElement.querySelector('.info-box-number');
-                            numberElement.textContent = formatCurrency(stats.monthlyMembershipRevenue || 0);
-                            updateRevenueChange(membershipRevenueElement, stats.monthlyMembershipRevenue, stats.lastMonthMembershipRevenue);
-                        }
-
-                        // Update Product Revenue with comparison
-                        const productRevenueElement = document.querySelector('.info-box:nth-child(4)');
-                        if (productRevenueElement) {
-                            const numberElement = productRevenueElement.querySelector('.info-box-number');
-                            numberElement.textContent = formatCurrency(stats.monthlyProductRevenue || 0);
-                            updateRevenueChange(productRevenueElement, stats.monthlyProductRevenue, stats.lastMonthProductRevenue);
-                        }
-                    } else {
-                        throw new Error(data.message || 'Failed to fetch revenue data');
-                    }
-                } catch (error) {
-                    console.error('Error fetching revenue data:', error);
-                    window.toast('Failed to load revenue data', 'error');
+            toggle.addEventListener("click", () => {
+                isDaily = !isDaily;
+                if (isDaily) {
+                    slider.classList.remove("slide-monthly");
+                    slider.classList.add("slide-daily");
+                    dailyLabel.classList.add("toggle-active");
+                    monthlyLabel.classList.remove("toggle-active");
+                } else {
+                    slider.classList.remove("slide-daily");
+                    slider.classList.add("slide-monthly");
+                    dailyLabel.classList.remove("toggle-active");
+                    monthlyLabel.classList.add("toggle-active");
                 }
-            }
 
-            // Initial update
-            await updateInfoBoxes();
-
-            // Update every 5 minutes
-            setInterval(updateInfoBoxes, 300000);
+                // Update the info boxes with the new data
+                updateInfoBoxes();
+            });
         });
-  
-  
-          // Notification Modal Logic
-          document.addEventListener('DOMContentLoaded', function() {
+
+        // Notification Modal Logic
+        document.addEventListener('DOMContentLoaded', function() {
             const notificationIcon = document.querySelector('.notification');
             const notificationModal = document.querySelector('.notification-modal');
             const closeNotifications = document.querySelector('.close-notifications');
@@ -1672,8 +1730,30 @@
             // Refresh unread count periodically
             setInterval(fetchUnreadCount, 30000); // Every 30 seconds
         });
-    
-  </script>
+    </script>
+
+    <script src="./js/financeChart.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="./js/logout.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Function to format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'NPR',
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            // Initial update
+            await updateInfoBoxes();
+
+            // Update every 5 minutes
+            setInterval(updateInfoBoxes, 300000);
+        });
+    </script>
 
 </body>
 

@@ -317,7 +317,6 @@
   border-radius: 8px;
   max-width: 800px;
   max-height: 90vh;
-  overflow-y: auto;
   transform: translateY(-20px);
   transition: transform 0.3s ease-in-out;
   position: relative;

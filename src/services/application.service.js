@@ -3,12 +3,13 @@ const Application = require("../models/Application.model");
 const Member = require("../models/Member.model");
 const memberService = require("./member.service");
 const applicationHistoryService = require("./applicationHistory.service");
-const { generateMemberId } = require("../utils/idgenerator/generateMemberId");
+const generateMemberId = require("../utils/idgenerator/generateMemberId");
 const notificationService = require("./notification.service");
 const {
   sendWelcomeEmail,
   sendMembershipAcceptanceEmail,
 } = require("../utils/emailService");
+const generateApplicationId = require("../utils/idgenerator/generateApplicationId");
 
 // Validate input data for application creation
 const validateApplicationData = async (applicationData) => {
@@ -98,9 +99,13 @@ const createApplicationService = async (applicationData) => {
     // Validate input data
     await validateApplicationData(applicationData);
 
+    // Generate application ID before creating the document
+    const applicationId = await generateApplicationId();
+
     // Prepare application data
     const applicationWithData = {
       ...applicationData,
+      applicationId, // Set the generated ID
       email: applicationData.email.toLowerCase(),
       applicationStatus: "pending",
       // Ensure startDate is provided
@@ -135,7 +140,8 @@ const createApplicationService = async (applicationData) => {
 
     // Create application history within transaction
     await applicationHistoryService.createApplicationHistoryService(
-      application
+      application,
+      { session }
     );
 
     // Create notification within transaction
@@ -266,16 +272,14 @@ const acceptApplicationService = async (applicationId) => {
 
     // Send acceptance email
     try {
-      await sendMembershipAcceptanceEmail(
-        member.email,
-        member.fullName,
-        {
-          memberId: member.memberId,
-          membershipType: member.membershipType,
-          startDate: member.startDate,
-          endDate: member.endDate,
-        }
-      );
+      await sendMembershipAcceptanceEmail({
+        email: member.email,
+        fullName: member.fullName,
+        memberId: member.memberId,
+        membershipType: member.membershipType,
+        startDate: member.startDate,
+        endDate: member.endDate,
+      });
     } catch (emailError) {
       console.error("Failed to send acceptance email:", emailError);
       // Non-critical error, don't stop the transaction

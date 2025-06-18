@@ -125,7 +125,7 @@ const membershipExpiryTemplate = ({
         </div>
         
         <div class="footer">
-            <p>© ${new Date().getFullYear()} Your Organization. All rights reserved.</p>
+            <p>© ${new Date().getFullYear()} Knox Barbell. All rights reserved.</p>
             <p>Need help? Contact our support team.</p>
         </div>
     </div>

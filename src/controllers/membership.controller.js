@@ -1,11 +1,20 @@
 const membershipService = require("../services/membership.service");
+const { validateCreateMembership, validateUpdateMembership } = require("../validations/membership.validation");
 
 // Create Membership
 const createMembership = async (req, res) => {
   try {
-    const membership = await membershipService.createMembershipService(
-      req.body
-    );
+    // Validate request body
+    const { error, value } = validateCreateMembership(req.body);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.details.map(detail => detail.message)
+      });
+    }
+
+    const membership = await membershipService.createMembershipService(value);
     res.status(201).json({
       success: true,
       message: "Membership created successfully",
@@ -60,9 +69,19 @@ const getMembershipById = async (req, res) => {
 // Update Membership
 const updateMembership = async (req, res) => {
   try {
+    // Validate request body
+    const { error, value } = validateUpdateMembership(req.body);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.details.map(detail => detail.message)
+      });
+    }
+
     const membership = await membershipService.updateMembershipService(
       req.params.id,
-      req.body
+      value
     );
     res.status(200).json({
       success: true,

@@ -42,7 +42,7 @@ const pendingMembershipPaymentTemplate = (params) => {
         </p>
       </div>
       
-      <p>Best regards,<br/>Your Organization</p>
+      <p>Best regards,<br/>Knox Barbell</p>
     </div>
   `;
 };

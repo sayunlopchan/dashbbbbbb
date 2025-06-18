@@ -5,6 +5,8 @@ const { pendingMembershipPaymentTemplate } = require('./emailTemplates/pendingMe
 const { membershipExpiryReminderTemplate } = require('./emailTemplates/membershipExpiryReminder');
 const { membershipExpiryTemplate } = require('./emailTemplates/membershipExpiry');
 const { membershipCancellationTemplate } = require('./emailTemplates/membershipCancellation');
+const { memberCreationTemplate } = require('./emailTemplates/memberCreation');
+const { eventNotificationTemplate } = require('./emailTemplates/eventNotification');
 
 // Create a transporter using the default SMTP transport
 const createTransporter = () => {
@@ -273,6 +275,128 @@ const sendMembershipCancellationEmail = async (memberDetails) => {
   });
 };
 
+/**
+ * Send member creation confirmation email
+ * @param {Object} memberDetails - Member's details
+ * @returns {Promise<void>}
+ */
+const sendMemberCreationEmail = async (memberDetails) => {
+  console.log(`🎉 Preparing member creation email for: ${memberDetails.email}`);
+
+  return sendEmail(memberDetails.email, memberDetails.fullName, {
+    subject: 'Welcome to Our Community - Membership Created Successfully!',
+    html: memberCreationTemplate({
+      fullName: memberDetails.fullName,
+      memberId: memberDetails.memberId,
+      membershipType: memberDetails.membershipType,
+      startDate: memberDetails.startDate,
+      endDate: memberDetails.endDate,
+      email: memberDetails.email,
+      contact: memberDetails.contact
+    })
+  });
+};
+
+/**
+ * Send event notification email to a single member
+ * @param {Object} memberDetails - Member's details
+ * @param {Object} eventDetails - Event details
+ * @returns {Promise<void>}
+ */
+const sendEventNotificationEmail = async (memberDetails, eventDetails) => {
+  console.log(`📧 Preparing event notification email for: ${memberDetails.email}`);
+  console.log('📧 Member details:', {
+    fullName: memberDetails.fullName,
+    email: memberDetails.email,
+    memberStatus: memberDetails.memberStatus
+  });
+  console.log('📧 Event details:', {
+    title: eventDetails.title,
+    organizer: eventDetails.organizer,
+    category: eventDetails.category,
+    location: eventDetails.location,
+    eventId: eventDetails.eventId
+  });
+
+  return sendEmail(memberDetails.email, memberDetails.fullName, {
+    subject: `🎉 New Event: ${eventDetails.title}`,
+    html: eventNotificationTemplate({
+      memberName: memberDetails.fullName,
+      eventTitle: eventDetails.title,
+      eventOrganizer: eventDetails.organizer,
+      eventCategory: eventDetails.category,
+      eventLocation: eventDetails.location,
+      eventStartTime: eventDetails.startTime,
+      eventEndTime: eventDetails.endTime,
+      eventDescription: eventDetails.description,
+      eventTags: eventDetails.tags,
+      eventId: eventDetails.eventId
+    })
+  });
+};
+
+/**
+ * Send event notification emails to all active members
+ * @param {Object} eventDetails - Event details
+ * @param {Array} members - Array of member objects
+ * @returns {Promise<Object>} - Results of email sending
+ */
+const sendEventNotificationToAllMembers = async (eventDetails, members) => {
+  console.log(`📧 Sending event notification to ${members.length} members`);
+  
+  const results = {
+    total: members.length,
+    successful: 0,
+    failed: 0,
+    errors: []
+  };
+
+  // Send emails in parallel with a limit to avoid overwhelming the email service
+  const batchSize = 10; // Send 10 emails at a time
+  const batches = [];
+  
+  for (let i = 0; i < members.length; i += batchSize) {
+    batches.push(members.slice(i, i + batchSize));
+  }
+
+  for (const batch of batches) {
+    const batchPromises = batch.map(async (member) => {
+      try {
+        await sendEventNotificationEmail(member, eventDetails);
+        results.successful++;
+        console.log(`✅ Event notification sent to ${member.fullName} (${member.email})`);
+        return { success: true, member: member.fullName, email: member.email };
+      } catch (error) {
+        results.failed++;
+        const errorInfo = {
+          member: member.fullName,
+          email: member.email,
+          error: error.message
+        };
+        results.errors.push(errorInfo);
+        console.error(`❌ Failed to send event notification to ${member.fullName} (${member.email}):`, error.message);
+        return { success: false, member: member.fullName, email: member.email, error: error.message };
+      }
+    });
+
+    // Wait for current batch to complete before processing next batch
+    await Promise.all(batchPromises);
+    
+    // Small delay between batches to be respectful to email service
+    if (batches.indexOf(batch) < batches.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  console.log(`📊 Event notification results:`, {
+    total: results.total,
+    successful: results.successful,
+    failed: results.failed
+  });
+
+  return results;
+};
+
 module.exports = {
   sendEmail,
   sendWelcomeEmail,
@@ -280,5 +404,8 @@ module.exports = {
   sendExpiryEmail,
   sendPendingMembershipPaymentReminder,
   sendMembershipExpiryReminder,
-  sendMembershipCancellationEmail
+  sendMembershipCancellationEmail,
+  sendMemberCreationEmail,
+  sendEventNotificationEmail,
+  sendEventNotificationToAllMembers
 };

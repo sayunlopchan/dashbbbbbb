@@ -1,11 +1,13 @@
 const Event = require("../models/Event.model");
+const Member = require("../models/Member.model");
 const mongoose = require("mongoose");
+const { sendEventNotificationToAllMembers } = require("../utils/emailService");
 
 // Create a new event
 const createEventService = async (eventData, userId) => {
   try {
-    // Validate MongoDB ObjectId for author
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
+    // Validate MongoDB ObjectId for author only if userId is provided
+    if (userId && !mongoose.Types.ObjectId.isValid(userId)) {
       throw new Error("Invalid user ID");
     }
 
@@ -30,6 +32,24 @@ const createEventService = async (eventData, userId) => {
       throw new Error("Invalid event category");
     }
 
+    // Check for duplicate events (same title, organizer, and start time within 5 minutes)
+    const startTimeDate = new Date(startTime);
+    const fiveMinutesBefore = new Date(startTimeDate.getTime() - 5 * 60 * 1000);
+    const fiveMinutesAfter = new Date(startTimeDate.getTime() + 5 * 60 * 1000);
+
+    const existingEvent = await Event.findOne({
+      title: title.trim(),
+      organizer: organizer.trim(),
+      startTime: {
+        $gte: fiveMinutesBefore,
+        $lte: fiveMinutesAfter
+      }
+    });
+
+    if (existingEvent) {
+      throw new Error(`An event with the same title "${title}" by "${organizer}" at this time already exists. Please check for duplicates.`);
+    }
+
     // Ensure description is an array
     const descriptionArray = Array.isArray(description)
       ? description
@@ -39,15 +59,66 @@ const createEventService = async (eventData, userId) => {
     const newEventData = {
       ...eventData,
       description: descriptionArray,
-      images: eventData.images || [],
+      images: eventData.images || [], // This will now contain file paths
       tags: eventData.tags || [],
-      author: userId,
       participantCount: 0
     };
+
+    console.log('📝 Creating event with data:', {
+      title: newEventData.title,
+      organizer: newEventData.organizer,
+      category: newEventData.category,
+      location: newEventData.location,
+      startTime: newEventData.startTime,
+      endTime: newEventData.endTime,
+      description: newEventData.description,
+      tags: newEventData.tags,
+      images: newEventData.images?.length || 0
+    });
 
     // Create new event
     const event = new Event(newEventData);
     await event.save();
+
+    console.log('✅ Event created successfully:', {
+      eventId: event.eventId,
+      title: event.title,
+      _id: event._id
+    });
+
+    // Send event notification to all active members
+    try {
+      // Fetch all active members
+      const activeMembers = await Member.find({ 
+        memberStatus: { $in: ['active', 'expiring'] } // Include both active and expiring members
+      }).select('fullName email memberStatus');
+
+      console.log(`🔍 Found ${activeMembers.length} active/expiring members`);
+
+      if (activeMembers.length > 0) {
+        console.log(`📧 Sending event notification to ${activeMembers.length} active members`);
+        console.log('📧 Members to notify:', activeMembers.map(m => `${m.fullName} (${m.email})`));
+        
+        const emailResults = await sendEventNotificationToAllMembers(event, activeMembers);
+        
+        console.log(`📊 Event notification email results:`, {
+          total: emailResults.total,
+          successful: emailResults.successful,
+          failed: emailResults.failed
+        });
+        
+        if (emailResults.failed > 0) {
+          console.warn(`⚠️ ${emailResults.failed} event notification emails failed to send`);
+          console.warn('❌ Failed emails:', emailResults.errors);
+        }
+      } else {
+        console.log('📧 No active members found to send event notifications to');
+      }
+    } catch (emailError) {
+      console.error('❌ Error sending event notification emails:', emailError.message);
+      console.error('❌ Email error stack:', emailError.stack);
+      // Don't throw the error - event creation was successful, email failure is non-critical
+    }
 
     return event;
   } catch (error) {

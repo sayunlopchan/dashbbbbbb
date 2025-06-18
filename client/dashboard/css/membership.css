@@ -12,6 +12,12 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.membership-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
 .membership-card::before {
@@ -25,21 +31,7 @@
   z-index: 1;
 }
 
-.membership-card.silver {
-  background: linear-gradient(135deg, var(--silver-color) 0%, #5A5A5A 100%);
-}
 
-.membership-card.gold {
-  background: linear-gradient(135deg, var(--gold-color) 0%, #E6A500 100%);
-}
-
-.membership-card.diamond {
-  background: linear-gradient(135deg, var(--diamond-color) 0%, #0E6A30 100%);
-}
-
-.membership-card.platinum {
-  background: linear-gradient(135deg, var(--platinum-color) 0%, #8e44ad 100%);
-}
 
 .membership-card h2 {
   font-size: 1.2rem;
@@ -65,15 +57,129 @@
   z-index: 2;
 }
 
+/* Membership card actions */
+.membership-actions {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.membership-card:hover .membership-actions {
+  opacity: 1;
+}
+
+.membership-actions button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.membership-actions .edit-btn:hover {
+  background: rgba(52, 152, 219, 0.8);
+}
+
+.membership-actions .delete-btn:hover {
+  background: rgba(231, 76, 60, 0.8);
+}
+
+/* Loading states */
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  color: #6c757d;
+}
+
+.loading-card i {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: #007bff;
+}
+
+.loading-card p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.no-memberships {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  color: #6c757d;
+  text-align: center;
+}
+
+.no-memberships i {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #dee2e6;
+}
+
+.no-memberships p {
+  margin: 0 0 20px 0;
+  font-size: 1.1rem;
+}
+
+.no-memberships button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.no-memberships button:hover {
+  background: #0056b3;
+}
+
+/* Table container */
+.table-container {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.table-header {
+  padding: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.table-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
 
 /* Enrolled Members Table */
 .enrolled-table {
   width: 100%;
   border-collapse: collapse;
   background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .enrolled-table th,
@@ -96,6 +202,7 @@
 .enrolled-table tr{
   border: 1px solid #C8C8C8;
 }
+
 .enrolled-table thead tr{
   border-radius: 10px;
 }
@@ -104,9 +211,70 @@
   border-radius: 10px;
 }
 
-
 .enrolled-table tr:hover {
   background-color: #f8f9fa;
+}
+
+/* Loading and no data states for table */
+.loading-row {
+  text-align: center;
+  padding: 40px !important;
+  color: #6c757d;
+}
+
+.loading-row i {
+  font-size: 1.5rem;
+  margin-right: 10px;
+  color: #007bff;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px !important;
+  color: #6c757d;
+}
+
+.no-data i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #dee2e6;
+  display: block;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Action buttons in table */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.action-buttons button {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.action-buttons .edit-btn {
+  color: #007bff;
+}
+
+.action-buttons .edit-btn:hover {
+  background: rgba(0, 123, 255, 0.1);
+}
+
+.action-buttons .delete-btn {
+  color: #dc3545;
+}
+
+.action-buttons .delete-btn:hover {
+  background: rgba(220, 53, 69, 0.1);
 }
 
 .membership-badge {
@@ -137,7 +305,135 @@
   color: #9b59b6;
 }
 
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
 
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.close-modal:hover {
+  background: #f8f9fa;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.btn:not(.btn-secondary) {
+  background: #007bff;
+  color: white;
+}
+
+.btn:not(.btn-secondary):hover {
+  background: #0056b3;
+}
 
 @media (max-width: 576px) {
   .membership-cards {
@@ -147,5 +443,176 @@
   .enrolled-table {
       display: block;
       overflow-x: auto;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 20px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+/* Color customization styles */
+.color-customization {
+  margin-top: 15px;
+}
+
+.color-type-selector {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.radio-label input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.color-section {
+  margin-bottom: 20px;
+}
+
+.color-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.color-input-group input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.color-input-group input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.gradient-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.gradient-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gradient-direction {
+  margin-bottom: 15px;
+}
+
+.gradient-direction select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.9rem;
+}
+
+.color-preview {
+  margin-top: 20px;
+}
+
+.color-preview label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #333;
+}
+
+.preview-card {
+  width: 100%;
+  height: 120px;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+  z-index: 1;
+}
+
+.preview-content {
+  text-align: center;
+  color: white;
+  position: relative;
+  z-index: 2;
+}
+
+.preview-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.preview-content p {
+  margin: 0 0 5px 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.preview-content span {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Responsive design for color customization */
+@media (max-width: 768px) {
+  .color-type-selector {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .gradient-inputs {
+    grid-template-columns: 1fr;
+  }
+  
+  .color-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .color-input-group input[type="color"] {
+    width: 100%;
+    height: 50px;
   }
 }

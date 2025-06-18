@@ -60,6 +60,12 @@ const PaymentSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    remark: {
+      type: String,
+      trim: true,
+      maxlength: [500, "Remark cannot exceed 500 characters"],
+      default: null
+    },
     paymentDate: {
       type: Date,
       default: Date.now,

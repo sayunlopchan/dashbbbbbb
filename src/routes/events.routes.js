@@ -5,6 +5,9 @@ const {
   getEventById,
   updateEvent,
   deleteEvent,
+  getEventImage,
+  checkUploadsDirectory,
+  testFileUpload
 } = require("../controllers/event.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
 const upload = require("../middlewares/upload.middleware");
@@ -30,5 +33,17 @@ router
 
   // Delete event
   .delete(authenticate, deleteEvent);
+
+// Get event image
+router.get("/:eventId/images/:imageId", getEventImage);
+
+// Debug route to check uploads directory
+router.get("/debug/uploads", checkUploadsDirectory);
+
+// Test file upload (no authentication)
+router.post("/test-upload", upload.array('images', 3), testFileUpload);
+
+// Test event creation without authentication
+router.post("/test-create", upload.array('images', 3), createEvent);
 
 module.exports = router;

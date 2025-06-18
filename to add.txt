@@ -1,0 +1,38 @@
+to add: 
+
+daily revenue = done
+discount payment record / remark = done
+
+
+user Personal Trainer
+&
+local facitiy
+
+others : boxing , jumba classes
+
+# Image Upload System
+
+## Overview
+Images are now stored as files on the filesystem instead of binary data in MongoDB.
+
+## Directory Structure
+- `uploads/` - Directory where event images are stored
+- Images are automatically created with unique filenames: `event-{timestamp}-{random}.{extension}`
+
+## API Endpoints
+- `POST /api/events` - Create event with images (max 3 images, 5MB each)
+- `PUT /api/events/:eventId` - Update event with new images
+- `GET /api/events/:eventId/images/:imageId` - Serve specific image
+- `GET /uploads/{filename}` - Direct access to uploaded images
+
+## Image Storage
+- Images are stored in the `uploads/` directory
+- File paths are stored in MongoDB instead of binary data
+- Automatic cleanup when events are deleted
+- Supported formats: JPG, JPEG, PNG, GIF
+
+## Security
+- File type validation (images only)
+- File size limit (5MB per file)
+- Maximum 3 images per event
+- Unique filename generation to prevent conflicts

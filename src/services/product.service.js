@@ -5,10 +5,15 @@ const generateProductId = require('../utils/idgenerator/generateProductId');
 const createProduct = async (productData) => {
   try {
     const productId = await generateProductId();
+    
+    // Set default description if not provided
+    const description = productData.description?.trim() || 'No description provided';
+    
     const product = new Product({
       ...productData,
       productId,
-      status: productData.stock > 0 ? 'in-stock' : 'out-of-stock'
+      description,
+      status: productData.stock > 0 ? 'active' : 'out_of_stock'
     });
     return await product.save();
   } catch (error) {
@@ -94,7 +99,12 @@ const updateProduct = async (productId, updateData) => {
 
     // Update stock status if stock is being modified
     if (updateData.stock !== undefined) {
-      updateData.status = updateData.stock > 0 ? 'in-stock' : 'out-of-stock';
+      updateData.status = updateData.stock > 0 ? 'active' : 'out_of_stock';
+    }
+
+    // Handle description update
+    if (updateData.description !== undefined) {
+      updateData.description = updateData.description?.trim() || 'No description provided';
     }
 
     Object.assign(product, updateData);
@@ -137,7 +147,7 @@ const updateProductStock = async (productId, quantity, operation = 'decrease') =
     }
 
     // Update status based on new stock level
-    product.status = product.stock > 0 ? 'in-stock' : 'out-of-stock';
+    product.status = product.stock > 0 ? 'active' : 'out_of_stock';
     
     await product.save({ session });
     await session.commitTransaction();

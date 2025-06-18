@@ -4,7 +4,6 @@ const utc = require("dayjs/plugin/utc");
 const Member = require("../models/Member.model");
 const {
   sendPendingMembershipPaymentReminder,
-  sendMembershipExpiryReminder,
 } = require("../utils/emailService");
 const { createMemberStatusNotificationService, createMembershipNotificationService } = require("../services/notification.service");
 const { updateMemberStatusesService } = require("../services/member.service");
@@ -20,7 +19,7 @@ const checkMemberStatusNotifications = async () => {
     // Find members with pending status about to start
     const pendingMembers = await Member.find({
       memberStatus: "pending",
-      startDate: { $lte: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) }, // Within next 7 days
+      startDate: { $lte: new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000) }, // Within next 1 day
     });
 
     console.log(`📊 Found ${pendingMembers.length} pending members about to start`);
@@ -89,51 +88,6 @@ const checkMemberStatusNotifications = async () => {
         console.log(`📧 Payment Reminder Email sent to ${member.fullName}`);
       } catch (error) {
         console.error(`❌ Error processing unpaid member ${member.fullName}:`, error);
-      }
-    }
-
-    // Find members whose membership is about to expire
-    const expiringMembers = await Member.find({
-      memberStatus: "active",
-      endDate: {
-        $lte: new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000), // Within next 14 days
-        $gt: today,
-      },
-    });
-
-    console.log(`📊 Found ${expiringMembers.length} members about to expire`);
-
-    for (const member of expiringMembers) {
-      try {
-        console.log(`📝 Processing expiring member: ${member.fullName} (ID: ${member._id})`);
-        console.log(`📅 Member's end date: ${member.endDate}`);
-        
-        // Calculate days until expiry
-        const daysUntilExpiry = Math.ceil((new Date(member.endDate) - today) / (1000 * 60 * 60 * 24));
-        
-        // Create notification for expiring member
-        const notification = await createMemberStatusNotificationService(
-          member,
-          "MEMBERSHIP_EXPIRING"
-        );
-        console.log(`✅ Created notification for ${member.fullName}:`, {
-          notificationId: notification._id,
-          type: notification.type,
-          message: notification.message
-        });
-
-        // Send expiry reminder email
-        await sendMembershipExpiryReminder({
-          ...member.toObject(),
-          reminderType: "EXPIRING_SOON",
-          message: `Your membership is expiring soon. Please renew to maintain uninterrupted access.`,
-          expiryDate: member.endDate,
-          daysUntilExpiry: daysUntilExpiry
-        });
-
-        console.log(`📧 Expiry Reminder Email sent to ${member.fullName}`);
-      } catch (error) {
-        console.error(`❌ Error processing member ${member.fullName}:`, error);
       }
     }
 

@@ -50,11 +50,11 @@ const applicationHistorySchema = new mongoose.Schema(
   }
 );
 
-// Ensure case-insensitive email uniqueness
-applicationHistorySchema.index(
-  { email: 1 },
-  { unique: true, collation: { locale: "en", strength: 2 } }
-);
+// Remove the unique email constraint since multiple applications can have the same email
+// applicationHistorySchema.index(
+//   { email: 1 },
+//   { unique: true, collation: { locale: "en", strength: 2 } }
+// );
 
 const ApplicationHistory =
   mongoose.models.ApplicationHistory ||

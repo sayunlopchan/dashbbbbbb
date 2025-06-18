@@ -91,7 +91,8 @@ const createPaymentService = async (paymentData) => {
       type: paymentData.paymentType,
       paymentId: payment.paymentId,
       quantity: paymentData.quantity,
-      productId: paymentData.productId
+      productId: paymentData.productId,
+      remark: paymentData.remark
     };
 
     // Add payment to member's payment history
@@ -143,9 +144,43 @@ const getRevenueStatsService = async () => {
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
 
+    // Calculate today's and yesterday's date range
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    const startOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+    const endOfYesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59, 999);
+
     // Get total revenue
     const totalRevenue = await Payment.aggregate([
       { $match: { status: "completed" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get today's revenue
+    const dailyRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentDate: {
+            $gte: startOfToday,
+            $lte: endOfToday,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get yesterday's revenue
+    const yesterdayRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentDate: {
+            $gte: startOfYesterday,
+            $lte: endOfYesterday,
+          },
+        },
+      },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
@@ -188,6 +223,36 @@ const getRevenueStatsService = async () => {
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
+    // Get today's membership revenue
+    const dailyMembershipRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentType: "membership",
+          paymentDate: {
+            $gte: startOfToday,
+            $lte: endOfToday,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get yesterday's membership revenue
+    const yesterdayMembershipRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentType: "membership",
+          paymentDate: {
+            $gte: startOfYesterday,
+            $lte: endOfYesterday,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
     // Get this month's membership revenue
     const monthlyMembershipRevenue = await Payment.aggregate([
       {
@@ -212,6 +277,36 @@ const getRevenueStatsService = async () => {
           paymentDate: {
             $gte: lastMonth,
             $lte: endOfLastMonth,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get today's product revenue
+    const dailyProductRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentType: "product",
+          paymentDate: {
+            $gte: startOfToday,
+            $lte: endOfToday,
+          },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get yesterday's product revenue
+    const yesterdayProductRevenue = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentType: "product",
+          paymentDate: {
+            $gte: startOfYesterday,
+            $lte: endOfYesterday,
           },
         },
       },
@@ -282,13 +377,43 @@ const getRevenueStatsService = async () => {
       { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]);
 
+    // Get daily revenue trend (last 30 days)
+    const dailyTrend = await Payment.aggregate([
+      {
+        $match: {
+          status: "completed",
+          paymentDate: {
+            $gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000),
+            $lte: now,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$paymentDate" },
+            month: { $month: "$paymentDate" },
+            day: { $dayOfMonth: "$paymentDate" },
+          },
+          total: { $sum: "$amount" },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+    ]);
+
     return {
       totalRevenue: totalRevenue[0]?.total || 0,
+      dailyRevenue: dailyRevenue[0]?.total || 0,
+      yesterdayRevenue: yesterdayRevenue[0]?.total || 0,
       monthlyRevenue: monthlyRevenue[0]?.total || 0,
       lastMonthRevenue: lastMonthRevenue[0]?.total || 0,
       membershipRevenue: membershipRevenue[0]?.total || 0,
+      dailyMembershipRevenue: dailyMembershipRevenue[0]?.total || 0,
+      yesterdayMembershipRevenue: yesterdayMembershipRevenue[0]?.total || 0,
       monthlyMembershipRevenue: monthlyMembershipRevenue[0]?.total || 0,
       lastMonthMembershipRevenue: lastMonthMembershipRevenue[0]?.total || 0,
+      dailyProductRevenue: dailyProductRevenue[0]?.total || 0,
+      yesterdayProductRevenue: yesterdayProductRevenue[0]?.total || 0,
       monthlyProductRevenue: monthlyProductRevenue[0]?.total || 0,
       lastMonthProductRevenue: lastMonthProductRevenue[0]?.total || 0,
       revenueByType: revenueByType.reduce((acc, curr) => {
@@ -297,6 +422,10 @@ const getRevenueStatsService = async () => {
       }, {}),
       monthlyTrend: monthlyTrend.map((item) => ({
         month: `${item._id.year}-${item._id.month.toString().padStart(2, "0")}`,
+        total: item.total,
+      })),
+      dailyTrend: dailyTrend.map((item) => ({
+        date: `${item._id.year}-${item._id.month.toString().padStart(2, "0")}-${item._id.day.toString().padStart(2, "0")}`,
         total: item.total,
       })),
     };

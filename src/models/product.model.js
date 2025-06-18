@@ -19,7 +19,8 @@ const productSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    default: ''
+    default: 'No description provided',
+    trim: true
   },
   stock: {
     type: Number,

@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const generateApplicationId = require("../utils/idgenerator/generateApplicationId");
 
 const applicationSchema = new mongoose.Schema(
   {
@@ -115,23 +114,6 @@ applicationSchema.pre("save", function (next) {
     }
   }
   next();
-});
-
-// Pre-save hook to generate applicationId only when creating a new document
-applicationSchema.pre("save", async function (next) {
-  // Only generate ID if:
-  // 1. The document is new (being created for the first time)
-  // 2. No applicationId has been manually provided
-  if (this.isNew && !this.applicationId) {
-    try {
-      this.applicationId = await generateApplicationId();
-      next();
-    } catch (error) {
-      next(error);
-    }
-  } else {
-    next();
-  }
 });
 
 const Application =

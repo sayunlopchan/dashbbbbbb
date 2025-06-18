@@ -157,6 +157,11 @@
             <div class="content-header">
                 <h1>Dashboard Overview</h1>
 
+                <div class="toggle-container" id="revenueToggle">
+                    <div class="toggle-slider slide-daily" id="slider"></div>
+                    <div class="toggle-label toggle-active" id="dailyLabel">Daily</div>
+                    <div class="toggle-label" id="monthlyLabel">Monthly</div>
+                </div>
             </div>
 
             <!-- Info Boxes -->
@@ -330,6 +335,147 @@
     <script src="./js/logout.js"></script>
     <script src="./js/dashboardChart.js"></script>
     <script>
+
+        // toggle btn 
+        const toggle = document.getElementById("revenueToggle");
+        const slider = document.getElementById("slider");
+        const dailyLabel = document.getElementById("dailyLabel");
+        const monthlyLabel = document.getElementById("monthlyLabel");
+
+        let isDaily = true;
+
+        toggle.addEventListener("click", () => {
+            isDaily = !isDaily;
+            if (isDaily) {
+                slider.classList.remove("slide-monthly");
+                slider.classList.add("slide-daily");
+                dailyLabel.classList.add("toggle-active");
+                monthlyLabel.classList.remove("toggle-active");
+            } else {
+                slider.classList.remove("slide-daily");
+                slider.classList.add("slide-monthly");
+                dailyLabel.classList.remove("toggle-active");
+                monthlyLabel.classList.add("toggle-active");
+            }
+
+            // Update the revenue info box with the new data
+            updateRevenueInfoBox();
+        });
+
+        // Function to update revenue info box based on toggle state
+        async function updateRevenueInfoBox() {
+            try {
+                console.log(`Updating revenue info box for: ${isDaily ? 'Daily' : 'Monthly'} view`);
+                
+                const revenueResponse = await fetch(`${baseUrl}/api/payments/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                const revenueText = await revenueResponse.text();
+                let revenueData;
+                try {
+                    revenueData = JSON.parse(revenueText);
+                } catch (parseError) {
+                    throw new Error('Invalid revenue data format');
+                }
+
+                if (!revenueData.success) {
+                    throw new Error('Failed to fetch revenue data');
+                }
+
+                console.log('Revenue data received:', revenueData.data);
+
+                const revenueBox = document.querySelector('.info-box:nth-child(3)');
+                if (revenueBox) {
+                    const revenueNumber = revenueBox.querySelector('.info-box-number');
+                    const revenueText = revenueBox.querySelector('.info-box-text');
+                    const revenueChange = revenueBox.querySelector('.revenue-change');
+                    const changePercentage = revenueBox.querySelector('.change-percentage');
+                    const changeIcon = revenueBox.querySelector('.revenue-change i');
+
+                    if (isDaily) {
+                        // Show daily revenue
+                        const dailyRevenue = revenueData.data.dailyRevenue || 0;
+                        const yesterdayRevenue = revenueData.data.yesterdayRevenue || 0;
+                        
+                        console.log(`Daily Revenue: ${dailyRevenue}, Yesterday Revenue: ${yesterdayRevenue}`);
+                        
+                        if (revenueNumber) {
+                            const formattedRevenue = dailyRevenue.toLocaleString('en-IN', {
+                                style: 'currency',
+                                currency: 'NPR',
+                                maximumFractionDigits: 0
+                            });
+                            revenueNumber.textContent = formattedRevenue;
+                        }
+
+                        // Calculate daily percentage change
+                        const percentageChange = yesterdayRevenue === 0 ? 0 :
+                            ((dailyRevenue - yesterdayRevenue) / yesterdayRevenue) * 100;
+
+                        const isPositive = percentageChange >= 0;
+
+                        // Update classes
+                        revenueChange.classList.toggle('negative', !isPositive);
+                        changeIcon.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
+
+                        // Update percentage text
+                        changePercentage.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
+                        
+                        // Update comparison text
+                        if (revenueText) {
+                            revenueText.textContent = 'vs yesterday';
+                        }
+                    } else {
+                        // Show monthly revenue
+                        const monthlyRevenue = revenueData.data.monthlyRevenue || 0;
+                        const lastMonthRevenue = revenueData.data.lastMonthRevenue || 0;
+                        
+                        console.log(`Monthly Revenue: ${monthlyRevenue}, Last Month Revenue: ${lastMonthRevenue}`);
+                        
+                        if (revenueNumber) {
+                            const formattedRevenue = monthlyRevenue.toLocaleString('en-IN', {
+                                style: 'currency',
+                                currency: 'NPR',
+                                maximumFractionDigits: 0
+                            });
+                            revenueNumber.textContent = formattedRevenue;
+                        }
+
+                        // Calculate monthly percentage change
+                        const percentageChange = lastMonthRevenue === 0 ? 0 :
+                            ((monthlyRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
+
+                        const isPositive = percentageChange >= 0;
+
+                        // Update classes
+                        revenueChange.classList.toggle('negative', !isPositive);
+                        changeIcon.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
+
+                        // Update percentage text
+                        changePercentage.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
+                        
+                        // Update comparison text
+                        if (revenueText) {
+                            revenueText.textContent = 'vs last month';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating revenue info box:', error);
+                // Show error state
+                const revenueBox = document.querySelector('.info-box:nth-child(3)');
+                if (revenueBox) {
+                    const revenueNumber = revenueBox.querySelector('.info-box-number');
+                    const revenueText = revenueBox.querySelector('.info-box-text');
+                    if (revenueNumber) revenueNumber.textContent = 'NPR 0';
+                    if (revenueText) revenueText.textContent = isDaily ? 'vs yesterday' : 'vs last month';
+                }
+            }
+        }
+
         // dashboard logic
         document.addEventListener('DOMContentLoaded', async () => {
             // Fetch and update dashboard info boxes
@@ -352,56 +498,8 @@
 
                     const totalMembers = membersData.data?.length || 0;
 
-                    // Fetch revenue stats
-                    const revenueResponse = await fetch(`${baseUrl}/api/payments/stats`, {
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        }
-                    });
-
-                    const revenueText = await revenueResponse.text();
-                    let revenueData;
-                    try {
-                        revenueData = JSON.parse(revenueText);
-                    } catch (parseError) {
-                        throw new Error('Invalid revenue data format');
-                    }
-
-                    // Update Revenue info box with comparison
-                    const revenueBox = document.querySelector('.info-box:nth-child(3)');
-                    if (revenueBox && revenueData.success) {
-                        const revenueNumber = revenueBox.querySelector('.info-box-number');
-                        const revenueText = revenueBox.querySelector('.info-box-text');
-                        const revenueChange = revenueBox.querySelector('.revenue-change');
-                        const changePercentage = revenueBox.querySelector('.change-percentage');
-                        const changeIcon = revenueBox.querySelector('.revenue-change i');
-
-                        if (revenueNumber) {
-                            const formattedRevenue = revenueData.data.monthlyRevenue.toLocaleString('en-IN', {
-                                style: 'currency',
-                                currency: 'NPR',
-                                maximumFractionDigits: 0
-                            });
-                            revenueNumber.textContent = formattedRevenue;
-                        }
-
-                        // Calculate and update percentage change
-                        if (revenueData.data.lastMonthRevenue !== undefined) {
-                            const currentRevenue = revenueData.data.monthlyRevenue || 0;
-                            const lastMonthRevenue = revenueData.data.lastMonthRevenue || 0;
-                            const percentageChange = lastMonthRevenue === 0 ? 0 : 
-                                ((currentRevenue - lastMonthRevenue) / lastMonthRevenue) * 100;
-                            
-                            const isPositive = percentageChange >= 0;
-                            
-                            // Update classes
-                            revenueChange.classList.toggle('negative', !isPositive);
-                            changeIcon.className = isPositive ? 'fas fa-caret-up' : 'fas fa-caret-down';
-                            
-                            // Update percentage text
-                            changePercentage.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
-                        }
-                    }
+                    // Update revenue info box using the new function
+                    await updateRevenueInfoBox();
 
                     // Fetch attendance data
                     const attendancesResponse = await fetch(`${baseUrl}/api/attendances`, {
@@ -500,6 +598,7 @@
 
             // Initial data fetch
             await updateDashboardInfoBoxes();
+            await updateRevenueInfoBox(); // Ensure revenue is loaded initially
 
             // Refresh data periodically
             setInterval(updateDashboardInfoBoxes, 10 * 60 * 1000); // Refresh every 10 minutes
@@ -672,7 +771,7 @@
         // Function to fetch and display events and announcements
         async function updateEventsAndAnnouncements() {
             try {
-    
+
 
                 // Fetch events
                 const eventsResponse = await fetch(`${baseUrl}/api/events`, {
@@ -682,11 +781,11 @@
                 });
 
                 const eventsText = await eventsResponse.text();
-    
+
                 let eventsData;
                 try {
                     eventsData = JSON.parse(eventsText);
-            
+
                 } catch (parseError) {
                     throw new Error('Invalid events data format');
                 }
@@ -756,7 +855,7 @@
                     throw new Error('Invalid announcements data format');
                 }
 
-                if (!announcementsData.success) { 
+                if (!announcementsData.success) {
                     throw new Error(announcementsData.message || 'Failed to fetch announcements');
                 }
 
@@ -856,7 +955,7 @@
                         // Show/hide badge based on count
                         notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
                     }
-                } catch (error) {}
+                } catch (error) { }
             }
 
             // Fetch notifications from API

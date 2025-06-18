@@ -46,10 +46,11 @@ const eventSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    images: {
-      type: [String],
-      default: [],
-    },
+    images: [{
+      filename: String,
+      originalName: String,
+      path: String
+    }],
     authorName: {
       type: String,
       required: true,

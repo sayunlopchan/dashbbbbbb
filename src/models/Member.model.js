@@ -110,6 +110,12 @@ const MemberSchema = new mongoose.Schema(
           enum: ["pending", "completed", "failed"],
           default: "pending",
         },
+        remark: {
+          type: String,
+          trim: true,
+          maxlength: [500, "Remark cannot exceed 500 characters"],
+          default: null
+        },
       },
     ],
     membershipDuration: {

@@ -155,7 +155,7 @@ const membershipExpiryReminderTemplate = ({
     </div>
     
     <div class="footer">
-      <p>© ${new Date().getFullYear()} Your Organization. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} Knox Barbell. All rights reserved.</p>
       <p>Reminder ${reminderCount} of 3</p>
     </div>
   </div>

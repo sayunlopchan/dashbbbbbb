@@ -492,7 +492,10 @@
                     imageHTML = `
                         <div class="event-images">
                             ${event.images.map(image => `
-                                <img src="${image}" alt="${event.title}" class="event-image" onerror="this.style.display='none'">
+                                <img src="/uploads/${image.filename}" 
+                                     alt="${image.originalName || image.filename}" 
+                                     class="event-image" 
+                                     onerror="this.style.display='none'">
                             `).join('')}
                         </div>
                     `;
@@ -585,6 +588,10 @@
         const editImageUpload = document.getElementById('editEventImages');
         const editImagePreviewContainer = document.getElementById('editImagePreviewContainer');
 
+        // Store selected files for edit form
+        let editSelectedFiles = [];
+        let existingImages = []; // Store existing images from the event
+
         // Function to open edit event modal
         async function openEditEventModal(event) {
             try {
@@ -595,6 +602,10 @@
                 if (!event) {
                     throw new Error('No event data received');
                 }
+
+                // Clear selected files and existing images
+                editSelectedFiles = [];
+                existingImages = [];
 
                 // Populate form with event details
                 const formFields = {
@@ -649,17 +660,18 @@
 
                 // Show existing images if any
                 if (event.images && Array.isArray(event.images) && event.images.length > 0) {
-                    event.images.forEach(imageUrl => {
-                        if (!imageUrl) return; // Skip invalid image URLs
+                    existingImages = [...event.images]; // Store existing images
+                    event.images.forEach(image => {
+                        if (!image || !image.filename) return; // Skip invalid images
 
                         const imagePreview = document.createElement('div');
                         imagePreview.classList.add('image-preview');
 
                         const previewImg = document.createElement('img');
-                        previewImg.src = imageUrl;
+                        previewImg.src = `/uploads/${image.filename}`;
                         previewImg.classList.add('preview-image');
                         previewImg.onerror = () => {
-                            console.warn('Failed to load image:', imageUrl);
+                            console.warn('Failed to load image:', image.filename);
                             editImagePreviewContainer.removeChild(imagePreview);
                         };
 
@@ -682,6 +694,11 @@
                         removeBtn.style.cursor = 'pointer';
 
                         removeBtn.addEventListener('click', () => {
+                            // Remove from existing images
+                            const imageIndex = existingImages.findIndex(img => img.filename === image.filename);
+                            if (imageIndex > -1) {
+                                existingImages.splice(imageIndex, 1);
+                            }
                             editImagePreviewContainer.removeChild(imagePreview);
                             editImageUpload.disabled = false;
                         });
@@ -708,6 +725,8 @@
             editEventForm.reset();
             editImagePreviewContainer.innerHTML = '';
             editImageUpload.disabled = false;
+            editSelectedFiles = []; // Clear selected files
+            existingImages = []; // Clear existing images
         }
 
         closeEditEventModalBtn.addEventListener('click', closeEditEventModal);
@@ -756,9 +775,11 @@
             }
 
             // Add new images if selected
-            if (editImageUpload.files.length > 0) {
-                for (let i = 0; i < editImageUpload.files.length; i++) {
-                    formData.append('images', editImageUpload.files[i]);
+            if (editSelectedFiles.length > 0) {
+                console.log(`Adding ${editSelectedFiles.length} new images to edit form`);
+                for (let i = 0; i < editSelectedFiles.length; i++) {
+                    console.log(`Adding new image ${i + 1}:`, editSelectedFiles[i].name);
+                    formData.append('images', editSelectedFiles[i]);
                 }
             }
 
@@ -810,7 +831,10 @@
                 return;
             }
 
-            files.forEach(file => {
+            // Store the selected files
+            editSelectedFiles = editSelectedFiles.concat(files);
+
+            files.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const imagePreview = document.createElement('div');
@@ -839,6 +863,11 @@
                     removeBtn.style.cursor = 'pointer';
 
                     removeBtn.addEventListener('click', () => {
+                        // Remove the file from editSelectedFiles array
+                        const fileIndex = editSelectedFiles.indexOf(file);
+                        if (fileIndex > -1) {
+                            editSelectedFiles.splice(fileIndex, 1);
+                        }
                         editImagePreviewContainer.removeChild(imagePreview);
                         editImageUpload.disabled = false;
                     });
@@ -858,7 +887,8 @@
                 reader.readAsDataURL(file);
             });
 
-            e.target.value = '';
+            // Don't reset file input - keep the files for form submission
+            // e.target.value = '';
         });
 
         // Existing switchTab function
@@ -888,10 +918,13 @@
 
         // Store uploaded images
         let uploadedImages = [];
+        let selectedFiles = []; // Store selected files
 
         // Modify form submission to use fetchEvents for immediate update
         addEventForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            console.log('Form submission started');
 
             // Create FormData object
             const formData = new FormData();
@@ -915,17 +948,29 @@
             }
 
             // Add images if selected
-            if (imageUpload.files.length > 0) {
-                for (let i = 0; i < imageUpload.files.length; i++) {
-                    formData.append('images', imageUpload.files[i]);
+            if (selectedFiles.length > 0) {
+                console.log(`Adding ${selectedFiles.length} images to form data`);
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    console.log(`Adding image ${i + 1}:`, selectedFiles[i].name);
+                    formData.append('images', selectedFiles[i]);
                 }
+            } else {
+                console.log('No images selected');
+            }
+
+            console.log('FormData contents:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
             }
 
             try {
+                console.log('Sending request to /api/events');
                 const response = await fetch('/api/events', {
                     method: 'POST',
                     body: formData // FormData will automatically set the correct Content-Type
                 });
+
+                console.log('Response status:', response.status);
 
                 if (response.status === 401) {
                     // Token expired, redirect to login
@@ -934,6 +979,7 @@
                 }
 
                 const result = await response.json();
+                console.log('Response data:', result);
 
                 if (response.ok) {
                     // Show success notification
@@ -968,7 +1014,10 @@
                 return;
             }
 
-            files.forEach(file => {
+            // Store the selected files
+            selectedFiles = selectedFiles.concat(files);
+
+            files.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const imagePreview = document.createElement('div');
@@ -997,6 +1046,11 @@
                     removeBtn.style.cursor = 'pointer';
 
                     removeBtn.addEventListener('click', () => {
+                        // Remove the file from selectedFiles array
+                        const fileIndex = selectedFiles.indexOf(file);
+                        if (fileIndex > -1) {
+                            selectedFiles.splice(fileIndex, 1);
+                        }
                         imagePreviewContainer.removeChild(imagePreview);
                         // Re-enable file input if it was disabled
                         imageUpload.disabled = false;
@@ -1018,8 +1072,8 @@
                 reader.readAsDataURL(file);
             });
 
-            // Reset file input
-            e.target.value = '';
+            // Don't reset file input - keep the files for form submission
+            // e.target.value = '';
         });
 
         // Open Modal
@@ -1030,6 +1084,7 @@
             const imagePreviewContainer = document.querySelector('.image-preview-container');
             imagePreviewContainer.innerHTML = '';
             imageUpload.disabled = false;
+            selectedFiles = []; // Clear selected files
         });
 
         // Close Modal Functions
@@ -1039,6 +1094,7 @@
             const imagePreviewContainer = document.querySelector('.image-preview-container');
             imagePreviewContainer.innerHTML = '';
             imageUpload.disabled = false;
+            selectedFiles = []; // Clear selected files
         }
 
         closeEventModalBtn.addEventListener('click', closeEventModal);

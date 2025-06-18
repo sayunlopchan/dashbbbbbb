@@ -7,6 +7,31 @@
     <title>Knox Barbell - Product</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
+    <style>
+      /* Product description textarea styling */
+      .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 80px;
+        transition: border-color 0.3s ease;
+      }
+
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+      }
+
+      .form-group textarea::placeholder {
+        color: #95a5a6;
+        font-style: italic;
+      }
+    </style>
   </head>
 
   <body>
@@ -190,10 +215,10 @@
             <label for="priceRange">Price Range:</label>
             <select id="priceRange">
               <option value="">All</option>
-              <option value="0-50">$0 - $50</option>
-              <option value="51-100">$51 - $100</option>
-              <option value="101-200">$101 - $200</option>
-              <option value="201+">$201+</option>
+              <option value="0-50">Rs0 - Rs50</option>
+              <option value="51-100">Rs51 - Rs100</option>
+              <option value="101-200">Rs101 - Rs200</option>
+              <option value="201+">Rs201+</option>
             </select>
           </div>
           <div class="filter-group">
@@ -204,10 +229,10 @@
               <option value="clothing">Clothing</option>
               <option value="accessories">Accessories</option>
             </select>
+            <button id="resetProductFilters" title="Reset Filters">
+              <i class="fa-solid fa-rotate"></i>
+            </button>
           </div>
-          <button id="resetProductFilters" title="Reset Filters">
-            <i class="fa-solid fa-rotate"></i>
-          </button>
         </div>
 
         <!-- Products Table -->
@@ -266,7 +291,7 @@
             <p>Fill in the details to add a new product.</p>
           </div>
         </div>
-        <form id="productForm">
+        <form id="productForm" class="product-form-container">
           <div class="form-grid">
             <div class="form-group">
               <label for="productName">Product Name</label>
@@ -292,7 +317,7 @@
             </div>
             <div class="form-group full-width">
               <label for="productDescription">Description</label>
-              <textarea id="productDescription" rows="3" required></textarea>
+              <textarea id="productDescription" rows="3" placeholder="Enter product description (optional)"></textarea>
             </div>
           </div>
           <div class="form-actions">
@@ -490,6 +515,7 @@
         }
       }
 
+      // update pagination
       function updatePagination(paginationData) {
         currentPage = parseInt(paginationData.currentPage) || 1;
         totalPages = parseInt(paginationData.totalPages) || 1;
@@ -500,6 +526,7 @@
         nextPageBtn.classList.toggle('disabled', currentPage >= totalPages);
       }
 
+      // display products 
       function displayProducts(products) {
         productTableBody.innerHTML = '';
 
@@ -535,7 +562,7 @@
           <td>${productId}</td>
           <td>${product.name || 'N/A'}</td>
           <td>${product.category ? product.category.charAt(0).toUpperCase() + product.category.slice(1) : 'N/A'}</td>
-          <td>$${product.price ? product.price.toFixed(2) : '0.00'}</td>
+          <td>Rs ${product.price ? product.price.toFixed(2) : '0.00'}</td>
           <td>${product.stock || 0}</td>
           <td>
             <span class="status ${stockClass}">
@@ -582,7 +609,7 @@
         });
       }
 
-      // Edit product function
+      // edit product function
       async function editProduct(productId) {
         try {
           const response = await fetch(`/api/products/${productId}`);
@@ -597,7 +624,11 @@
           document.getElementById('productCategory').value = product.category || '';
           document.getElementById('productPrice').value = product.price || '';
           document.getElementById('productStock').value = product.stock || '';
-          document.getElementById('productDescription').value = product.description || '';
+          
+          // Handle description - only show if it's not the default value
+          const description = product.description || '';
+          document.getElementById('productDescription').value = 
+            description === 'No description provided' ? '' : description;
 
           // Update modal for editing
           document.querySelector('#addProductModal .modal-header h2').textContent = 'Edit Product';
@@ -615,7 +646,7 @@
         }
       }
 
-      // Show Confirmation Dialog
+      // show confirmation dialog
       function showConfirmationDialog(title, message, action, productId) {
         confirmationTitle.textContent = title;
         confirmationMessage.textContent = message;
@@ -634,7 +665,7 @@
         document.body.style.overflow = 'hidden';
       }
 
-      // Hide Confirmation Dialog
+      // hide confirmation dialog
       function hideConfirmationDialog() {
         confirmationModal.classList.remove('active');
         document.body.style.overflow = '';
@@ -648,7 +679,7 @@
         confirmBtn.style.color = '';
       }
 
-      // Confirmation Dialog Event Listeners
+      // confirmation dialog event listeners
       confirmActionBtn.addEventListener('click', async () => {
         if (currentAction === 'delete' && currentProductId) {
           try {
@@ -681,7 +712,7 @@
         }
       });
 
-      // Event Listeners
+      // event listeners
       prevPageBtn.addEventListener("click", () => {
         if (currentPage > 1) {
           fetchProducts(currentPage - 1);
@@ -694,27 +725,31 @@
         }
       });
 
-      // Filter event listeners
+      // filter event listeners
       document.getElementById('categoryFilter').addEventListener('change', () => {
         currentPage = 1;
         fetchProducts(currentPage);
       });
 
+      // stock status filter
       document.getElementById('stockStatus').addEventListener('change', () => {
         currentPage = 1;
         fetchProducts(currentPage);
       });
 
+      // price range filter
       document.getElementById('priceRange').addEventListener('change', () => {
         currentPage = 1;
         fetchProducts(currentPage);
       });
 
+      // product search filter
       document.getElementById('productSearch').addEventListener('input', debounce(() => {
         currentPage = 1;
         fetchProducts(currentPage);
       }, 500));
 
+      // reset product filters
       document.getElementById('resetProductFilters').addEventListener('click', () => {
         currentPage = 1;
         document.getElementById('categoryFilter').value = '';
@@ -725,7 +760,7 @@
         toast('Filters have been reset', 'info');
       });
 
-      // Form Submission
+      // form submission
       productForm.addEventListener('submit', async function (e) {
         e.preventDefault();
 
@@ -733,9 +768,14 @@
           name: document.getElementById('productName').value.trim(),
           category: document.getElementById('productCategory').value,
           price: parseFloat(document.getElementById('productPrice').value),
-          stock: parseInt(document.getElementById('productStock').value),
-          description: document.getElementById('productDescription').value.trim()
+          stock: parseInt(document.getElementById('productStock').value)
         };
+
+        // Only include description if it has a value
+        const description = document.getElementById('productDescription').value.trim();
+        if (description) {
+          formData.description = description;
+        }
 
         const validationErrors = validateForm(formData);
         if (validationErrors.length > 0) {
@@ -781,18 +821,21 @@
         }
       });
 
-      // Modal Handling
+      // modal handling
+      // add product button
       addProductBtn.addEventListener('click', function () {
         resetModal();
         addProductModal.classList.add('active');
         document.body.style.overflow = 'hidden';
       });
 
+      // cancel button
       cancelBtn.addEventListener('click', function () {
         addProductModal.classList.remove('active');
         document.body.style.overflow = '';
       });
 
+      // close modal when clicking outside
       addProductModal.addEventListener('click', function (e) {
         if (e.target === addProductModal) {
           addProductModal.classList.remove('active');
@@ -800,7 +843,7 @@
         }
       });
 
-      // Utility function for debouncing search
+      // utility function for debouncing search
       function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -813,10 +856,10 @@
         };
       }
 
-      // Initial fetch
+      // initial fetch
       fetchProducts(1);
 
-      // Notification Modal Logic
+      // notification modal logic
       document.addEventListener('DOMContentLoaded', function () {
         const notificationIcon = document.querySelector('.notification');
         const notificationModal = document.querySelector('.notification-modal');

@@ -60,6 +60,9 @@ app.use(cookieParser());
 app.use(express.static(clientPath));
 app.use(express.static(path.join(__dirname, "public")));
 
+// Serve uploaded images
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // Routes without .html extension
 const htmlPages = [
   "dashboard",

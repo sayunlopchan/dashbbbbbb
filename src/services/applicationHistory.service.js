@@ -20,7 +20,7 @@ const getApplicationHistoryByIdService = async (applicationId) => {
 };
 
 // Create application history record
-const createApplicationHistoryService = async (applicationData) => {
+const createApplicationHistoryService = async (applicationData, options = {}) => {
   try {
     const historyData = {
       applicationId: applicationData.applicationId,
@@ -34,8 +34,18 @@ const createApplicationHistoryService = async (applicationData) => {
       submittedAt: applicationData.submittedAt,
     };
 
-    const history = new ApplicationHistory(historyData);
-    await history.save();
+    // Use findOneAndUpdate with upsert to handle duplicates gracefully
+    const history = await ApplicationHistory.findOneAndUpdate(
+      { applicationId: applicationData.applicationId },
+      historyData,
+      { 
+        new: true, 
+        upsert: true, 
+        runValidators: true,
+        session: options.session // Pass session for transactions
+      }
+    );
+    
     return history;
   } catch (error) {
     console.error("Error creating application history:", error);
