@@ -1,5 +1,7 @@
 const Announcement = require("../models/Announcement.model");
+const Member = require("../models/Member.model");
 const mongoose = require("mongoose");
+const { sendAnnouncementNotificationToAllMembers } = require("../utils/emailService");
 
 // Get all announcements
 const getAllAnnouncementsService = async () => {
@@ -71,6 +73,44 @@ const createAnnouncementService = async (announcementData) => {
 
     // Commit transaction
     await session.commitTransaction();
+
+    console.log('✅ Announcement created successfully:', {
+      announcementId: announcement.announcementId,
+      title: announcement.title,
+      _id: announcement._id
+    });
+
+    // Send announcement notification to all members
+    try {
+      // Fetch all members regardless of status
+      const allMembers = await Member.find({}).select('fullName email memberStatus');
+
+      console.log(`🔍 Found ${allMembers.length} total members`);
+
+      if (allMembers.length > 0) {
+        console.log(`📧 Sending announcement notification to ${allMembers.length} members`);
+        console.log('📧 Members to notify:', allMembers.map(m => `${m.fullName} (${m.email}) - Status: ${m.memberStatus}`));
+        
+        const emailResults = await sendAnnouncementNotificationToAllMembers(announcement, allMembers);
+        
+        console.log(`📊 Announcement notification email results:`, {
+          total: emailResults.total,
+          successful: emailResults.successful,
+          failed: emailResults.failed
+        });
+        
+        if (emailResults.failed > 0) {
+          console.warn(`⚠️ ${emailResults.failed} announcement notification emails failed to send`);
+          console.warn('❌ Failed emails:', emailResults.errors);
+        }
+      } else {
+        console.log('📧 No members found to send announcement notifications to');
+      }
+    } catch (emailError) {
+      console.error('❌ Error sending announcement notification emails:', emailError.message);
+      console.error('❌ Email error stack:', emailError.stack);
+      // Don't throw the error - announcement creation was successful, email failure is non-critical
+    }
 
     return announcement;
   } catch (error) {

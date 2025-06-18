@@ -7,6 +7,7 @@ const { membershipExpiryTemplate } = require('./emailTemplates/membershipExpiry'
 const { membershipCancellationTemplate } = require('./emailTemplates/membershipCancellation');
 const { memberCreationTemplate } = require('./emailTemplates/memberCreation');
 const { eventNotificationTemplate } = require('./emailTemplates/eventNotification');
+const { announcementNotificationTemplate } = require('./emailTemplates/announcementNotification');
 
 // Create a transporter using the default SMTP transport
 const createTransporter = () => {
@@ -397,6 +398,100 @@ const sendEventNotificationToAllMembers = async (eventDetails, members) => {
   return results;
 };
 
+/**
+ * Send announcement notification email to a single member
+ * @param {Object} memberDetails - Member's details
+ * @param {Object} announcementDetails - Announcement details
+ * @returns {Promise<void>}
+ */
+const sendAnnouncementNotificationEmail = async (memberDetails, announcementDetails) => {
+  console.log(`📧 Preparing announcement notification email for: ${memberDetails.email}`);
+  console.log('📧 Member details:', {
+    fullName: memberDetails.fullName,
+    email: memberDetails.email,
+    memberStatus: memberDetails.memberStatus
+  });
+  console.log('📧 Announcement details:', {
+    title: announcementDetails.title,
+    authorName: announcementDetails.authorName,
+    announcementId: announcementDetails.announcementId
+  });
+
+  return sendEmail(memberDetails.email, memberDetails.fullName, {
+    subject: `📢 New Announcement: ${announcementDetails.title}`,
+    html: announcementNotificationTemplate({
+      memberName: memberDetails.fullName,
+      announcementTitle: announcementDetails.title,
+      announcementAuthor: announcementDetails.authorName,
+      announcementDescription: announcementDetails.description,
+      announcementId: announcementDetails.announcementId,
+      postDate: announcementDetails.postDate
+    })
+  });
+};
+
+/**
+ * Send announcement notification emails to all members
+ * @param {Object} announcementDetails - Announcement details
+ * @param {Array} members - Array of member objects
+ * @returns {Promise<Object>} - Results of email sending
+ */
+const sendAnnouncementNotificationToAllMembers = async (announcementDetails, members) => {
+  console.log(`📧 Sending announcement notification to ${members.length} members`);
+  
+  const results = {
+    total: members.length,
+    successful: 0,
+    failed: 0,
+    errors: []
+  };
+
+  // Send emails in parallel with a limit to avoid overwhelming the email service
+  const batchSize = 10; // Send 10 emails at a time
+  const batches = [];
+  
+  for (let i = 0; i < members.length; i += batchSize) {
+    batches.push(members.slice(i, i + batchSize));
+  }
+
+  for (const batch of batches) {
+    const batchPromises = batch.map(async (member) => {
+      try {
+        await sendAnnouncementNotificationEmail(member, announcementDetails);
+        results.successful++;
+        console.log(`✅ Announcement notification sent to ${member.fullName} (${member.email})`);
+        return { success: true, member: member.fullName, email: member.email };
+      } catch (error) {
+        results.failed++;
+        const errorInfo = {
+          member: member.fullName,
+          email: member.email,
+          error: error.message
+        };
+        results.errors.push(errorInfo);
+        console.error(`❌ Failed to send announcement notification to ${member.fullName} (${member.email}):`, error.message);
+        return { success: false, member: member.fullName, email: member.email, error: error.message };
+      }
+    });
+
+    // Wait for current batch to complete before processing next batch
+    await Promise.all(batchPromises);
+    
+    // Small delay between batches to be respectful to email service
+    if (batches.indexOf(batch) < batches.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+
+  console.log(`📊 Announcement notification results:`, {
+    total: results.total,
+    successful: results.successful,
+    failed: results.failed
+  });
+
+  return results;
+};
+
 module.exports = {
   sendEmail,
   sendWelcomeEmail,
@@ -407,5 +502,7 @@ module.exports = {
   sendMembershipCancellationEmail,
   sendMemberCreationEmail,
   sendEventNotificationEmail,
-  sendEventNotificationToAllMembers
+  sendEventNotificationToAllMembers,
+  sendAnnouncementNotificationEmail,
+  sendAnnouncementNotificationToAllMembers
 };

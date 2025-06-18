@@ -114,7 +114,7 @@ const eventNotificationTemplate = (params) => {
       <div style="background-color: #e8f5e8; border-radius: 8px; padding: 15px; margin: 20px 0; border-left: 4px solid #4CAF50;">
         <h3 style="margin-top: 0; color: #2e7d32;">What's Next?</h3>
         <ul style="margin: 0; padding-left: 20px; color: #2e7d32;">
-          <li>Check your dashboard for more event details</li>
+          <li>Visit our website for more event details</li>
           <li>Register for the event if you're interested</li>
           <li>Share this event with other members</li>
           <li>Contact the organizer for any questions</li>
@@ -136,7 +136,7 @@ const eventNotificationTemplate = (params) => {
       <p style="margin-top: 20px;">We hope to see you at the event!</p>
       
       <p>Best regards,<br/>
-      <strong>Your Organization Team</strong></p>
+      <strong>Knox Barbell</strong></p>
       
       <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
       <p style="font-size: 0.8em; color: #666; text-align: center;">

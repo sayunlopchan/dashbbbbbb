@@ -86,20 +86,18 @@ const createEventService = async (eventData, userId) => {
       _id: event._id
     });
 
-    // Send event notification to all active members
+    // Send event notification to all members
     try {
-      // Fetch all active members
-      const activeMembers = await Member.find({ 
-        memberStatus: { $in: ['active', 'expiring'] } // Include both active and expiring members
-      }).select('fullName email memberStatus');
+      // Fetch all members regardless of status
+      const allMembers = await Member.find({}).select('fullName email memberStatus');
 
-      console.log(`🔍 Found ${activeMembers.length} active/expiring members`);
+      console.log(`🔍 Found ${allMembers.length} total members`);
 
-      if (activeMembers.length > 0) {
-        console.log(`📧 Sending event notification to ${activeMembers.length} active members`);
-        console.log('📧 Members to notify:', activeMembers.map(m => `${m.fullName} (${m.email})`));
+      if (allMembers.length > 0) {
+        console.log(`📧 Sending event notification to ${allMembers.length} members`);
+        console.log('📧 Members to notify:', allMembers.map(m => `${m.fullName} (${m.email}) - Status: ${m.memberStatus}`));
         
-        const emailResults = await sendEventNotificationToAllMembers(event, activeMembers);
+        const emailResults = await sendEventNotificationToAllMembers(event, allMembers);
         
         console.log(`📊 Event notification email results:`, {
           total: emailResults.total,
@@ -112,7 +110,7 @@ const createEventService = async (eventData, userId) => {
           console.warn('❌ Failed emails:', emailResults.errors);
         }
       } else {
-        console.log('📧 No active members found to send event notifications to');
+        console.log('📧 No members found to send event notifications to');
       }
     } catch (emailError) {
       console.error('❌ Error sending event notification emails:', emailError.message);
