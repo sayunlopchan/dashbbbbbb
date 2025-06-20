@@ -16,16 +16,29 @@ const checkMemberStatusNotifications = async () => {
     const today = new Date();
     console.log('🔍 Starting member status notification check at:', today.toISOString());
 
+    // Safely parse dates and handle invalid ones
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
     // Find members with pending status about to start
     const pendingMembers = await Member.find({
       memberStatus: "pending",
-      startDate: { $lte: new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000) }, // Within next 1 day
-    });
+      startDate: { 
+        $lte: tomorrow,
+        $ne: null, // Ensure startDate is not null
+        $exists: true // Ensure startDate exists
+      }
+    }).lean(); // Use lean() for better performance
 
     console.log(`📊 Found ${pendingMembers.length} pending members about to start`);
-
+    
     for (const member of pendingMembers) {
       try {
+           if (!member.startDate || isNaN(new Date(member.startDate).getTime())) {
+          console.error(`⛔ Invalid startDate for member ${member._id}`);
+          continue;
+        }
+          
         // Create notification for pending member
         await createMemberStatusNotificationService(
           member,
@@ -98,47 +111,63 @@ const checkMemberStatusNotifications = async () => {
 };
 
 const startAllCronJobs = () => {
-  // Explicitly set timezone to UTC
-  process.env.TZ = "UTC";
-
-  // Use environment variables for cron schedules with fallback to default
-  const DAILY_CRON_SCHEDULE = process.env.CRON_DAILY_SCHEDULE || "0 0 * * *";
-  const HOURLY_CRON_SCHEDULE = "0 * * * *"; // Run every hour
-
-  // Log the cron schedules
-  console.log(`🕰️ CRON_DAILY_SCHEDULE: ${DAILY_CRON_SCHEDULE}`);
-  console.log(`🕰️ HOURLY_CRON_SCHEDULE: ${HOURLY_CRON_SCHEDULE}`);
-  console.log(`🌍 Current Timezone: ${process.env.TZ}`);
-
-  // ⏰ Runs every hour to update member statuses
-  cron.schedule(HOURLY_CRON_SCHEDULE, async () => {
     try {
-      console.log("🕒 Running hourly member status updates...");
+    const DAILY_CRON_SCHEDULE = process.env.CRON_DAILY_SCHEDULE || "0 0 * * *";
+    const HOURLY_CRON_SCHEDULE = "0 * * * *";
+
+    console.log(`🕰 CRON_DAILY_SCHEDULE: ${DAILY_CRON_SCHEDULE}`);
+    console.log(`🕰 HOURLY_CRON_SCHEDULE: ${HOURLY_CRON_SCHEDULE}`);
+
+    // ⏰ Hourly job with better error handling
+    const hourlyJob = cron.schedule(HOURLY_CRON_SCHEDULE, async () => {
+      try {
+        console.log("🕒 Running hourly member status updates...");
+        const updates = await updateMemberStatusesService();
+        console.log(`✅ Hourly member status updates completed. Updated ${updates.length} members.`);
+      } catch (error) {
+        console.error("❌ Error in hourly member status updates:", error);
+      }
+    }, {
+      scheduled: true,
+      timezone: "UTC" // Explicitly set timezone
+    });
+
+    // ⏰ Daily job with better error handling
+    const dailyJob = cron.schedule(DAILY_CRON_SCHEDULE, async () => {
+      try {
+        console.log("🕒 Running daily cron jobs...");
+        await checkMemberStatusNotifications();
+        console.log("✅ Daily cron jobs completed successfully");
+      } catch (error) {
+        console.error("❌ Error in daily cron jobs:", error);
+      }
+    }, {
+      scheduled: true,
+      timezone: "UTC" // Explicitly set timezone
+    });
+
+    // Handle process exit
+    process.on('SIGINT', () => {
+      hourlyJob.stop();
+      dailyJob.stop();
+      process.exit();
+    });
+
+  } catch (schedulerError) {
+    console.error("❌ Failed to schedule cron jobs:", schedulerError);
+  }
+
+
+  // Initial update with delay to prevent server overload on startup
+  setTimeout(async () => {
+    try {
       const updates = await updateMemberStatusesService();
-      console.log(`✅ Hourly member status updates completed. Updated ${updates.length} members.`);
+      console.log(`✅ Initial member status update completed. Updated ${updates.length} members.`);
     } catch (error) {
-      console.error("❌ Error in hourly member status updates:", error);
+      console.error("❌ Error in initial member status update:", error);
     }
-  });
-
-  // ⏰ Runs every day at midnight UTC (configurable via env)
-  cron.schedule(DAILY_CRON_SCHEDULE, async () => {
-    try {
-      console.log("🕒 Running daily cron jobs...");
-      
-      // Run all daily checks
-      await checkMemberStatusNotifications();
-      
-      console.log("✅ Daily cron jobs completed successfully");
-    } catch (error) {
-      console.error("❌ Error in daily cron jobs:", error);
-    }
-  });
-
-  // Run initial status update when server starts
-  updateMemberStatusesService()
-    .then(updates => console.log(`✅ Initial member status update completed. Updated ${updates.length} members.`))
-    .catch(error => console.error("❌ Error in initial member status update:", error));
+  }, 10000); // 10-second delay
+  
 };
 
 // checkMemberStatusNotifications()

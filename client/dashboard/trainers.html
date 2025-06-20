@@ -11,6 +11,7 @@
   </head>
 
   <body>
+    <!-- sidebar -->
     <div class="sidebar">
       <div class="sidebar-header">
         <h3>Knox Barbell</h3>
@@ -90,6 +91,13 @@
           </a>
         </li>
         <li>
+          <a href="/locker">
+            <i class="fas fa-box"></i>
+            <span>Locker</span>
+            <div class="tooltip">Locker</div>
+          </a>
+        </li>
+        <li>
           <a href="/product">
             <i class="fas fa-box"></i>
             <span>Product</span>
@@ -150,6 +158,8 @@
 
       <!-- Content -->
       <div class="content">
+
+        <!-- header -->
         <div class="content-header">
           <h1>Trainers Management</h1>
           <button id="addTrainerBtn">
@@ -157,6 +167,8 @@
             <p>Add</p>
           </button>
         </div>
+
+        <!-- filter -->
         <div class="filter-group">
           <select id="statusFilter">
             <option value="">All Statuses</option>
@@ -173,60 +185,92 @@
             <i class="fa-solid fa-print"></i>
           </button>
         </div>
+
         <!-- Enrolled Members Table -->
-        <div class="container">
-          <div class="table-container">
-            <table class="trainer-table">
-              <thead>
-                <tr>
-                  <th>S.N</th>
-                  <th>Id</th>
-                  <th>Full Name</th>
-                  <th>Email Id</th>
-                  <th>Contact No.</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>loading...</td>
-                  <td>loading...</td>
-                  <td>loading...</td>
-                  <td>loading...</td>
-                  <td>loading...</td>
-                  <td><span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span></td>
-                  <td>
-                    <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                    <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <!-- Pagination Controls -->
-          <div class="pagination-controls">
-            <button id="prevPage" class="pagination-btn" disabled>
-              <i class="fas fa-chevron-left"></i> Previous
-            </button>
-            <span id="pageInfo">Page 1</span>
-            <button id="nextPage" class="pagination-btn" disabled>
-              Next <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
+        <div class="table-container">
+          <table class="trainer-table">
+            <thead>
+              <tr>
+                <th>S.N</th>
+                <th>Id</th>
+                <th>Full Name</th>
+                <th>Email Id</th>
+                <th>Contact No.</th>
+                <th>Gender</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td>loading...</td>
+                <td><span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span></td>
+                <td>
+                  <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                  <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+          <button id="prevPage" class="pagination-btn" disabled>
+            <i class="fas fa-chevron-left"></i> Previous
+          </button>
+          <span id="pageInfo">Page 1</span>
+          <button id="nextPage" class="pagination-btn" disabled>
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Trainer Member Management Section -->
+        <div class="content-header">
+          <h1>Trainer Member Assignments</h1>
+          <button id="assignMemberHeaderBtn" class="btn btn-primary"
+            style="display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-user-plus"></i> Assign Member
+          </button>
+        </div>
+
+        <!-- Assigned Members Table -->
+        <div class="table-container">
+          <table class="trainer-assignments-table">
+            <thead>
+              <tr>
+                <th>S.N</th>
+                <th>Trainer ID</th>
+                <th>Trainer Name</th>
+                <th>Member ID</th>
+                <th>Member Name</th>
+                <th>Assigned Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="8" class="text-center">Loading assignments...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-
-
 
     <!-- Add Trainers Modal -->
     <div class="modal-overlay" id="addTrainerModal">
       <div class="modal-content">
         <div class="modal-header">
-          <div>
+          <div class="heading-container">
             <h2>Add New Trainer</h2>
             <p>Fill in the details to add a new trainer.</p>
           </div>
@@ -250,6 +294,23 @@
               <input type="date" id="date" required>
             </div>
             <div class="form-group">
+              <label>Gender</label>
+              <div class="radio-group">
+                <div class="radio-option">
+                  <input type="radio" id="genderMale" name="gender" value="male" checked>
+                  <label for="genderMale">Male</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="genderFemale" name="gender" value="female">
+                  <label for="genderFemale">Female</label>
+                </div>
+                <div class="radio-option">
+                  <input type="radio" id="genderOther" name="gender" value="other">
+                  <label for="genderOther">Other</label>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
               <label>Status</label>
               <div class="radio-group">
                 <div class="radio-option">
@@ -266,6 +327,56 @@
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
             <button type="submit" class="btn btn-primary">Add Trainer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assign Member to Trainer Modal -->
+    <div class="modal-overlay" id="assignMemberModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="heading-container">
+            <h2>Assign Member to Trainer</h2>
+            <p>Select a member to assign to this trainer.</p>
+          </div>
+        </div>
+        <form id="assignMemberForm">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label for="selectedTrainer">Trainer</label>
+              <select id="selectedTrainerSelect">
+                <option value="">Select Trainer</option>
+              </select>
+            </div>
+            <div class="form-group full-width">
+              <label for="memberSearch">Search Members</label>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="memberSearch" placeholder="Search by member ID, name, or email..."
+                  autocomplete="off">
+                <div class="search-results" id="memberSearchResults"></div>
+              </div>
+            </div>
+            <div class="form-group full-width">
+              <label>Selected Member</label>
+              <div id="selectedMemberInfo" class="selected-member-info">
+                <div class="member-card">
+                  <div class="member-details">
+                    <strong id="selectedMemberName"></strong>
+                    <span id="selectedMemberId"></span>
+                    <span id="selectedMemberEmail"></span>
+                  </div>
+                  <button type="button" id="removeSelectedMember" class="btn btn-secondary">
+                    <i class="fa-solid fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelAssignBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="assignMemberBtn" disabled>Assign Member</button>
           </div>
         </form>
       </div>
@@ -317,6 +428,11 @@
         const contactRegex = /^[0-9]{10,15}$/;
         if (!formData.contact || !contactRegex.test(formData.contact)) {
           errors.push('Please enter a valid 10-15 digit contact number');
+        }
+
+        // Gender validation
+        if (!['male', 'female', 'other'].includes(formData.gender)) {
+          errors.push('Please select a valid gender');
         }
 
         // Join Date validation
@@ -376,13 +492,13 @@
             });
           } else {
             console.error('Failed to fetch trainers:', result.message);
-            trainerTableBody.innerHTML = `<tr><td colspan="8" class="text-center">Error loading trainers. Please try again.</td></tr>`;
+            trainerTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading trainers. Please try again.</td></tr>`;
             // Reset pagination on error
             updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
           }
         } catch (error) {
           console.error('Error fetching trainers:', error);
-          trainerTableBody.innerHTML = `<tr><td colspan="8" class="text-center">Error loading trainers. Please try again.</td></tr>`;
+          trainerTableBody.innerHTML = `<tr><td colspan="9" class="text-center">Error loading trainers. Please try again.</td></tr>`;
           // Reset pagination on error
           updatePagination({ currentPage: 1, totalPages: 1, total: 0 });
         }
@@ -410,7 +526,7 @@
         trainerTableBody.innerHTML = '';
 
         if (!trainers || !Array.isArray(trainers) || trainers.length === 0) {
-          trainerTableBody.innerHTML = `<tr><td colspan="8" class="text-center">No trainers found.</td></tr>`;
+          trainerTableBody.innerHTML = `<tr><td colspan="9" class="text-center">No trainers found.</td></tr>`;
           return;
         }
 
@@ -426,10 +542,11 @@
 
           tr.innerHTML = `
             <td>${rowNumber}</td>
-            <td>${trainer.trainerId || 'N/A'}</td>
+            <td class="trainer-detail-link" data-trainer-id="${trainer.trainerId || ''}" style="cursor:pointer;color:#3498db;text-decoration:underline;">${trainer.trainerId || 'N/A'}</td>
             <td>${trainer.fullName || 'N/A'}</td>
             <td>${trainer.email || 'N/A'}</td>
             <td>${trainer.contact || 'N/A'}</td>
+            <td>${trainer.gender ? trainer.gender.charAt(0).toUpperCase() + trainer.gender.slice(1) : 'N/A'}</td>
             <td>${joinDate}</td>
             <td>
                 <span class="status ${trainer.status || 'active'}">
@@ -446,6 +563,16 @@
             </td>
         `;
           trainerTableBody.appendChild(tr);
+        });
+
+        // Add click event for trainerId link
+        trainerTableBody.querySelectorAll('.trainer-detail-link').forEach(link => {
+          link.addEventListener('click', function() {
+            const trainerId = this.getAttribute('data-trainer-id');
+            if (trainerId) {
+              window.location.href = `/trainer-detail?trainerId=${encodeURIComponent(trainerId)}`;
+            }
+          });
         });
 
         attachActionListeners();
@@ -481,6 +608,9 @@
       // Initial fetch of trainers
       fetchTrainers(1);
 
+      // Initial fetch of trainer assignments
+      fetchTrainerAssignments();
+
       // Form Submission Handler
       trainerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -489,6 +619,7 @@
           fullName: document.getElementById('fullName').value,
           email: document.getElementById('email').value,
           contact: document.getElementById('contact').value,
+          gender: document.querySelector('input[name="gender"]:checked').value,
           joinDate: document.getElementById('date').value,
           status: document.querySelector('input[name="status"]:checked').value
         };
@@ -547,6 +678,19 @@
               document.getElementById('email').value = trainer.email;
               document.getElementById('contact').value = trainer.contact;
               document.getElementById('date').value = new Date(trainer.joinDate).toISOString().split('T')[0];
+
+              // Set gender
+              const genderMale = document.getElementById('genderMale');
+              const genderFemale = document.getElementById('genderFemale');
+              const genderOther = document.getElementById('genderOther');
+
+              if (trainer.gender === 'female') {
+                genderFemale.checked = true;
+              } else if (trainer.gender === 'other') {
+                genderOther.checked = true;
+              } else {
+                genderMale.checked = true;
+              }
 
               // Set status
               const statusActive = document.getElementById('statusActive');
@@ -615,14 +759,14 @@
 
       // Attach Action Listeners
       function attachActionListeners() {
-        document.querySelectorAll('.action-btn.edit').forEach(btn => {
+        document.querySelectorAll('.trainer-table .action-btn.edit').forEach(btn => {
           btn.addEventListener('click', () => {
             const trainerId = btn.getAttribute('data-trainer-id');
             editTrainer(trainerId);
           });
         });
 
-        document.querySelectorAll('.action-btn.delete').forEach(btn => {
+        document.querySelectorAll('.trainer-table .action-btn.delete').forEach(btn => {
           btn.addEventListener('click', () => {
             const trainerId = btn.getAttribute('data-trainer-id');
             if (trainerId) {
@@ -654,6 +798,32 @@
         if (e.target === addTrainerModal) {
           addTrainerModal.classList.remove('active');
           document.body.style.overflow = '';
+        }
+      });
+
+      // Assign Member Modal Event Listeners
+      document.getElementById('memberSearch').addEventListener('input', function (e) {
+        const query = e.target.value.trim();
+        searchMembers(query);
+      });
+
+      document.getElementById('removeSelectedMember').addEventListener('click', function () {
+        removeSelectedMember();
+      });
+
+      document.getElementById('assignMemberForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        assignMemberToTrainer();
+      });
+
+      document.getElementById('cancelAssignBtn').addEventListener('click', function () {
+        closeAssignMemberModal();
+      });
+
+      // Close assign member modal when clicking outside
+      document.getElementById('assignMemberModal').addEventListener('click', function (e) {
+        if (e.target === document.getElementById('assignMemberModal')) {
+          closeAssignMemberModal();
         }
       });
 
@@ -797,142 +967,300 @@
           day: '2-digit'
         });
       }
-      // Notification Modal Logic
-      document.addEventListener('DOMContentLoaded', function () {
-        const notificationIcon = document.querySelector('.notification');
-        const notificationModal = document.querySelector('.notification-modal');
-        const closeNotifications = document.querySelector('.close-notifications');
-        const notificationList = document.querySelector('.notification-list');
-        const notificationBadge = document.querySelector('.notification-badge');
 
-        // Toggle notification modal
-        notificationIcon.addEventListener('click', function (e) {
-          e.stopPropagation();
-          notificationModal.classList.toggle('active');
-          if (notificationModal.classList.contains('active')) {
-            fetchNotifications();
-          }
+      // Member Assignment Functionality
+      let selectedMember = null;
+      let currentTrainerForAssignment = null;
+
+      // Open assign member modal
+      function openAssignMemberModal(trainerId) {
+        currentTrainerForAssignment = trainerId || null;
+
+        // Populate trainer dropdown
+        const trainerSelect = document.getElementById('selectedTrainerSelect');
+        trainerSelect.innerHTML = '<option value="">Select Trainer</option>';
+        allTrainers.forEach(trainer => {
+          const option = document.createElement('option');
+          option.value = trainer.trainerId;
+          option.textContent = `${trainer.fullName} (${trainer.trainerId})`;
+          trainerSelect.appendChild(option);
         });
 
-        // Close notification modal
-        closeNotifications.addEventListener('click', function (e) {
-          e.stopPropagation();
-          notificationModal.classList.remove('active');
-        });
-
-        // Close modal when clicking outside
-        document.addEventListener('click', function (e) {
-          if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
-            notificationModal.classList.remove('active');
-          }
-        });
-
-        // Fetch unread count
-        async function fetchUnreadCount() {
-          try {
-            const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
-            const data = await response.json();
-            if (data.success) {
-              notificationBadge.textContent = data.data.unreadCount;
-              // Show/hide badge based on count
-              notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
-            }
-          } catch (error) {
-            console.error('Error fetching unread count:', error);
-          }
+        // If trainerId is provided, select it and disable dropdown
+        if (trainerId) {
+          trainerSelect.value = trainerId;
+          trainerSelect.disabled = true;
+        } else {
+          trainerSelect.value = '';
+          trainerSelect.disabled = false;
         }
 
-        // Fetch notifications from API
-        async function fetchNotifications() {
-          try {
-            notificationList.innerHTML = `
-                        <div class="notification-loading">
-                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-                        </div>
-                    `;
+        // Reset form
+        document.getElementById('memberSearch').value = '';
+        document.getElementById('memberSearchResults').innerHTML = '';
+        document.getElementById('assignMemberBtn').disabled = true;
+        selectedMember = null;
 
-            const response = await fetch(`${baseUrl}/api/notifications`);
-            const data = await response.json();
+        // Show modal
+        document.getElementById('assignMemberModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
 
-            if (data.success) {
-              const notifications = data.data;
+      // Search members
+      async function searchMembers(query) {
+        if (!query || query.length < 2) {
+          document.getElementById('memberSearchResults').innerHTML = '';
+          document.getElementById('memberSearchResults').classList.remove('active');
+          return;
+        }
 
-              if (notifications.length === 0) {
-                notificationList.innerHTML = `
-                                <div class="notification-empty">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <p>No new notifications</p>
-                                </div>
-                            `;
-                return;
-              }
+        try {
+          const response = await fetch(`/api/members/search?q=${encodeURIComponent(query)}`);
+          const result = await response.json();
 
-              // Render notifications
-              notificationList.innerHTML = notifications.map(notif => `
-                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
-                                 data-notification-id="${notif._id}">
-                                <div class="notification-title">
-                                    ${notif.title}
-                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
-                                </div>
-                                <div class="notification-message">${notif.message}</div>
-                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
-                            </div>
-                        `).join('');
+          if (result.success) {
+            displaySearchResults(result.data);
+          } else {
+            document.getElementById('memberSearchResults').innerHTML = '<div class="search-result-item">No members found</div>';
+            document.getElementById('memberSearchResults').classList.add('active');
+          }
+        } catch (error) {
+          console.error('Error searching members:', error);
+          document.getElementById('memberSearchResults').innerHTML = '<div class="search-result-item">Error searching members</div>';
+          document.getElementById('memberSearchResults').classList.add('active');
+        }
+      }
 
-              // Add click handler to mark notifications as read
-              const notificationItems = document.querySelectorAll('.notification-item');
-              notificationItems.forEach(item => {
-                item.addEventListener('click', async () => {
-                  const notificationId = item.dataset.notificationId;
-                  if (item.classList.contains('unread')) {
-                    try {
-                      const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
-                        method: 'PATCH',
-                        credentials: 'include'
-                      });
+      // Display search results
+      function displaySearchResults(members) {
+        const resultsContainer = document.getElementById('memberSearchResults');
 
-                      if (response.ok) {
-                        // Update UI
-                        item.classList.remove('unread');
-                        const unreadDot = item.querySelector('.unread-dot');
-                        if (unreadDot) unreadDot.remove();
+        if (!members || members.length === 0) {
+          resultsContainer.innerHTML = '<div class="search-result-item">No members found</div>';
+          resultsContainer.classList.add('active');
+          return;
+        }
 
-                        // Update unread count
-                        await fetchUnreadCount();
-                      }
-                    } catch (error) {
-                      console.error('Error marking notification as read:', error);
-                    }
-                  }
+        const resultsHTML = members.map(member => `
+          <div class="search-result-item" data-member-id="${member.memberId}" data-member-name="${member.fullName}" data-member-email="${member.email}">
+            <div class="member-name">${member.fullName}</div>
+            <div class="member-details">${member.memberId} • ${member.email}</div>
+          </div>
+        `).join('');
 
-                  // Close notification modal
-                  notificationModal.classList.remove('active');
+        resultsContainer.innerHTML = resultsHTML;
+        resultsContainer.classList.add('active');
 
-                  // Redirect to application page
-                  window.location.href = '/application';
-                });
+        // Add click listeners to search results
+        resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+          item.addEventListener('click', () => {
+            selectMember({
+              memberId: item.dataset.memberId,
+              fullName: item.dataset.memberName,
+              email: item.dataset.memberEmail
+            });
+          });
+        });
+      }
+
+      // Select member from search results
+      function selectMember(member) {
+        selectedMember = member;
+
+        // Update selected member info
+        document.getElementById('selectedMemberName').textContent = member.fullName;
+        document.getElementById('selectedMemberId').textContent = member.memberId;
+        document.getElementById('selectedMemberEmail').textContent = member.email;
+
+        // Show selected member info
+
+        // Hide search results
+        document.getElementById('memberSearchResults').classList.remove('active');
+
+        // Enable assign button
+        document.getElementById('assignMemberBtn').disabled = false;
+      }
+
+      // Remove selected member
+      function removeSelectedMember() {
+        selectedMember = null;
+        document.getElementById('selectedMemberName').textContent = '';
+        document.getElementById('selectedMemberId').textContent = '';
+        document.getElementById('selectedMemberEmail').textContent = '';
+        document.getElementById('assignMemberBtn').disabled = true;
+      }
+
+      // Assign member to trainer
+      async function assignMemberToTrainer() {
+        // Get trainerId from dropdown if not pre-selected
+        let trainerId = currentTrainerForAssignment;
+        if (!trainerId) {
+          trainerId = document.getElementById('selectedTrainerSelect').value;
+        }
+        if (!selectedMember || !trainerId) {
+          toast('Please select a trainer and member first', 'error');
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/trainers/${trainerId}/assign-member`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              memberId: selectedMember.memberId
+            })
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            toast('Member assigned to trainer successfully!', 'success');
+            closeAssignMemberModal();
+            fetchTrainerAssignments(); // Refresh assignments table
+          } else {
+            throw new Error(result.message || 'Failed to assign member to trainer');
+          }
+        } catch (error) {
+          console.error('Error assigning member:', error);
+          toast(error.message, 'error');
+        }
+      }
+
+      // Close assign member modal
+      function closeAssignMemberModal() {
+        document.getElementById('assignMemberModal').classList.remove('active');
+        document.body.style.overflow = '';
+        selectedMember = null;
+        currentTrainerForAssignment = null;
+      }
+
+      // Fetch trainer assignments
+      async function fetchTrainerAssignments() {
+        try {
+          const response = await fetch('/api/trainers/members/all');
+          const result = await response.json();
+
+          if (result.success) {
+            displayTrainerAssignments(result.data);
+          } else {
+            console.error('Failed to fetch trainer assignments:', result.message);
+          }
+        } catch (error) {
+          console.error('Error fetching trainer assignments:', error);
+        }
+      }
+
+      // Display trainer assignments
+      function displayTrainerAssignments(trainers) {
+        const assignmentsTableBody = document.querySelector('.trainer-assignments-table tbody');
+
+        if (!trainers || trainers.length === 0) {
+          assignmentsTableBody.innerHTML = '<tr><td colspan="8" class="text-center">No assignments found.</td></tr>';
+          return;
+        }
+
+        let allAssignments = [];
+        let assignmentIndex = 1;
+
+        trainers.forEach(trainer => {
+          if (trainer.assignedMembers && trainer.assignedMembers.length > 0) {
+            trainer.assignedMembers.forEach((member, idx) => {
+              allAssignments.push({
+                index: assignmentIndex++,
+                trainerId: trainer.trainerId,
+                trainerName: trainer.fullName,
+                memberId: member.memberId,
+                memberName: member.fullName,
+                assignedDate: member.assignedDate,
+                status: member.status,
+                isFirst: idx === 0, // Mark first assignment row for this trainer
+                totalAssignments: trainer.assignedMembers.length
               });
-            } else {
-              throw new Error(data.message || 'Failed to fetch notifications');
-            }
-          } catch (error) {
-            console.error('Error fetching notifications:', error);
-            notificationList.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Failed to load notifications</p>
-                        </div>
-                    `;
+            });
           }
+          // Do nothing for trainers with no assigned members
+        });
+
+        if (allAssignments.length === 0) {
+          assignmentsTableBody.innerHTML = '<tr><td colspan="8" class="text-center">No assignments found.</td></tr>';
+          return;
         }
 
-        // Initial fetch of notifications and unread count
-        fetchNotifications();
-        fetchUnreadCount();
+        const assignmentsHTML = allAssignments.map(assignment => `
+          <tr>
+            <td>${assignment.index}</td>
+            <td>${assignment.trainerId}</td>
+            <td>${assignment.trainerName}</td>
+            <td>${assignment.memberId || '-'}</td>
+            <td>${assignment.memberName || '-'}</td>
+            <td>${assignment.assignedDate ? new Date(assignment.assignedDate).toLocaleDateString() : '-'}</td>
+            <td>
+              ${assignment.status ? `<span class="status-badge ${assignment.status}">${assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}</span>` : '-'}
+            </td>
+            <td>
+              ${assignment.memberId ? `<button class="action-btn delete" data-trainer-id="${assignment.trainerId}" data-member-id="${assignment.memberId}" title="Remove Assignment"><i class="fa-solid fa-trash"></i></button>` : ''}
+            </td>
+          </tr>
+        `).join('');
 
-        // Refresh unread count periodically
-        setInterval(fetchUnreadCount, 30000); // Every 30 seconds
+        assignmentsTableBody.innerHTML = assignmentsHTML;
+
+        // Add event listeners to delete and assign-member buttons
+        attachAssignmentDeleteListeners();
+      }
+
+      // Attach delete listeners to assignment table
+      function attachAssignmentDeleteListeners() {
+        document.querySelectorAll('.trainer-assignments-table .action-btn.delete').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const trainerId = btn.getAttribute('data-trainer-id');
+            const memberId = btn.getAttribute('data-member-id');
+            if (trainerId && memberId) {
+              showAssignmentConfirmationDialog(trainerId, memberId);
+            }
+          });
+        });
+      }
+
+      // Show confirmation dialog for assignment removal
+      function showAssignmentConfirmationDialog(trainerId, memberId) {
+        window.confirmDialog({
+          title: 'Remove Assignment',
+          message: 'Are you sure you want to remove this member from the trainer? This action cannot be undone.',
+          type: 'delete'
+        }).then(confirmed => {
+          if (confirmed) {
+            removeMemberFromTrainer(trainerId, memberId);
+          }
+        });
+      }
+
+      // Remove member from trainer
+      async function removeMemberFromTrainer(trainerId, memberId) {
+        try {
+          const response = await fetch(`/api/trainers/${trainerId}/members/${memberId}`, {
+            method: 'DELETE'
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            toast('Member removed from trainer successfully!', 'success');
+            fetchTrainerAssignments(); // Refresh assignments table
+          } else {
+            throw new Error(result.message || 'Failed to remove member from trainer');
+          }
+        } catch (error) {
+          console.error('Error removing member:', error);
+          toast(error.message, 'error');
+        }
+      }
+
+      // Add event listener for header assign member button
+      document.getElementById('assignMemberHeaderBtn').addEventListener('click', function () {
+        openAssignMemberModal(); // No trainerId, so modal allows trainer selection
       });
     </script>
   </body>

@@ -3,6 +3,7 @@ const dayjs = require("dayjs");
 const { sendMembershipExpiryReminder, sendMemberCreationEmail } = require("../utils/emailService");
 const { createPaymentService } = require("./payment.service");
 const mongoose = require("mongoose");
+const Trainer = require("../models/Trainer.model");
 
 // Create Member
 const createMemberService = async (data, options = {}) => {
@@ -183,8 +184,16 @@ const updateMemberService = async (memberId, data) => {
 
   // Recalculate status
   const currentDate = new Date();
-  const memberStatus =
-    currentDate >= startDate && currentDate <= endDate ? "active" : "pending";
+  let memberStatus = "pending";
+  
+  // Only set to active if current date is >= start date AND payment has been made
+  if (currentDate >= startDate && currentDate <= endDate) {
+    // Check if member has payments (we need to get the current member data)
+    const existingMember = await Member.findOne({ memberId });
+    if (existingMember && existingMember.payments && existingMember.payments.length > 0) {
+      memberStatus = "active";
+    }
+  }
 
   // Prepare update data
   const updateData = {
@@ -311,7 +320,7 @@ const renewMembershipService = async (memberId, renewalData) => {
     member.endDate = newEndDate;
     member.membershipType = renewalData.membershipType;
     member.membershipDuration = duration;
-    member.memberStatus = "active";
+    member.memberStatus = "pending";
 
     // Save member updates
     await member.save({ session });
@@ -382,7 +391,7 @@ const checkMembershipStatusService = async (memberId) => {
 // Cancel membership
 const cancelMembershipService = async (
   memberId,
-  cancelReason = "Manual Cancellation"
+  cancelReason = "Non Payment"
 ) => {
   const member = await Member.findOne({ memberId });
   if (!member) {
@@ -449,7 +458,7 @@ const getMemberAlertsService = async (filter = 'all') => {
 
   // Get members with their membership details
   const members = await Member.find(query)
-    .select('memberId fullName membershipType startDate endDate memberStatus')
+    .select('memberId fullName membershipType startDate endDate memberStatus payments')
     .sort({ endDate: 1 }); // Sort by end date ascending
 
   console.log(`Found ${members.length} members matching query`);
@@ -474,11 +483,17 @@ const getMemberAlertsService = async (filter = 'all') => {
       if (currentDate > member.endDate) {
         newStatus = 'expired';
       } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
-        // If within 7 days of expiry, mark as expiring
-        if (daysUntilExpiry <= 7) {
-          newStatus = 'expiring';
+        // Only set to active if payment has been made
+        if (member.payments && member.payments.length > 0) {
+          // If within 7 days of expiry, mark as expiring
+          if (daysUntilExpiry <= 7) {
+            newStatus = 'expiring';
+          } else {
+            newStatus = 'active';
+          }
         } else {
-          newStatus = 'active';
+          // If no payment made, keep as pending even if start date has passed
+          newStatus = 'pending';
         }
       } else if (currentDate < member.startDate) {
         newStatus = 'pending';
@@ -537,7 +552,7 @@ const updateMemberStatusesService = async () => {
     const members = await Member.find({
       memberStatus: { $nin: ['cancelled'] },
       endDate: { $exists: true }
-    }).select('memberId fullName membershipType startDate endDate memberStatus');
+    }).select('memberId fullName membershipType startDate endDate memberStatus payments');
 
     console.log(`Found ${members.length} members to check for status updates`);
 
@@ -545,14 +560,20 @@ const updateMemberStatusesService = async () => {
       let newStatus = member.memberStatus;
       const daysUntilExpiry = Math.ceil((member.endDate - currentDate) / (1000 * 60 * 60 * 24));
 
-      // Determine new status based on dates
+      // Determine new status based on dates and payment status
       if (currentDate > member.endDate) {
         newStatus = 'expired';
       } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
-        if (daysUntilExpiry <= 7) {
-          newStatus = 'expiring';
+        // Only set to active if payment has been made
+        if (member.payments && member.payments.length > 0) {
+          if (daysUntilExpiry <= 7) {
+            newStatus = 'expiring';
+          } else {
+            newStatus = 'active';
+          }
         } else {
-          newStatus = 'active';
+          // If no payment made, keep as pending even if start date has passed
+          newStatus = 'pending';
         }
       } else if (currentDate < member.startDate) {
         newStatus = 'pending';
@@ -563,7 +584,8 @@ const updateMemberStatusesService = async () => {
         console.log(`Updating member ${member.memberId} status:`, {
           oldStatus: member.memberStatus,
           newStatus,
-          daysUntilExpiry
+          daysUntilExpiry,
+          hasPayments: member.payments && member.payments.length > 0
         });
 
         try {
@@ -591,6 +613,297 @@ const updateMemberStatusesService = async () => {
   }
 };
 
+// Assign locker to member
+const assignLockerToMemberService = async (memberId, lockerData) => {
+  try {
+    console.log('assignLockerToMemberService called with:', { memberId, lockerData });
+    
+    const member = await Member.findOne({ memberId });
+    if (!member) {
+      throw new Error("Member not found");
+    }
+
+    console.log('Member found:', member.memberId, member.fullName);
+
+    // Check if locker is already assigned to another member
+    if (lockerData.lockerNumber) {
+      const existingLockerAssignment = await Member.findOne({
+        "lockers.lockerNumber": lockerData.lockerNumber,
+        memberId: { $ne: memberId } // Exclude current member
+      });
+
+      if (existingLockerAssignment) {
+        throw new Error(`Locker ${lockerData.lockerNumber} is already assigned to another member`);
+      }
+      // Prevent duplicate locker assignment for the same member
+      if (member.lockers && member.lockers.some(l => l.lockerNumber === lockerData.lockerNumber)) {
+        throw new Error(`Locker ${lockerData.lockerNumber} is already assigned to this member`);
+      }
+    }
+
+    console.log('No existing locker assignment found, proceeding with assignment');
+
+    // Add new locker assignment to the lockers array
+    member.lockers = member.lockers || [];
+    const newLocker = {
+      lockerNumber: lockerData.lockerNumber,
+      assignedDate: new Date()
+    };
+    member.lockers.push(newLocker);
+
+    // Also add to lockerHistory
+    member.lockerHistory = member.lockerHistory || [];
+    member.lockerHistory.push({
+      lockerNumber: newLocker.lockerNumber,
+      assignedDate: newLocker.assignedDate,
+      removedDate: null
+    });
+
+    console.log('Updated member lockers data:', member.lockers);
+    console.log('Updated member lockerHistory data:', member.lockerHistory);
+
+    await member.save();
+    console.log('Member saved successfully');
+    
+    return member;
+  } catch (error) {
+    console.error("Error in assignLockerToMemberService:", error);
+    throw new Error(`Failed to assign locker: ${error.message}`);
+  }
+};
+
+// Remove locker assignment from member
+const removeLockerFromMemberService = async (memberId) => {
+  try {
+    console.log('removeLockerFromMemberService called with memberId:', memberId);
+    
+    const member = await Member.findOne({ memberId });
+    if (!member) {
+      throw new Error("Member not found");
+    }
+
+    console.log('Member found:', member.memberId, 'Current lockers:', member.lockers);
+
+    // Move all current lockers to lockerHistory with removedDate
+    if (Array.isArray(member.lockers)) {
+      member.lockerHistory = member.lockerHistory || [];
+      const now = new Date();
+      member.lockers.forEach(locker => {
+        // Find the corresponding history entry and set removedDate
+        const historyEntry = member.lockerHistory.find(h => h.lockerNumber === locker.lockerNumber && !h.removedDate);
+        if (historyEntry) {
+          historyEntry.removedDate = now;
+        } else {
+          // If not found, add a new history entry
+          member.lockerHistory.push({
+            lockerNumber: locker.lockerNumber,
+            assignedDate: locker.assignedDate || now,
+            removedDate: now
+          });
+        }
+      });
+    }
+
+    // Remove all lockers
+    member.lockers = [];
+
+    await member.save();
+    console.log('Locker(s) removed and history updated successfully');
+    
+    return member;
+  } catch (error) {
+    console.error("Error in removeLockerFromMemberService:", error);
+    throw new Error(`Failed to remove locker: ${error.message}`);
+  }
+};
+
+// Assign personal trainer to member (multiple allowed)
+const assignPersonalTrainerToMemberService = async (memberId, trainerData) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // Find the member
+    const member = await Member.findOne({ memberId });
+    if (!member) {
+      throw new Error("Member not found");
+    }
+
+    // Find the trainer and get their details
+    const trainer = await Trainer.findOne({ trainerId: trainerData.trainerId });
+    if (!trainer) {
+      throw new Error("Trainer not found");
+    }
+
+    // Prevent duplicate assignment
+    if (member.personalTrainers && member.personalTrainers.some(pt => pt.trainerId === trainerData.trainerId && !pt.removedDate)) {
+      throw new Error("This trainer is already assigned to the member");
+    }
+
+    // Add to personalTrainers
+    const newAssignment = {
+      trainerId: trainer.trainerId,
+      trainerFullName: trainer.fullName,
+      assignedDate: new Date(),
+      removedDate: null
+    };
+    member.personalTrainers = member.personalTrainers || [];
+    member.personalTrainers.push(newAssignment);
+
+    // Add to assignedPersonalTrainerHistory
+    member.assignedPersonalTrainerHistory = member.assignedPersonalTrainerHistory || [];
+    member.assignedPersonalTrainerHistory.push({
+      trainerId: trainer.trainerId,
+      trainerFullName: trainer.fullName,
+      assignedDate: newAssignment.assignedDate,
+      removedDate: null
+    });
+
+    // Also update trainer's assignedMembers and history
+    if (!trainer.assignedMembers) trainer.assignedMembers = [];
+    if (!trainer.assignedMembers.some(m => m.memberId === memberId && !m.removedDate)) {
+      const memberAssignment = {
+        memberId: member.memberId,
+        fullName: member.fullName,
+        assignedDate: newAssignment.assignedDate,
+        status: "active",
+        removedDate: null
+      };
+      trainer.assignedMembers.push(memberAssignment);
+      trainer.assignedMemberHistory = trainer.assignedMemberHistory || [];
+      trainer.assignedMemberHistory.push({
+        memberId: member.memberId,
+        fullName: member.fullName,
+        assignedDate: newAssignment.assignedDate,
+        removedDate: null
+      });
+    }
+
+    await member.save({ session });
+    await trainer.save({ session });
+    await session.commitTransaction();
+    return member;
+  } catch (error) {
+    await session.abortTransaction();
+    console.error("Error in assignPersonalTrainerToMemberService:", error);
+    throw new Error(`Failed to assign personal trainer: ${error.message}`);
+  } finally {
+    session.endSession();
+  }
+};
+
+// Remove personal trainer assignment from member (by trainerId)
+const removePersonalTrainerFromMemberService = async (memberId, trainerId) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    // Find the member
+    const member = await Member.findOne({ memberId });
+    if (!member) {
+      throw new Error("Member not found");
+    }
+
+    // Remove from personalTrainers (set removedDate)
+    let found = false;
+    if (Array.isArray(member.personalTrainers)) {
+      member.personalTrainers.forEach(pt => {
+        if (pt.trainerId === trainerId && !pt.removedDate) {
+          pt.removedDate = new Date();
+          found = true;
+        }
+      });
+      // Remove from active personalTrainers
+      member.personalTrainers = member.personalTrainers.filter(pt => !pt.removedDate);
+    }
+
+    // Update assignedPersonalTrainerHistory (set removedDate)
+    if (Array.isArray(member.assignedPersonalTrainerHistory)) {
+      member.assignedPersonalTrainerHistory.forEach(hist => {
+        if (hist.trainerId === trainerId && !hist.removedDate) {
+          hist.removedDate = new Date();
+        }
+      });
+    }
+
+    // Also update trainer's assignedMembers and assignedMemberHistory
+    const trainer = await Trainer.findOne({ trainerId });
+    if (trainer) {
+      if (Array.isArray(trainer.assignedMembers)) {
+        trainer.assignedMembers.forEach(m => {
+          if (m.memberId === memberId && !m.removedDate) {
+            m.removedDate = new Date();
+          }
+        });
+        // Remove from active assignedMembers
+        trainer.assignedMembers = trainer.assignedMembers.filter(m => !m.removedDate);
+      }
+      if (Array.isArray(trainer.assignedMemberHistory)) {
+        trainer.assignedMemberHistory.forEach(hist => {
+          if (hist.memberId === memberId && !hist.removedDate) {
+            hist.removedDate = new Date();
+          }
+        });
+      }
+      await trainer.save({ session });
+    }
+
+    if (!found) {
+      throw new Error("Trainer assignment not found for this member");
+    }
+
+    await member.save({ session });
+    await session.commitTransaction();
+    return member;
+  } catch (error) {
+    await session.abortTransaction();
+    console.error("Error in removePersonalTrainerFromMemberService:", error);
+    throw new Error(`Failed to remove personal trainer: ${error.message}`);
+  } finally {
+    session.endSession();
+  }
+};
+
+// Get all members with locker assignments
+const getMembersWithLockersService = async () => {
+  try {
+    console.log('getMembersWithLockersService called');
+    
+    // Find members with at least one locker in the lockers array
+    const members = await Member.find({
+      "lockers.0": { $exists: true }
+    }).select("memberId fullName email lockers");
+
+    console.log('Found members with lockers:', members.length);
+    console.log('Members with lockers:', members.map(m => ({ 
+      memberId: m.memberId, 
+      fullName: m.fullName, 
+      lockers: m.lockers 
+    })));
+    
+    return members;
+  } catch (error) {
+    console.error("Error in getMembersWithLockersService:", error);
+    throw new Error(`Failed to get members with lockers: ${error.message}`);
+  }
+};
+
+// Get all members with personal trainer assignments
+const getMembersWithPersonalTrainersService = async () => {
+  try {
+    const members = await Member.find({
+      "personalTrainer.trainerId": { $ne: null }
+    }).select("memberId fullName personalTrainer");
+
+    return members;
+  } catch (error) {
+    console.error("Error in getMembersWithPersonalTrainersService:", error);
+    throw new Error(`Failed to get members with personal trainers: ${error.message}`);
+  }
+};
+
 module.exports = {
   createMemberService,
   getAllMembersService,
@@ -604,5 +917,11 @@ module.exports = {
   cancelMembershipService,
   sendExpiryReminderSequence,
   getMemberAlertsService,
-  updateMemberStatusesService
+  updateMemberStatusesService,
+  assignLockerToMemberService,
+  removeLockerFromMemberService,
+  assignPersonalTrainerToMemberService,
+  removePersonalTrainerFromMemberService,
+  getMembersWithLockersService,
+  getMembersWithPersonalTrainersService
 };

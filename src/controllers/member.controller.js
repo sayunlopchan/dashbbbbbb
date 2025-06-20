@@ -1,6 +1,8 @@
 const memberService = require("../services/member.service");
+const paymentService = require("../services/payment.service");
 const generateMemberId = require("../utils/idgenerator/generateMemberId");
 const Member = require("../models/Member.model");
+const asyncHandler = require("../utils/asyncHandler");
 
 // Create Member
 const createMember = async (req, res) => {
@@ -270,6 +272,21 @@ const cancelMembership = async (req, res) => {
       // Non-critical error, so we don't throw it
     }
 
+    // Send cancellation email to member
+    try {
+      const { sendMembershipCancellationEmail } = await import(
+        "../utils/emailService.js"
+      );
+      await sendMembershipCancellationEmail(member);
+      console.log(`✅ Cancellation email sent to member: ${member.email}`);
+    } catch (emailError) {
+      console.error(
+        "Failed to send cancellation email:",
+        emailError
+      );
+      // Non-critical error, so we don't throw it
+    }
+
     res.status(200).json({
       success: true,
       message: "Membership cancelled successfully",
@@ -333,6 +350,185 @@ const getMemberAlerts = async (req, res) => {
   }
 };
 
+// Assign locker to member
+const assignLockerToMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const { lockerNumber, paymentAmount, paymentMethod = "cash" } = req.body;
+
+    console.log('=== LOCKER ASSIGNMENT REQUEST ===');
+    console.log('Request params:', req.params);
+    console.log('Request body:', req.body);
+    console.log('Parsed data:', { memberId, lockerNumber, paymentAmount, paymentMethod });
+
+    if (!lockerNumber || !paymentAmount) {
+      console.log('Validation failed: missing required fields');
+      return res.status(400).json({
+        success: false,
+        message: "Locker number and payment amount are required"
+      });
+    }
+
+    // Validate payment amount
+    const amount = parseFloat(paymentAmount);
+    if (isNaN(amount) || amount <= 0) {
+      console.log('Validation failed: invalid payment amount');
+      return res.status(400).json({
+        success: false,
+        message: "Payment amount must be a positive number"
+      });
+    }
+
+    console.log('Validation passed, proceeding with assignment...');
+
+    // First assign the locker to the member
+    const member = await memberService.assignLockerToMemberService(memberId, {
+      lockerNumber
+    });
+
+    console.log('Locker assigned to member:', member.memberId);
+
+    // Then create a payment record for the locker assignment
+    const paymentData = {
+      memberId: memberId,
+      amount: amount,
+      paymentType: "locker",
+      paymentMethod: paymentMethod,
+      description: `Locker assignment payment for locker ${lockerNumber}`,
+      locker: {
+        lockerNumber: lockerNumber
+      }
+    };
+
+    console.log('Creating payment record:', paymentData);
+
+    const payment = await paymentService.createPaymentService(paymentData);
+
+    console.log('Payment created:', payment.paymentId);
+
+    res.status(200).json({
+      success: true,
+      message: "Locker assigned and payment recorded successfully",
+      data: {
+        member: member,
+        payment: payment
+      }
+    });
+  } catch (error) {
+    console.error('=== ERROR IN LOCKER ASSIGNMENT ===');
+    console.error('Error details:', error);
+    console.error('Error stack:', error.stack);
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to assign locker"
+    });
+  }
+};
+
+// Remove locker from member
+const removeLockerFromMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+
+    const member = await memberService.removeLockerFromMemberService(memberId);
+
+    res.status(200).json({
+      success: true,
+      message: "Locker removed successfully",
+      data: member
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to remove locker"
+    });
+  }
+};
+
+// Assign personal trainer to member
+const assignPersonalTrainerToMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+    const { trainerId } = req.body;
+
+    if (!trainerId) {
+      return res.status(400).json({
+        success: false,
+        message: "Trainer ID is required"
+      });
+    }
+
+    const member = await memberService.assignPersonalTrainerToMemberService(memberId, {
+      trainerId
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Personal trainer assigned successfully",
+      data: member
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to assign personal trainer"
+    });
+  }
+};
+
+// Remove personal trainer from member
+const removePersonalTrainerFromMember = async (req, res) => {
+  try {
+    const { memberId } = req.params;
+
+    const member = await memberService.removePersonalTrainerFromMemberService(memberId);
+
+    res.status(200).json({
+      success: true,
+      message: "Personal trainer removed successfully",
+      data: member
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to remove personal trainer"
+    });
+  }
+};
+
+// Get members with lockers
+const getMembersWithLockers = async (req, res) => {
+  try {
+    const members = await memberService.getMembersWithLockersService();
+
+    res.status(200).json({
+      success: true,
+      data: members
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch members with lockers"
+    });
+  }
+};
+
+// Get members with personal trainers
+const getMembersWithPersonalTrainers = async (req, res) => {
+  try {
+    const members = await memberService.getMembersWithPersonalTrainersService();
+
+    res.status(200).json({
+      success: true,
+      data: members
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch members with personal trainers"
+    });
+  }
+};
+
 module.exports = {
   createMember,
   getAllMembers,
@@ -345,5 +541,11 @@ module.exports = {
   checkMembershipStatus,
   cancelMembership,
   searchMembers,
-  getMemberAlerts
+  getMemberAlerts,
+  assignLockerToMember,
+  removeLockerFromMember,
+  assignPersonalTrainerToMember,
+  removePersonalTrainerFromMember,
+  getMembersWithLockers,
+  getMembersWithPersonalTrainers
 };

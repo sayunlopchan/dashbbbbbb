@@ -9,6 +9,8 @@ const createPaymentService = async (paymentData) => {
   const session = await mongoose.startSession();
 
   try {
+    console.log('createPaymentService called with:', paymentData);
+    
     session.startTransaction();
 
     // Find the member
@@ -16,6 +18,8 @@ const createPaymentService = async (paymentData) => {
     if (!member) {
       throw new Error("Member not found");
     }
+
+    console.log('Member found for payment:', member.memberId, member.fullName);
 
     // If this is a product payment, validate and update stock
     if (paymentData.paymentType === "product") {
@@ -50,7 +54,7 @@ const createPaymentService = async (paymentData) => {
 
     // Check if payment already exists for this member with same amount and date
     const oneMinuteAgo = new Date(Date.now() - 60000);
-    const existingPayment = await Payment.findOne({
+    let duplicateQuery = {
       memberId: paymentData.memberId,
       amount: paymentData.amount,
       paymentType: paymentData.paymentType,
@@ -58,14 +62,19 @@ const createPaymentService = async (paymentData) => {
         $gte: oneMinuteAgo,
         $lte: new Date()
       }
-    });
-
+    };
+    // For locker payments, also check locker number
+    if (paymentData.paymentType === "locker" && paymentData.locker && paymentData.locker.lockerNumber) {
+      duplicateQuery["locker.lockerNumber"] = paymentData.locker.lockerNumber;
+    }
+    const existingPayment = await Payment.findOne(duplicateQuery);
     if (existingPayment) {
       throw new Error("Duplicate payment detected. Please wait a moment before trying again.");
     }
 
     // Generate unique payment ID
     const paymentId = await generatePaymentId();
+    console.log('Generated payment ID:', paymentId);
 
     // Get member's full name
     const fullName = member.fullName ? `${member.fullName}` : "Unknown Member";
@@ -80,7 +89,16 @@ const createPaymentService = async (paymentData) => {
         `${paymentData.paymentType} payment by ${fullName}`,
     });
 
+    console.log('Payment object created:', {
+      paymentId: payment.paymentId,
+      memberId: payment.memberId,
+      amount: payment.amount,
+      paymentType: payment.paymentType,
+      locker: payment.locker
+    });
+
     await payment.save({ session });
+    console.log('Payment saved successfully');
 
     // Prepare payment record for member's payment history
     const memberPaymentRecord = {
@@ -101,15 +119,36 @@ const createPaymentService = async (paymentData) => {
     // Update last payment date
     member.lastPaymentDate = payment.paymentDate;
 
-    // Update member status to active if it was pending
-    if (member.memberStatus === "pending") {
-      member.memberStatus = "active";
+    // Update member status based on start date and payment
+    // Only activate if this is a 'membership' payment and the first for the current period
+    if (
+      paymentData.paymentType === "membership" &&
+      member.memberStatus === "pending"
+    ) {
+      // Determine the start of the new period
+      let periodStart = new Date(member.startDate);
+      if (member.cancellationDate && member.cancellationDate > periodStart) {
+        periodStart = new Date(member.cancellationDate);
+      }
+      // Find all membership payments made after the period start
+      const membershipPaymentsThisPeriod = member.payments.filter(
+        (p) =>
+          (p.type === "membership" || p.paymentType === "membership") &&
+          p.paymentDate >= periodStart
+      );
+      // If this is the first membership payment after the period start, activate
+      if (membershipPaymentsThisPeriod.length === 1) { // this payment just pushed
+        member.memberStatus = "active";
+      }
+      // If not first payment, keep status as "pending"
     }
 
     // Save the member with new payment
     await member.save({ session });
+    console.log('Member updated with payment history');
 
     await session.commitTransaction();
+    console.log('Transaction committed successfully');
 
     return payment;
   } catch (error) {

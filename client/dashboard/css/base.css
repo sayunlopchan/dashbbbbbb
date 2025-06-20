@@ -41,10 +41,16 @@ input {
   padding: 10px 14px;
   border: none;
   outline: none;
-  background-color: #f9fafb; 
+  background-color: #f9fafb;
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* Remove border on focus */
+input:focus {
+  border: none;
+  outline: none;
+  background-color: none;
+}
 
 
 
@@ -65,9 +71,8 @@ input {
   position: absolute;
   height: 90%;
   width: 50%;
-  background-color: #2563eb;
   border-radius: 9999px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, background-color 0.3s ease;
   z-index: 0;
 }
 
@@ -84,13 +89,20 @@ input {
   color: white !important;
 }
 
-.slide-monthly {
-  transform: translateX(100%);
+/* Daily (default) color */
+.slide-daily {
+  transform: translateX(-1%);
+  background-color: var(--btn-primary);
+  /* e.g., #f59e0b or any default */
 }
 
-.slide-daily {
-  transform: translateX(0%);
+/* Monthly color */
+.slide-monthly {
+  transform: translateX(92%);
+  background-color: #4f46e5;
+  /* example: indigo color */
 }
+
 /* toggle button end */
 
 /* Sidebar base styles */
@@ -453,7 +465,6 @@ input {
 }
 
 .members-table {
-  min-width: 1000px;
   width: 100%;
   border-collapse: collapse;
   background-color: white;
@@ -624,6 +635,7 @@ input {
   background-color: white;
   border-radius: 8px;
   width: fit-content;
+  max-height: 90vh;
   padding: 25px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   transform: translateY(-20px);
@@ -637,8 +649,7 @@ input {
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  /* margin-bottom: 20px; */
+  margin-bottom: 20px;
 }
 
 .modal-header h2 {
@@ -648,14 +659,12 @@ input {
 
 .modal-header p {
   color: #7f8c8d;
-  margin-top: 5px;
 }
 
 .modal-close {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--danger-color);
   cursor: pointer;
   transition: color 0.3s ease;
 }
@@ -666,13 +675,10 @@ input {
 
 /* Form Styles */
 .form-grid {
-display: grid;
+  display: grid;
   gap: 15px;
   margin-bottom: 15px;
   overflow-y: auto;
-  min-height: 380px;
-  max-height: 400px;
-  padding: 0 1rem;
 }
 
 .form-grid-event {
@@ -683,9 +689,6 @@ display: grid;
   grid-template-columns: 1fr;
 }
 
-.form-group {
-  margin-bottom: 15px;
-}
 
 .form-group label {
   display: block;
@@ -1370,20 +1373,20 @@ textarea {
 
 @media (max-width: 768px) {
   .info-boxes {
-      grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .charts-section {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 576px) {
   .info-boxes {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
 
   .events-announcements {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
 }

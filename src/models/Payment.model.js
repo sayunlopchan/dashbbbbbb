@@ -22,7 +22,7 @@ const PaymentSchema = new mongoose.Schema(
     },
     paymentType: {
       type: String,
-      enum: ["membership", "product", "other"],
+      enum: ["membership", "product", "locker", "other"],
       required: true,
     },
     paymentMethod: {
@@ -75,6 +75,27 @@ const PaymentSchema = new mongoose.Schema(
       enum: ["pending", "completed", "failed", "refunded"],
       default: "completed",
     },
+    // Locker schema
+    locker: {
+      lockerNumber: {
+        type: String,
+        trim: true,
+        required: false,
+      }
+    },
+    // Personal Trainer schema
+    personalTrainer: {
+      trainerFullName: {
+        type: String,
+        trim: true,
+        required: false,
+      },
+      trainerId: {
+        type: String,
+        trim: true,
+        required: false,
+      }
+    }
   },
   {
     timestamps: true,
@@ -85,6 +106,7 @@ const PaymentSchema = new mongoose.Schema(
 PaymentSchema.index({ memberId: 1, paymentDate: -1 });
 PaymentSchema.index({ paymentType: 1, paymentDate: -1 });
 PaymentSchema.index({ productId: 1 });
+PaymentSchema.index({ "personalTrainer.trainerId": 1 });
 
 const Payment =
   mongoose.models.Payment || mongoose.model("Payment", PaymentSchema);

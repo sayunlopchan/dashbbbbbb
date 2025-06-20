@@ -7,31 +7,6 @@
     <title>Knox Barbell - Product</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/base.css">
-    <style>
-      /* Product description textarea styling */
-      .form-group textarea {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        font-family: inherit;
-        resize: vertical;
-        min-height: 80px;
-        transition: border-color 0.3s ease;
-      }
-
-      .form-group textarea:focus {
-        outline: none;
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
-      }
-
-      .form-group textarea::placeholder {
-        color: #95a5a6;
-        font-style: italic;
-      }
-    </style>
   </head>
 
   <body>
@@ -115,6 +90,13 @@
           </a>
         </li>
         <li>
+          <a href="/locker">
+              <i class="fas fa-box"></i>
+              <span>Locker</span>
+              <div class="tooltip">Locker</div>
+          </a>
+      </li>
+        <li>
           <a href="/product" class="active">
             <i class="fas fa-box"></i>
             <span>Product</span>
@@ -183,44 +165,26 @@
             <p>Add Product</p>
           </button>
         </div>
-
-        <div class="filter-group">
-          <button id="downloadProducts" title="Download CSV">
-            <i class="fa-solid fa-download"></i>
-          </button>
-          <button id="printProducts" title="Print">
-            <i class="fa-solid fa-print"></i>
-          </button>
-        </div>
-
         <!-- Filters Section -->
         <div class="filters">
+
           <!-- search filter -->
           <div class="filter-group search-box">
             <i class="fas fa-search"></i>
             <input type="text" id="productSearch" placeholder="Search products..." autocomplete="off">
           </div>
+          
           <!-- stock filter -->
           <div class="filter-group">
-            <label for="stockStatus">Stock Status:</label>
             <select id="stockStatus">
-              <option value="">All</option>
+              <option value="">All Stock</option>
               <option value="in-stock">In Stock</option>
               <option value="low-stock">Low Stock</option>
               <option value="out-of-stock">Out of Stock</option>
             </select>
           </div>
-          <!-- price range filter -->
-          <div class="filter-group">
-            <label for="priceRange">Price Range:</label>
-            <select id="priceRange">
-              <option value="">All</option>
-              <option value="0-50">Rs0 - Rs50</option>
-              <option value="51-100">Rs51 - Rs100</option>
-              <option value="101-200">Rs101 - Rs200</option>
-              <option value="201+">Rs201+</option>
-            </select>
-          </div>
+          
+          <!-- category -->
           <div class="filter-group">
             <select id="categoryFilter">
               <option value="">All Categories</option>
@@ -229,6 +193,16 @@
               <option value="clothing">Clothing</option>
               <option value="accessories">Accessories</option>
             </select>
+          </div>
+
+          <!-- buttons -->
+          <div class="filter-group">
+            <button id="downloadProducts" title="Download CSV">
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <button id="printProducts" title="Print">
+              <i class="fa-solid fa-print"></i>
+            </button>
             <button id="resetProductFilters" title="Reset Filters">
               <i class="fa-solid fa-rotate"></i>
             </button>
@@ -426,7 +400,6 @@
       function applyFilters(products) {
         const categoryFilter = document.getElementById('categoryFilter').value;
         const stockStatus = document.getElementById('stockStatus').value;
-        const priceRange = document.getElementById('priceRange').value;
         const searchQuery = document.getElementById('productSearch').value.toLowerCase();
 
         return products.filter(product => {
@@ -440,15 +413,6 @@
             if (stockStatus === 'in-stock' && product.stock <= 0) return false;
             if (stockStatus === 'out-of-stock' && product.stock > 0) return false;
             if (stockStatus === 'low-stock' && (product.stock > 10 || product.stock <= 0)) return false;
-          }
-
-          // Price range filter
-          if (priceRange) {
-            const price = product.price;
-            if (priceRange === '0-50' && (price < 0 || price > 50)) return false;
-            if (priceRange === '51-100' && (price < 51 || price > 100)) return false;
-            if (priceRange === '101-200' && (price < 101 || price > 200)) return false;
-            if (priceRange === '201+' && price < 201) return false;
           }
 
           // Search filter
@@ -737,12 +701,6 @@
         fetchProducts(currentPage);
       });
 
-      // price range filter
-      document.getElementById('priceRange').addEventListener('change', () => {
-        currentPage = 1;
-        fetchProducts(currentPage);
-      });
-
       // product search filter
       document.getElementById('productSearch').addEventListener('input', debounce(() => {
         currentPage = 1;
@@ -754,7 +712,6 @@
         currentPage = 1;
         document.getElementById('categoryFilter').value = '';
         document.getElementById('stockStatus').value = '';
-        document.getElementById('priceRange').value = '';
         document.getElementById('productSearch').value = '';
         fetchProducts(1);
         toast('Filters have been reset', 'info');

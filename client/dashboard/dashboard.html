@@ -94,6 +94,13 @@
                 </a>
             </li>
             <li>
+                <a href="/locker">
+                    <i class="fas fa-box"></i>
+                    <span>Locker</span>
+                    <div class="tooltip">Locker</div>
+                </a>
+            </li>
+            <li>
                 <a href="/product">
                     <i class="fas fa-box"></i>
                     <span>Product</span>
@@ -154,20 +161,23 @@
 
         <!-- Content -->
         <div class="content">
+            <!-- overview -->
             <div class="content-header">
                 <h1>Dashboard Overview</h1>
 
+                <!-- daily-monthly toggle start-->
                 <div class="toggle-container" id="revenueToggle">
                     <div class="toggle-slider slide-daily" id="slider"></div>
                     <div class="toggle-label toggle-active" id="dailyLabel">Daily</div>
                     <div class="toggle-label" id="monthlyLabel">Monthly</div>
                 </div>
+                <!-- daily-monthly toggle end -->
             </div>
 
             <!-- Info Boxes -->
             <div class="info-boxes">
                 <!-- Total neumber of members -->
-                <div class="info-box">
+                <div class="info-box info-box-members">
                     <div class="info-box-header">
                         <span class="info-box-title">Total Members</span>
                         <div class="info-box-icon members">
@@ -175,14 +185,14 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">0</span>
+                        <span class="info-box-number" id="members-count">0</span>
                         <span class="info-box-text">Active Members: 0</span>
                         <a href="/members" class="info-box-link">View all members</a>
                     </div>
                 </div>
 
-                <!-- number of member Attendance to day  -->
-                <div class="info-box">
+                <!-- number of member Attendance today  -->
+                <div class="info-box info-box-attendance">
                     <div class="info-box-header">
                         <span class="info-box-title">Attendance</span>
                         <div class="info-box-icon attendance">
@@ -190,14 +200,14 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">0</span>
+                        <span class="info-box-number" id="attendance-count">0</span>
                         <span class="info-box-text">Check-ins today</span>
                         <a href="/attendance" class="info-box-link">View attendance</a>
                     </div>
                 </div>
 
                 <!--Total Revenue this month -->
-                <div class="info-box">
+                <div class="info-box info-box-revenue">
                     <div class="info-box-header">
                         <span class="info-box-title">Revenue</span>
                         <div class="info-box-icon revenue">
@@ -206,7 +216,7 @@
                     </div>
                     <div class="info-box-content">
                         <div class="revenue-comparison">
-                            <span class="info-box-number">NPR 0</span>
+                            <span class="info-box-number" id="revenue-count">NPR 0</span>
                             <span class="revenue-change">
                                 <i class="fas fa-caret-up"></i>
                                 <span class="change-percentage">0%</span>
@@ -218,7 +228,7 @@
                 </div>
 
                 <!-- Upcomming EVENTS -->
-                <div class="info-box">
+                <div class="info-box info-box-events">
                     <div class="info-box-header">
                         <span class="info-box-title">Events</span>
                         <div class="info-box-icon events">
@@ -226,7 +236,7 @@
                         </div>
                     </div>
                     <div class="info-box-content">
-                        <span class="info-box-number">0</span>
+                        <span class="info-box-number" id="events-count">0</span>
                         <span class="info-box-text">Upcoming Events</span>
                         <a href="/events" class="info-box-link">View events</a>
                     </div>
@@ -387,9 +397,9 @@
 
                 console.log('Revenue data received:', revenueData.data);
 
-                const revenueBox = document.querySelector('.info-box:nth-child(3)');
+                const revenueBox = document.querySelector('.info-box-revenue');
                 if (revenueBox) {
-                    const revenueNumber = revenueBox.querySelector('.info-box-number');
+                    const revenueNumber = document.getElementById('revenue-count');
                     const revenueText = revenueBox.querySelector('.info-box-text');
                     const revenueChange = revenueBox.querySelector('.revenue-change');
                     const changePercentage = revenueBox.querySelector('.change-percentage');
@@ -466,9 +476,9 @@
             } catch (error) {
                 console.error('Error updating revenue info box:', error);
                 // Show error state
-                const revenueBox = document.querySelector('.info-box:nth-child(3)');
+                const revenueBox = document.querySelector('.info-box-revenue');
                 if (revenueBox) {
-                    const revenueNumber = revenueBox.querySelector('.info-box-number');
+                    const revenueNumber = document.getElementById('revenue-count');
                     const revenueText = revenueBox.querySelector('.info-box-text');
                     if (revenueNumber) revenueNumber.textContent = 'NPR 0';
                     if (revenueText) revenueText.textContent = isDaily ? 'vs yesterday' : 'vs last month';
@@ -516,6 +526,9 @@
                         throw new Error('Invalid attendance data format');
                     }
 
+                    // Debug log for attendance data
+                    console.log('Attendance API data:', attendancesData);
+
                     // Get today's date in YYYY-MM-DD format
                     const today = new Date();
                     const todayStr = today.toISOString().split('T')[0];
@@ -526,12 +539,26 @@
                         todayCheckInsCount = attendancesData.data.filter(attendance => {
                             try {
                                 if (!attendance.date) return false;
-                                const attendanceDate = new Date(attendance.date).toISOString().split('T')[0];
-                                return attendanceDate === todayStr;
+                                // Convert attendance date to local date string
+                                const attendanceDate = new Date(attendance.date);
+                                const localAttendanceDateStr = attendanceDate.getFullYear() + '-' +
+                                    String(attendanceDate.getMonth() + 1).padStart(2, '0') + '-' +
+                                    String(attendanceDate.getDate()).padStart(2, '0');
+                                const today = new Date();
+                                const localTodayStr = today.getFullYear() + '-' +
+                                    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                                    String(today.getDate()).padStart(2, '0');
+                                // Debug log
+                                console.log('Comparing attendance date', localAttendanceDateStr, 'to today', localTodayStr);
+                                return localAttendanceDateStr === localTodayStr;
                             } catch (error) {
                                 return false;
                             }
                         }).length;
+                    } else {
+                        // Fallback if data is missing or not an array
+                        console.warn('Attendance data missing or not an array:', attendancesData);
+                        todayCheckInsCount = 0;
                     }
 
                     // Fetch events data
@@ -565,30 +592,30 @@
                     }
 
                     // Update all info boxes
-                    const membersBox = document.querySelector('.info-box:nth-child(1)');
-                    const attendanceBox = document.querySelector('.info-box:nth-child(2)');
-                    const eventsBox = document.querySelector('.info-box:nth-child(4)');
+                    const membersBox = document.querySelector('.info-box-members');
+                    const attendanceBox = document.querySelector('.info-box-attendance');
+                    const eventsBox = document.querySelector('.info-box-events');
 
                     if (membersBox) {
-                        const membersNumber = membersBox.querySelector('.info-box-number');
+                        const membersNumber = document.getElementById('members-count');
                         const membersText = membersBox.querySelector('.info-box-text');
                         if (membersNumber) membersNumber.textContent = totalMembers;
                         if (membersText) membersText.textContent = `Active Members: ${totalMembers}`;
                     }
 
                     if (attendanceBox) {
-                        const attendanceNumber = attendanceBox.querySelector('.info-box-number');
+                        const attendanceNumber = document.getElementById('attendance-count');
                         if (attendanceNumber) attendanceNumber.textContent = todayCheckInsCount;
                     }
 
                     if (eventsBox) {
-                        const eventsNumber = eventsBox.querySelector('.info-box-number');
+                        const eventsNumber = document.getElementById('events-count');
                         if (eventsNumber) eventsNumber.textContent = upcomingEventsCount;
                     }
 
                 } catch (error) {
                     // Show error state in info boxes
-                    const infoBoxes = document.querySelectorAll('.info-box');
+                    const infoBoxes = document.querySelectorAll('.info-box-members, .info-box-attendance, .info-box-revenue, .info-box-events');
                     infoBoxes.forEach(box => {
                         const number = box.querySelector('.info-box-number');
                         if (number) number.textContent = '0';
@@ -756,12 +783,12 @@
                 });
 
                 // Update the count in the events info box
-                const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
+                const eventCountElement = document.getElementById('events-count');
                 if (eventCountElement) {
                     eventCountElement.textContent = upcomingEvents.length;
                 }
             } catch (error) {
-                const eventCountElement = document.querySelector('.info-box:nth-child(4) .info-box-number');
+                const eventCountElement = document.getElementById('events-count');
                 if (eventCountElement) {
                     eventCountElement.textContent = '0';
                 }

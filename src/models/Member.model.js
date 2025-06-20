@@ -122,6 +122,84 @@ const MemberSchema = new mongoose.Schema(
       type: Number,
       default: 1,
     },
+    // Locker assignments (now supports multiple lockers)
+    lockers: [
+      {
+        lockerNumber: {
+          type: String,
+          trim: true,
+          required: true
+        },
+        assignedDate: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ],
+    // Locker assignment history
+    lockerHistory: [
+      {
+        lockerNumber: {
+          type: String,
+          trim: true,
+          required: true
+        },
+        assignedDate: {
+          type: Date,
+          required: true
+        },
+        removedDate: {
+          type: Date,
+          default: null
+        }
+      }
+    ],
+    // Personal Trainer assignments (multiple)
+    personalTrainers: [
+      {
+        trainerId: {
+          type: String,
+          trim: true,
+          required: true
+        },
+        trainerFullName: {
+          type: String,
+          trim: true,
+          required: true
+        },
+        assignedDate: {
+          type: Date,
+          default: Date.now
+        },
+        removedDate: {
+          type: Date,
+          default: null
+        }
+      }
+    ],
+    // Personal Trainer assignment history
+    assignedPersonalTrainerHistory: [
+      {
+        trainerId: {
+          type: String,
+          trim: true,
+          required: true
+        },
+        trainerFullName: {
+          type: String,
+          trim: true,
+          required: true
+        },
+        assignedDate: {
+          type: Date,
+          required: true
+        },
+        removedDate: {
+          type: Date,
+          default: null
+        }
+      }
+    ],
   },
   {
     timestamps: true,
@@ -176,6 +254,10 @@ MemberSchema.pre("save", function (next) {
 
   next();
 });
+
+// Indexes for faster queries
+MemberSchema.index({ "locker.lockerNumber": 1 });
+MemberSchema.index({ "personalTrainers.trainerId": 1 });
 
 const Member = mongoose.models.Member || mongoose.model("Member", MemberSchema);
 module.exports = Member;

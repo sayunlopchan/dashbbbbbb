@@ -24,6 +24,12 @@ const trainerSchema = new mongoose.Schema(
         "Please enter a valid 10-15 digit contact number",
       ],
     },
+    gender: {
+      type: String,
+      required: [true, "Gender is required"],
+      enum: ["male", "female", "other"],
+      trim: true,
+    },
     joinDate: {
       type: Date,
       required: [true, "Join date is required"],
@@ -38,6 +44,57 @@ const trainerSchema = new mongoose.Schema(
       enum: ["active", "inactive"],
       default: "active",
     },
+    // Assigned members array
+    assignedMembers: [
+      {
+        memberId: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        fullName: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        assignedDate: {
+          type: Date,
+          default: Date.now,
+        },
+        status: {
+          type: String,
+          enum: ["active", "inactive"],
+          default: "active",
+        },
+        removedDate: {
+          type: Date,
+          default: null
+        }
+      }
+    ],
+    // Assigned member history
+    assignedMemberHistory: [
+      {
+        memberId: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        fullName: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        assignedDate: {
+          type: Date,
+          required: true,
+        },
+        removedDate: {
+          type: Date,
+          default: null
+        }
+      }
+    ],
   },
   {
     timestamps: true,
@@ -50,6 +107,9 @@ trainerSchema.pre("save", function (next) {
   this.contact = this.contact.trim();
   next();
 });
+
+// Index for faster queries
+trainerSchema.index({ "assignedMembers.memberId": 1 });
 
 const Trainer =
   mongoose.models.Trainer || mongoose.model("Trainer", trainerSchema);

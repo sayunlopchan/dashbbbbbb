@@ -1,32 +1,4 @@
-/* Filters Section */
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 25px;
-  padding: 15px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
 
-.filter-group {
-  display: flex;
-  align-items: center;
-}
-
-.filter-group label {
-  margin-right: 10px;
-  font-weight: 500;
-}
-
-.filter-group select,
-.filter-group input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  min-width: 150px;
-}
 
 .search-box {
   position: relative;
@@ -202,30 +174,6 @@
   transform: scale(0.9);
 }
 
-
-.fl-container {
-  display: flex;
-  gap: 10px;
-}
-
-
-/* Close Button */
-.close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  color: #777;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.close-button:hover {
-  color: #333;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .form-container {
@@ -284,49 +232,22 @@
   }
 }
 
-/* New css for new add member modal */
-
-
-
-/* -------------------------------------------- */
-/* Member Detail */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease-in-out;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.modal-content {
+/* member modal */
+.member-modal-content {
   background: white;
   padding: 2rem;
   border-radius: 8px;
   max-width: 800px;
-  max-height: 90vh;
   transform: translateY(-20px);
   transition: transform 0.3s ease-in-out;
   position: relative;
 }
 
-.modal-overlay.active .modal-content {
+.modal-overlay.active .member-modal-content {
   transform: translateY(0);
 }
 
-.modal-content.member-detail {
+.member-modal-content.member-detail {
   background-color: white;
   border-radius: 10px;
   width: 90%;
@@ -338,7 +259,7 @@
   position: relative;
 }
 
-.modal-content.member-detail .modal-header {
+.member-modal-content.member-detail .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -347,58 +268,58 @@
   padding-bottom: 10px;
 }
 
-.modal-content.member-detail .modal-header h2 {
+.member-modal-content.member-detail .modal-header h2 {
   margin: 0;
   color: #333;
 }
 
-.modal-content.member-detail .modal-header i {
+.member-modal-content.member-detail .modal-header i {
   color: #888;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
-.modal-content.member-detail .modal-header i:hover {
+.member-modal-content.member-detail .modal-header i:hover {
   color: #333;
 }
 
-.modal-content.member-detail .form-grid {
+.member-modal-content.member-detail .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 15px;
 }
 
-.modal-content.member-detail .form-group {
+.member-modal-content.member-detail .form-group {
   display: flex;
   flex-direction: column;
 }
 
-.modal-content.member-detail .form-group label {
+.member-modal-content.member-detail .form-group label {
   margin-bottom: 5px;
   color: #666;
   font-weight: 500;
 }
 
-.modal-content.member-detail .form-group input,
-.modal-content.member-detail .form-group select {
+.member-modal-content.member-detail .form-group input,
+.member-modal-content.member-detail .form-group select {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   background-color: #f9f9f9;
 }
 
-.modal-content.member-detail .form-group input:disabled,
-.modal-content.member-detail .form-group select:disabled {
+.member-modal-content.member-detail .form-group input:disabled,
+.member-modal-content.member-detail .form-group select:disabled {
   background-color: #f1f1f1;
   cursor: not-allowed;
 }
 
-.modal-content.member-detail .radio-group {
+.member-modal-content.member-detail .radio-group {
   display: flex;
   gap: 15px;
 }
 
-.modal-content.member-detail .radio-option {
+.member-modal-content.member-detail .radio-option {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -438,12 +359,12 @@
 }
 
 @media (max-width: 768px) {
-  .modal-content.member-detail {
+  .member-modal-content.member-detail {
     width: 95%;
     padding: 15px;
   }
 
-  .modal-content.member-detail .form-grid {
+  .member-modal-content.member-detail .form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -722,4 +643,190 @@
 
 .member-alerts .action-btn:hover i {
     transform: scale(1.1);
+}
+
+/* Trainer Assignment Table Styles */
+.trainer-assignments {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 25px;
+    padding: 20px;
+}
+
+.trainer-assignments .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.trainer-assignments .section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.trainer-assignments .btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trainer-assignments .btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.trainer-assignments .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.trainer-assignments .btn-secondary {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.trainer-assignments .btn-secondary:hover {
+    background-color: #e9ecef;
+}
+
+.trainer-assignments .filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.trainer-assignments table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.trainer-assignments th {
+    text-align: left;
+    padding: 12px;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    font-weight: 600;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.trainer-assignments td {
+    padding: 12px;
+    border-bottom: 1px solid #e9ecef;
+    color: #2c3e50;
+}
+
+.trainer-assignments tr:last-child td {
+    border-bottom: none;
+}
+
+.trainer-assignments tr:hover {
+    background-color: #f8f9fa;
+}
+
+.trainer-assignments .status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.trainer-assignments .status.active {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.trainer-assignments .status.inactive {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.trainer-assignments .action-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    margin-right: 5px;
+}
+
+.trainer-assignments .action-btn.remove {
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+.trainer-assignments .action-btn.remove:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.trainer-assignments .action-btn.status-toggle {
+    color: #3498db;
+    border: 1px solid #3498db;
+}
+
+.trainer-assignments .action-btn.status-toggle:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.trainer-assignments .action-btn i {
+    transition: transform 0.2s ease;
+}
+
+.trainer-assignments .action-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Responsive styles for trainer assignments */
+@media (max-width: 768px) {
+    .trainer-assignments {
+        margin-top: 15px;
+        padding: 15px;
+    }
+
+    .trainer-assignments th,
+    .trainer-assignments td {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .trainer-assignments .section-title {
+        font-size: 1rem;
+    }
+
+    .trainer-assignments .filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .trainer-assignments {
+        padding: 10px;
+    }
+
+    .trainer-assignments th,
+    .trainer-assignments td {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    .trainer-assignments .status {
+        padding: 3px 6px;
+        font-size: 0.8rem;
+    }
 }

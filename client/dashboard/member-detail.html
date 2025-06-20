@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Details | Knox Barbell</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/member-detail.css">
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>Knox Barbell</h3>
+      <button class="toggle-btn" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+          <div class="tooltip">Dashboard</div>
+        </a></li>
+      <li><a href="/members" class="active"><i class="fas fa-user"></i><span>Member</span>
+          <div class="tooltip">Member</div>
+        </a></li>
+      <li><a href="/application"><i class="fa-solid fa-file-lines"></i><span>Application</span>
+          <div class="tooltip">Application</div>
+        </a></li>
+      <li><a href="/membership"><i class="fas fa-id-card"></i><span>Membership</span>
+          <div class="tooltip">Membership</div>
+        </a></li>
+      <li><a href="/trainers"><i class="fas fa-chalkboard-teacher"></i><span>Trainers</span>
+          <div class="tooltip">Trainers</div>
+        </a></li>
+      <li><a href="/employee"><i class="fas fa-users"></i><span>Employee</span>
+          <div class="tooltip">Employee</div>
+        </a></li>
+      <li><a href="/notifications"><i class="fas fa-bell"></i><span>Notifications</span>
+          <div class="tooltip">Notifications</div>
+        </a></li>
+      <li><a href="/attendance"><i class="fas fa-calendar-check"></i><span>Attendance</span>
+          <div class="tooltip">Attendance</div>
+        </a></li>
+      <li><a href="/events"><i class="fas fa-calendar-alt"></i><span>Events</span>
+          <div class="tooltip">Events</div>
+        </a></li>
+      <li><a href="/finance"><i class="fas fa-wallet"></i><span>Finance</span>
+          <div class="tooltip">Finance</div>
+        </a></li>
+      <li><a href="/locker"><i class="fas fa-box"></i><span>Locker</span>
+          <div class="tooltip">Locker</div>
+        </a></li>
+      <li><a href="/product"><i class="fas fa-box"></i><span>Product</span>
+          <div class="tooltip">Product</div>
+        </a></li>
+      <li class="logout-item"><a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i><span>Logout</span>
+          <div class="tooltip">Logout</div>
+        </a></li>
+    </ul>
+  </div>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-toggle" id="mobileToggle"><i class="fas fa-bars"></i></button>
+        <h3>Member Details</h3>
+      </div>
+      <div class="topbar-right">
+        <div class="notification">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">0</span>
+          <div class="notification-modal">
+            <div class="notification-header">
+              <h3>Notifications</h3>
+              <div class="notification-actions">
+                <a href="/notifications" class="view-all-link">View All</a>
+                <button class="close-notifications"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            <div class="notification-list">
+              <div class="notification-loading"><i class="fas fa-spinner fa-spin"></i> Loading notifications...</div>
+            </div>
+          </div>
+        </div>
+        <div class="user-greeting">
+          <img src="/img/Knox Logo-01.png" alt="User">
+          <span>Hello, Knox Barbell</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- member detail header -->
+      <header class="member-detail-header">
+        <h1 class="member-detail-title">Member Details</h1>
+        <div class="member-detail-actions">
+          <a href="/members" class="member-detail-btn member-detail-btn--back">
+            <i class="fas fa-arrow-left"></i> Back to Members
+          </a>
+        </div>
+      </header>
+
+      <!-- filter -->
+      <div class="filter-group">
+        <button id="downloadTrainers" title="Download CSV">
+          <i class="fa-solid fa-download"></i>
+        </button>
+        <button id="printTrainers" title="Print">
+          <i class="fa-solid fa-print"></i>
+        </button>
+      </div>
+
+
+      <!-- member detail -->
+      <div class="member-detail-page">
+        <div id="memberDetailRoot">
+          <!-- Loading State -->
+          <div class="member-loading-state" id="loadingSpinner">
+            <i class="fas fa-spinner member-loading-spinner"></i>
+            <p>Loading member details...</p>
+          </div>
+
+          <!-- Error State -->
+          <div class="member-error-state" id="errorContainer" style="display:none;"></div>
+
+          <!-- Member Content -->
+          <div id="memberDetailContainer" style="display:none;">
+            <!-- This will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Utility: get query param
+      function getQueryParam(name) {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name);
+      }
+
+      const memberId = getQueryParam('memberId');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const memberDetailContainer = document.getElementById('memberDetailContainer');
+      const errorContainer = document.getElementById('errorContainer');
+
+      async function fetchMemberDetails() {
+        if (!memberId) {
+          showError('No member ID provided in URL.');
+          return;
+        }
+
+        try {
+          // Fetch member data
+          const [memberRes, attRes, payRes] = await Promise.all([
+            fetch(`/api/members/${memberId}`),
+            fetch(`/api/attendances/member/${memberId}`),
+            fetch(`/api/members/${memberId}/payment-history`)
+          ]);
+
+          const [memberData, attData, payData] = await Promise.all([
+            memberRes.json(),
+            attRes.json(),
+            payRes.json()
+          ]);
+
+          if (!memberData.success) throw new Error(memberData.message || 'Member not found');
+
+          const member = memberData.data;
+          const attendance = attData.success ? attData.data : [];
+          const payments = payData.success ? payData.data : [];
+
+          renderMemberDetails(member, attendance, payments);
+        } catch (err) {
+          showError(err.message || 'Failed to load member details.');
+        }
+      }
+
+      function showError(msg) {
+        loadingSpinner.style.display = 'none';
+        memberDetailContainer.style.display = 'none';
+        errorContainer.style.display = 'block';
+        errorContainer.textContent = msg;
+      }
+
+      function getStatusBadge(status) {
+        status = (status || '').toLowerCase();
+        if (status.includes('active')) return 'member-status-badge--active';
+        if (status.includes('inactive')) return 'member-status-badge--inactive';
+        if (status.includes('pending')) return 'member-status-badge--pending';
+        return '';
+      }
+
+      function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      function renderMemberDetails(member, attendance, payments) {
+        loadingSpinner.style.display = 'none';
+        errorContainer.style.display = 'none';
+        memberDetailContainer.style.display = 'block';
+
+        // Calculate check-ins this month
+        const currentMonthCheckins = attendance ? attendance.filter(a => {
+          const d = new Date(a.date);
+          const now = new Date();
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        }).length : 0;
+
+        memberDetailContainer.innerHTML = `
+          <!-- Profile Section -->
+          <section class="member-detail-card">
+            <h2 class="member-detail-section-title">Profile Information</h2>
+            <div class="member-detail-grid">
+              <div class="member-detail-field">
+                <label class="member-detail-label">Member ID</label>
+                <div class="member-detail-value">${member.memberId || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Full Name</label>
+                <div class="member-detail-value">${member.fullName || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Email</label>
+                <div class="member-detail-value">${member.email || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Contact</label>
+                <div class="member-detail-value">${member.contact || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Gender</label>
+                <div class="member-detail-value">${member.gender || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Date of Birth</label>
+                <div class="member-detail-value">${formatDate(member.dateOfBirth)}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Address</label>
+                <div class="member-detail-value">${member.address || 'N/A'}</div>
+              </div>
+            </div>
+          </section>
+    
+          <!-- Emergency Info Section -->
+          <section class="member-detail-card">
+            <h2 class="member-detail-section-title">Emergency Contact</h2>
+            <div class="member-detail-grid">
+              <div class="member-detail-field">
+                <label class="member-detail-label">Emergency Contact Name</label>
+                <div class="member-detail-value">${member.emergencyContactName || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Relationship</label>
+                <div class="member-detail-value">${member.emergencyContactRelationship || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Emergency Number</label>
+                <div class="member-detail-value">${member.emergencyNumber || 'N/A'}</div>
+              </div>
+            </div>
+          </section>
+    
+          <!-- Membership Info Section -->
+          <section class="member-detail-card">
+            <h2 class="member-detail-section-title">Membership Information</h2>
+            <div class="member-detail-grid">
+              <div class="member-detail-field">
+                <label class="member-detail-label">Membership Type</label>
+                <div class="member-detail-value">${member.membershipType || 'N/A'}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Start Date</label>
+                <div class="member-detail-value">${formatDate(member.startDate)}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">End Date</label>
+                <div class="member-detail-value">${formatDate(member.endDate)}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Status</label>
+                <div class="member-detail-value">
+                  <span class="member-status-badge ${getStatusBadge(member.memberStatus)}">
+                    ${member.memberStatus || 'N/A'}
+                  </span>
+                </div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Cancellation Date</label>
+                <div class="member-detail-value">${formatDate(member.cancellationDate)}</div>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Cancellation Reason</label>
+                <div class="member-detail-value">${member.cancellationReason || 'N/A'}</div>
+              </div>
+            </div>
+          </section>
+    
+          <!-- Lockers Section -->
+          <section class="member-detail-card">
+            <h2 class="member-detail-section-title">Locker Assignments</h2>
+            <div class="member-detail-grid">
+              <div class="member-detail-field">
+                <label class="member-detail-label">Current Lockers</label>
+                <ul class="member-detail-list">
+                  ${(member.lockers && member.lockers.length) ?
+            member.lockers.map(l => `
+                      <li class="member-detail-list-item">
+                        <span class="member-detail-list-label">Locker #${l.lockerNumber}</span>
+                        <span class="member-detail-list-value">Assigned: ${formatDate(l.assignedDate)}</span>
+                      </li>
+                    `).join('') :
+            '<li class="member-detail-list-item">No current lockers assigned</li>'}
+                </ul>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Locker History</label>
+                <ul class="member-detail-list">
+                  ${(member.lockerHistory && member.lockerHistory.length) ?
+            member.lockerHistory.map(l => `
+                      <li class="member-detail-list-item">
+                        <span class="member-detail-list-label">Locker #${l.lockerNumber}</span>
+                        <span class="member-detail-list-value">
+                          ${formatDate(l.assignedDate)} → ${l.removedDate ? formatDate(l.removedDate) : 'Active'}
+                        </span>
+                      </li>
+                    `).join('') :
+            '<li class="member-detail-list-item">No locker history available</li>'}
+                </ul>
+              </div>
+            </div>
+          </section>
+    
+          <!-- Trainers Section -->
+          <section class="member-detail-card">
+            <h2 class="member-detail-section-title">Personal Trainers</h2>
+            <div class="member-detail-grid">
+              <div class="member-detail-field">
+                <label class="member-detail-label">Current Trainers</label>
+                <ul class="member-detail-list">
+                  ${(member.personalTrainers && member.personalTrainers.length) ?
+            member.personalTrainers.filter(pt => !pt.removedDate).map(pt => `
+                      <li class="member-detail-list-item">
+                        <span class="member-detail-list-label">${pt.trainerFullName} (${pt.trainerId})</span>
+                        <span class="member-detail-list-value">Assigned: ${formatDate(pt.assignedDate)}</span>
+                      </li>
+                    `).join('') :
+            '<li class="member-detail-list-item">No current trainers assigned</li>'}
+                </ul>
+              </div>
+              <div class="member-detail-field">
+                <label class="member-detail-label">Trainer History</label>
+                <ul class="member-detail-list">
+                  ${(member.assignedPersonalTrainerHistory && member.assignedPersonalTrainerHistory.length) ?
+            member.assignedPersonalTrainerHistory.map(pt => `
+                      <li class="member-detail-list-item">
+                        <span class="member-detail-list-label">${pt.trainerFullName} (${pt.trainerId})</span>
+                        <span class="member-detail-list-value">
+                          ${formatDate(pt.assignedDate)} → ${pt.removedDate ? formatDate(pt.removedDate) : 'Active'}
+                        </span>
+                      </li>
+                    `).join('') :
+            '<li class="member-detail-list-item">No trainer history available</li>'}
+                </ul>
+              </div>
+            </div>
+          </section>
+    
+          <!-- Attendance Section -->
+          <section class="member-detail-card">
+            <h2 class="member-detail-section-title">Attendance</h2>
+            <div class="member-detail-grid">
+              <div class="member-detail-field">
+                <label class="member-detail-label">Check-ins This Month</label>
+                <div class="member-detail-value">${currentMonthCheckins} check-ins</div>
+              </div>
+            </div>
+          </section>
+    
+          <!-- Payment History Section -->
+          <section class="member-detail-card member-payment-history">
+            <h2 class="member-detail-section-title">Payment History</h2>
+            <div class="table-container">
+              <table class="member-payment-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${payments && payments.length ?
+            payments.map((p, i) => `
+                      <tr>
+                        <td>${i + 1}</td>
+                        <td>Rs${p.amount.toFixed(2)}</td>
+                        <td>${formatDate(p.paymentDate)}</td>
+                        <td>${p.paymentMethod || 'N/A'}</td>
+                        <td>
+                          <span class="member-status-badge ${getStatusBadge(p.status)}">
+                            ${p.status || 'N/A'}
+                          </span>
+                        </td>
+                      </tr>
+                    `).join('') :
+            `<tr>
+                      <td colspan="5" style="text-align: center; padding: 2rem; color: var(--secondary-color);">
+                        No payment history found
+                      </td>
+                    </tr>`}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        `;
+
+        // Store member detail data globally for download
+        window.memberDetailData = member;
+        window.memberDetailAttendanceCount = attendance ? attendance.filter(a => {
+          const d = new Date(a.date);
+          const now = new Date();
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        }).length : 0;
+        window.memberDetailPayments = payments;
+      }
+
+      // Fetch member details when page loads
+      fetchMemberDetails();
+
+      document.getElementById('downloadTrainers').addEventListener('click', () => {
+        if (!window.memberDetailData) {
+          window.toast('No member data to download', 'error');
+          return;
+        }
+        const member = window.memberDetailData;
+        // Build CSV content for all sections
+        let csvContent = '';
+        // Personal Info
+        csvContent += 'Personal Information\n';
+        csvContent += 'Member ID,Full Name,Email,Contact,Gender,Date of Birth,Address\n';
+        csvContent += [
+          member.memberId || '',
+          member.fullName || '',
+          member.email || '',
+          member.contact || '',
+          member.gender || '',
+          member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString() : '',
+          member.address || ''
+        ].join(',') + '\n\n';
+        // Emergency Info
+        csvContent += 'Emergency Contact\n';
+        csvContent += 'Name,Relationship,Number\n';
+        csvContent += [
+          member.emergencyContactName || '',
+          member.emergencyContactRelationship || '',
+          member.emergencyNumber || ''
+        ].join(',') + '\n\n';
+        // Membership Info
+        csvContent += 'Membership Information\n';
+        csvContent += 'Membership Type,Start Date,End Date,Status,Cancellation Date,Cancellation Reason\n';
+        csvContent += [
+          member.membershipType || '',
+          member.startDate ? new Date(member.startDate).toLocaleDateString() : '',
+          member.endDate ? new Date(member.endDate).toLocaleDateString() : '',
+          member.memberStatus || '',
+          member.cancellationDate ? new Date(member.cancellationDate).toLocaleDateString() : '',
+          member.cancellationReason || ''
+        ].join(',') + '\n\n';
+        // Locker Assignments
+        csvContent += 'Locker Assignments\n';
+        csvContent += 'Current Lockers\n';
+        csvContent += 'Locker Number,Assigned Date\n';
+        if (member.lockers && member.lockers.length) {
+          member.lockers.forEach(l => {
+            csvContent += [l.lockerNumber, l.assignedDate ? new Date(l.assignedDate).toLocaleDateString() : ''].join(',') + '\n';
+          });
+        } else {
+          csvContent += 'No current lockers assigned\n';
+        }
+        csvContent += '\nLocker History\n';
+        csvContent += 'Locker Number,Assigned Date,Removed Date\n';
+        if (member.lockerHistory && member.lockerHistory.length) {
+          member.lockerHistory.forEach(l => {
+            csvContent += [l.lockerNumber, l.assignedDate ? new Date(l.assignedDate).toLocaleDateString() : '', l.removedDate ? new Date(l.removedDate).toLocaleDateString() : 'Active'].join(',') + '\n';
+          });
+        } else {
+          csvContent += 'No locker history available\n';
+        }
+        csvContent += '\n';
+        // Personal Trainers
+        csvContent += 'Personal Trainers\n';
+        csvContent += 'Current Trainers\n';
+        csvContent += 'Trainer Name,Trainer ID,Assigned Date\n';
+        if (member.personalTrainers && member.personalTrainers.length) {
+          member.personalTrainers.filter(pt => !pt.removedDate).forEach(pt => {
+            csvContent += [pt.trainerFullName, pt.trainerId, pt.assignedDate ? new Date(pt.assignedDate).toLocaleDateString() : ''].join(',') + '\n';
+          });
+        } else {
+          csvContent += 'No current trainers assigned\n';
+        }
+        csvContent += '\nTrainer History\n';
+        csvContent += 'Trainer Name,Trainer ID,Assigned Date,Removed Date\n';
+        if (member.assignedPersonalTrainerHistory && member.assignedPersonalTrainerHistory.length) {
+          member.assignedPersonalTrainerHistory.forEach(pt => {
+            csvContent += [pt.trainerFullName, pt.trainerId, pt.assignedDate ? new Date(pt.assignedDate).toLocaleDateString() : '', pt.removedDate ? new Date(pt.removedDate).toLocaleDateString() : 'Active'].join(',') + '\n';
+          });
+        } else {
+          csvContent += 'No trainer history available\n';
+        }
+        csvContent += '\n';
+        // Attendance
+        csvContent += 'Attendance\n';
+        csvContent += 'Check-ins This Month\n';
+        csvContent += (window.memberDetailAttendanceCount !== undefined ? window.memberDetailAttendanceCount : 'N/A') + ' check-ins\n\n';
+        // Payment History
+        csvContent += 'Payment History\n';
+        csvContent += 'Amount,Date,Method,Status\n';
+        if (window.memberDetailPayments && window.memberDetailPayments.length) {
+          window.memberDetailPayments.forEach(p => {
+            csvContent += [
+              'Rs' + (p.amount ? p.amount.toFixed(2) : '0.00'),
+              p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : '',
+              p.paymentMethod || '',
+              p.status || ''
+            ].join(',') + '\n';
+          });
+        } else {
+          csvContent += 'No payment history found\n';
+        }
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        link.setAttribute('href', url);
+        link.setAttribute('download', `member_detail_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.toast('Member detail downloaded', 'success');
+      });
+
+      document.getElementById('printTrainers').addEventListener('click', () => {
+        if (!window.memberDetailData) {
+          window.toast('No member data to print', 'error');
+          return;
+        }
+        const member = window.memberDetailData;
+        const date = new Date().toLocaleString();
+        const attendanceCount = window.memberDetailAttendanceCount !== undefined ? window.memberDetailAttendanceCount : 'N/A';
+        const payments = window.memberDetailPayments || [];
+        const printContent = `
+          <html>
+          <head>
+            <title>Member Detail Report</title>
+            <style>
+              body { font-family: Arial, sans-serif; }
+              h1 { text-align: center; }
+              .header { margin-bottom: 20px; }
+              .footer { margin-top: 20px; text-align: center; font-size: 12px; }
+              table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+              th { background-color: #f5f5f5; }
+              section { margin-bottom: 2rem; }
+              .section-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>Member Detail Report</h1>
+              <p>Generated on: ${date}</p>
+            </div>
+            <section>
+              <div class="section-title">Personal Information</div>
+              <table><tbody>
+                <tr><th>Member ID</th><td>${member.memberId || ''}</td></tr>
+                <tr><th>Full Name</th><td>${member.fullName || ''}</td></tr>
+                <tr><th>Email</th><td>${member.email || ''}</td></tr>
+                <tr><th>Contact</th><td>${member.contact || ''}</td></tr>
+                <tr><th>Gender</th><td>${member.gender || ''}</td></tr>
+                <tr><th>Date of Birth</th><td>${member.dateOfBirth ? new Date(member.dateOfBirth).toLocaleDateString() : ''}</td></tr>
+                <tr><th>Address</th><td>${member.address || ''}</td></tr>
+              </tbody></table>
+            </section>
+            <section>
+              <div class="section-title">Emergency Contact</div>
+              <table><tbody>
+                <tr><th>Name</th><td>${member.emergencyContactName || ''}</td></tr>
+                <tr><th>Relationship</th><td>${member.emergencyContactRelationship || ''}</td></tr>
+                <tr><th>Number</th><td>${member.emergencyNumber || ''}</td></tr>
+              </tbody></table>
+            </section>
+            <section>
+              <div class="section-title">Membership Information</div>
+              <table><tbody>
+                <tr><th>Membership Type</th><td>${member.membershipType || ''}</td></tr>
+                <tr><th>Start Date</th><td>${member.startDate ? new Date(member.startDate).toLocaleDateString() : ''}</td></tr>
+                <tr><th>End Date</th><td>${member.endDate ? new Date(member.endDate).toLocaleDateString() : ''}</td></tr>
+                <tr><th>Status</th><td>${member.memberStatus || ''}</td></tr>
+                <tr><th>Cancellation Date</th><td>${member.cancellationDate ? new Date(member.cancellationDate).toLocaleDateString() : ''}</td></tr>
+                <tr><th>Cancellation Reason</th><td>${member.cancellationReason || ''}</td></tr>
+              </tbody></table>
+            </section>
+            <section>
+              <div class="section-title">Locker Assignments</div>
+              <div><strong>Current Lockers</strong></div>
+              <table><thead><tr><th>Locker Number</th><th>Assigned Date</th></tr></thead><tbody>
+                ${(member.lockers && member.lockers.length) ?
+                  member.lockers.map(l => `<tr><td>${l.lockerNumber}</td><td>${l.assignedDate ? new Date(l.assignedDate).toLocaleDateString() : ''}</td></tr>`).join('') :
+                  '<tr><td colspan="2">No current lockers assigned</td></tr>'}
+              </tbody></table>
+              <div><strong>Locker History</strong></div>
+              <table><thead><tr><th>Locker Number</th><th>Assigned Date</th><th>Removed Date</th></tr></thead><tbody>
+                ${(member.lockerHistory && member.lockerHistory.length) ?
+                  member.lockerHistory.map(l => `<tr><td>${l.lockerNumber}</td><td>${l.assignedDate ? new Date(l.assignedDate).toLocaleDateString() : ''}</td><td>${l.removedDate ? new Date(l.removedDate).toLocaleDateString() : 'Active'}</td></tr>`).join('') :
+                  '<tr><td colspan="3">No locker history available</td></tr>'}
+              </tbody></table>
+            </section>
+            <section>
+              <div class="section-title">Personal Trainers</div>
+              <div><strong>Current Trainers</strong></div>
+              <table><thead><tr><th>Trainer Name</th><th>Trainer ID</th><th>Assigned Date</th></tr></thead><tbody>
+                ${(member.personalTrainers && member.personalTrainers.length) ?
+                  member.personalTrainers.filter(pt => !pt.removedDate).map(pt => `<tr><td>${pt.trainerFullName}</td><td>${pt.trainerId}</td><td>${pt.assignedDate ? new Date(pt.assignedDate).toLocaleDateString() : ''}</td></tr>`).join('') :
+                  '<tr><td colspan="3">No current trainers assigned</td></tr>'}
+              </tbody></table>
+              <div><strong>Trainer History</strong></div>
+              <table><thead><tr><th>Trainer Name</th><th>Trainer ID</th><th>Assigned Date</th><th>Removed Date</th></tr></thead><tbody>
+                ${(member.assignedPersonalTrainerHistory && member.assignedPersonalTrainerHistory.length) ?
+                  member.assignedPersonalTrainerHistory.map(pt => `<tr><td>${pt.trainerFullName}</td><td>${pt.trainerId}</td><td>${pt.assignedDate ? new Date(pt.assignedDate).toLocaleDateString() : ''}</td><td>${pt.removedDate ? new Date(pt.removedDate).toLocaleDateString() : 'Active'}</td></tr>`).join('') :
+                  '<tr><td colspan="4">No trainer history available</td></tr>'}
+              </tbody></table>
+            </section>
+            <section>
+              <div class="section-title">Attendance</div>
+              <table><tbody>
+                <tr><th>Check-ins This Month</th><td>${attendanceCount} check-ins</td></tr>
+              </tbody></table>
+            </section>
+            <section>
+              <div class="section-title">Payment History</div>
+              <table><thead><tr><th>Amount</th><th>Date</th><th>Method</th><th>Status</th></tr></thead><tbody>
+                ${(payments && payments.length) ?
+                  payments.map(p => `<tr><td>Rs${p.amount ? p.amount.toFixed(2) : '0.00'}</td><td>${p.paymentDate ? new Date(p.paymentDate).toLocaleDateString() : ''}</td><td>${p.paymentMethod || ''}</td><td>${p.status || ''}</td></tr>`).join('') :
+                  '<tr><td colspan="4">No payment history found</td></tr>'}
+              </tbody></table>
+            </section>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} Knox Barbell - Member Detail Report</p>
+            </div>
+          </body>
+          </html>
+        `;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.onload = function () {
+          printWindow.print();
+          printWindow.close();
+        };
+        window.toast('Printing member detail...', 'success');
+      });
+    </script>
+</body>
+
+</html>

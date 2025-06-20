@@ -82,6 +82,9 @@ const htmlPages = [
   "product",
   "application-form",
   "application",
+  "locker",
+  "member-detail",
+  "trainer-detail",
 ];
 
 // Unprotected pages

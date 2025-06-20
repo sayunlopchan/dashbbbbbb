@@ -26,15 +26,15 @@
   font-weight: 600;
 }
 
-.trainer-table tr{
+.trainer-table tr {
   border: 1px solid #C8C8C8;
 }
 
-.trainer-table thead tr{
+.trainer-table thead tr {
   border-radius: 10px;
 }
 
-.trainer-table tbody tr:last-child{
+.trainer-table tbody tr:last-child {
   border-radius: 10px;
 }
 
@@ -42,3 +42,163 @@
   background-color: #f8f9fa;
 }
 
+/* Trainer Assignments Table */
+.trainer-assignments-table {
+  min-width: 400px;
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.trainer-assignments-table th,
+.trainer-assignments-table td {
+  padding: 15px;
+  text-align: left;
+}
+
+.trainer-assignments-table td {
+  font-weight: 400;
+  color: #6a6a6a;
+  font-size: 0.95rem;
+}
+
+.trainer-assignments-table th {
+  background-color: #e9e9e9;
+  font-weight: 600;
+}
+
+.trainer-assignments-table tr {
+  border: 1px solid #C8C8C8;
+}
+
+.trainer-assignments-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Action Button for Assign Member */
+.action-btn.assign-member {
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+.action-btn.assign-member:hover {
+  color: #ffffff;
+  background-color: var(--accent-color);
+}
+
+/* Add delete button style for assignments table */
+.trainer-assignments-table .action-btn.delete {
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+  padding: 5px;
+}
+
+.trainer-assignments-table .action-btn.delete:hover {
+  color: #fff;
+  background-color: var(--danger-color);
+}
+
+/* Member Search Styles */
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-results.active {
+  display: block;
+}
+
+.search-result-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+  background-color: #f8f9fa;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item .member-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.search-result-item .member-details {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Selected Member Info */
+.selected-member-info {
+  margin-top: 10px;
+}
+
+.member-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  height: 100px;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.member-details strong {
+  color: #333;
+  font-size: 1rem;
+}
+
+.member-details span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Status Badge for Assignments */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.status-badge.inactive {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+/* Text Center Utility */
+.text-center {
+  text-align: center;
+}

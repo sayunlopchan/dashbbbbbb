@@ -72,10 +72,94 @@ const deleteTrainer = asyncHandler(async (req, res) => {
   });
 });
 
+// Assign member to trainer
+const assignMemberToTrainer = asyncHandler(async (req, res) => {
+  const { trainerId } = req.params;
+  const { memberId } = req.body;
+
+  if (!memberId) {
+    return res.status(400).json({
+      success: false,
+      message: "Member ID is required"
+    });
+  }
+
+  const trainer = await trainerService.assignMemberToTrainerService(trainerId, {
+    memberId
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Member assigned to trainer successfully",
+    data: trainer
+  });
+});
+
+// Remove member from trainer
+const removeMemberFromTrainer = asyncHandler(async (req, res) => {
+  const { trainerId, memberId } = req.params;
+
+  const trainer = await trainerService.removeMemberFromTrainerService(trainerId, memberId);
+
+  res.status(200).json({
+    success: true,
+    message: "Member removed from trainer successfully",
+    data: trainer
+  });
+});
+
+// Get trainer with assigned members
+const getTrainerWithMembers = asyncHandler(async (req, res) => {
+  const { trainerId } = req.params;
+
+  const trainer = await trainerService.getTrainerWithMembersService(trainerId);
+
+  res.status(200).json({
+    success: true,
+    data: trainer
+  });
+});
+
+// Get all trainers with their assigned members
+const getAllTrainersWithMembers = asyncHandler(async (req, res) => {
+  const trainers = await trainerService.getAllTrainersWithMembersService();
+
+  res.status(200).json({
+    success: true,
+    data: trainers
+  });
+});
+
+// Update member status in trainer
+const updateMemberStatusInTrainer = asyncHandler(async (req, res) => {
+  const { trainerId, memberId } = req.params;
+  const { status } = req.body;
+
+  if (!status || !["active", "inactive"].includes(status)) {
+    return res.status(400).json({
+      success: false,
+      message: "Status must be 'active' or 'inactive'"
+    });
+  }
+
+  const trainer = await trainerService.updateMemberStatusInTrainerService(trainerId, memberId, status);
+
+  res.status(200).json({
+    success: true,
+    message: "Member status updated successfully",
+    data: trainer
+  });
+});
+
 module.exports = {
   createTrainer,
   getAllTrainers,
   getTrainerById,
   updateTrainer,
   deleteTrainer,
+  assignMemberToTrainer,
+  removeMemberFromTrainer,
+  getTrainerWithMembers,
+  getAllTrainersWithMembers,
+  updateMemberStatusInTrainer
 };

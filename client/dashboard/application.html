@@ -90,6 +90,13 @@
                 </a>
             </li>
             <li>
+                <a href="/locker">
+                    <i class="fas fa-box"></i>
+                    <span>Locker</span>
+                    <div class="tooltip">Locker</div>
+                </a>
+            </li>
+            <li>
                 <a href="/product">
                     <i class="fas fa-box"></i>
                     <span>Product</span>
@@ -121,7 +128,7 @@
                 <div class="notification">
                     <i class="fas fa-bell"></i>
                     <span class="notification-badge">0</span>
-                    
+
                     <!-- Notification Modal -->
                     <div class="notification-modal">
                         <div class="notification-header">
@@ -152,7 +159,51 @@
         <div class="content">
             <div class="content-header">
                 <h1>Applications Management</h1>
-                <div class="header-actions">
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters">
+                <!-- search filter -->
+                <div class="filter-group search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search by name or ID..." autocomplete="off">
+                </div>
+
+                <!-- gender filter -->
+                <div class="filter-group">
+                    <select id="gender">
+                        <option value="">All Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- membership type filter -->
+                <div class="filter-group">
+                    <select id="membershipType">
+                        <option value="">Memberships</option>
+                        <option value="silver">Silver</option>
+                        <option value="gold">Gold</option>
+                        <option value="diamond">Diamond</option>
+                        <option value="platinum">Platinum</option>
+                    </select>
+                </div>
+
+                <!-- age filter -->
+                <div class="filter-group">
+                    <select id="age">
+                        <option value="">Age</option>
+                        <option value="under18">Under 18</option>
+                        <option value="18-25">18-25</option>
+                        <option value="26-35">26-35</option>
+                        <option value="36-45">36-45</option>
+                        <option value="46-55">46-55</option>
+                        <option value="56+">56+</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
                     <button id="downloadApplications" title="Download CSV">
                         <i class="fa-solid fa-download"></i>
                     </button>
@@ -165,80 +216,38 @@
                 </div>
             </div>
 
-            <!-- Filters Section -->
-            <div class="filters">
-                <!-- gender filter -->
-                <div class="filter-group">
-                    <label for="gender">Gender:</label>
-                    <select id="gender">
-                        <option value="">All</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <!-- membership type filter -->
-                <div class="filter-group">
-                    <label for="membershipType">Membership:</label>
-                    <select id="membershipType">
-                        <option value="">All</option>
-                        <option value="silver">Silver</option>
-                        <option value="gold">Gold</option>
-                        <option value="diamond">Diamond</option>
-                        <option value="platinum">Platinum</option>
-                    </select>
-                </div>
-                <!-- age filter -->
-                <div class="filter-group">
-                    <label for="age">Age:</label>
-                    <select id="age">
-                        <option value="">All</option>
-                        <option value="under18">Under 18</option>
-                        <option value="18-25">18-25</option>
-                        <option value="26-35">26-35</option>
-                        <option value="36-45">36-45</option>
-                        <option value="46-55">46-55</option>
-                        <option value="56+">56+</option>
-                    </select>
-                </div>
-                <!-- search filter -->
-                <div class="filter-group search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search by name or ID..." autocomplete="off">
-                </div>
-            </div>
-
             <!-- Enrolled Applications Table -->
-            <table class="trainer-table">
-                <thead>
-                    <tr>
-                        <th>S.N</th>
-                        <th>Id</th>
-                        <th>Full Name</th>
-                        <th>Email Id</th>
-                        <th>Contact No.</th>
-                        <th>Starting Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>                        
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td>loading...</td>
-                        <td><span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span></td>
-                        <td>
-                            <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
-                            <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
+            <div class="table-container">
+                <table class="trainer-table">
+                    <thead>
+                        <tr>
+                            <th>S.N</th>
+                            <th>Id</th>
+                            <th>Full Name</th>
+                            <th>Email Id</th>
+                            <th>Contact No.</th>
+                            <th>Starting Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td>loading...</td>
+                            <td><span class="status"> <i class="fa-solid fa-circle-check"></i>loading...</span></td>
+                            <td>
+                                <button class="action-btn edit"><i class="fa-solid fa-pen"></i></button>
+                                <button class="action-btn delete"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
             <!-- Pagination Controls -->
             <div class="pagination-controls">
                 <button id="prevPage" class="pagination-btn" disabled>
@@ -321,7 +330,7 @@
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();
-            
+
             if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
                 age--;
             }
@@ -343,7 +352,7 @@
             try {
                 const response = await fetch('/api/applications');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     // Store all applications
                     allApplications = result.data;
@@ -383,7 +392,7 @@
                                 application.contact,
                                 application.applicationId
                             ];
-                            return searchFields.some(field => 
+                            return searchFields.some(field =>
                                 field && field.toLowerCase().includes(search)
                             );
                         }
@@ -525,7 +534,7 @@
                 }
 
                 const result = await response.json();
-                
+
                 if (result.success) {
                     fetchApplications();
                     // Remove loading notification and show success
@@ -561,7 +570,7 @@
                 }
 
                 const result = await response.json();
-                
+
                 if (result.success) {
                     fetchApplications();
                     toast('Application deleted successfully!', 'success');
@@ -687,7 +696,7 @@
                         application.contact,
                         application.applicationId
                     ];
-                    return searchFields.some(field => 
+                    return searchFields.some(field =>
                         field && field.toLowerCase().includes(search)
                     );
                 }
@@ -720,11 +729,11 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             const date = new Date().toISOString().split('T')[0];
-            
+
             link.setAttribute('href', url);
             link.setAttribute('download', `applications_list_${date}.csv`);
             link.style.visibility = 'hidden';
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -766,7 +775,7 @@
                         application.contact,
                         application.applicationId
                     ];
-                    return searchFields.some(field => 
+                    return searchFields.some(field =>
                         field && field.toLowerCase().includes(search)
                     );
                 }
@@ -864,7 +873,7 @@
     <script src="./js/logout.js"></script>
     <script>
         // Notification Modal Logic
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const notificationIcon = document.querySelector('.notification');
             const notificationModal = document.querySelector('.notification-modal');
             const closeNotifications = document.querySelector('.close-notifications');
@@ -872,7 +881,7 @@
             const notificationBadge = document.querySelector('.notification-badge');
 
             // Toggle notification modal
-            notificationIcon.addEventListener('click', function(e) {
+            notificationIcon.addEventListener('click', function (e) {
                 e.stopPropagation();
                 notificationModal.classList.toggle('active');
                 if (notificationModal.classList.contains('active')) {
@@ -881,13 +890,13 @@
             });
 
             // Close notification modal
-            closeNotifications.addEventListener('click', function(e) {
+            closeNotifications.addEventListener('click', function (e) {
                 e.stopPropagation();
                 notificationModal.classList.remove('active');
             });
 
             // Close modal when clicking outside
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
                     notificationModal.classList.remove('active');
                 }
@@ -922,7 +931,7 @@
 
                     if (data.success) {
                         const notifications = data.data;
-                        
+
                         if (notifications.length === 0) {
                             notificationList.innerHTML = `
                                 <div class="notification-empty">
@@ -957,13 +966,13 @@
                                             method: 'PATCH',
                                             credentials: 'include'
                                         });
-                                        
+
                                         if (response.ok) {
                                             // Update UI
                                             item.classList.remove('unread');
                                             const unreadDot = item.querySelector('.unread-dot');
                                             if (unreadDot) unreadDot.remove();
-                                            
+
                                             // Update unread count
                                             await fetchUnreadCount();
                                         }

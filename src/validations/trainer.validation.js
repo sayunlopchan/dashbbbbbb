@@ -10,11 +10,9 @@ const validateTrainer = (req, res, next) => {
     gender: Joi.string()
       .valid('male', 'female', 'other')
       .required(),
-    dateOfBirth: Joi.date().iso().max('now').required(),
-    specialization: Joi.string().optional(),
-    qualifications: Joi.array().items(Joi.string()).optional(),
+    joinDate: Joi.date().iso().required(),
     status: Joi.string()
-      .valid('active', 'inactive', 'suspended')
+      .valid('active', 'inactive')
       .optional()
       .default('active')
   });
@@ -30,6 +28,42 @@ const validateTrainer = (req, res, next) => {
   next();
 };
 
+// Validate member assignment to trainer
+const validateMemberAssignment = (req, res, next) => {
+  const schema = Joi.object({
+    memberId: Joi.string().trim().required()
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    });
+  }
+
+  next();
+};
+
+// Validate member status update
+const validateMemberStatusUpdate = (req, res, next) => {
+  const schema = Joi.object({
+    status: Joi.string().valid('active', 'inactive').required()
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
+    });
+  }
+
+  next();
+};
+
 module.exports = {
-  validateTrainer
+  validateTrainer,
+  validateMemberAssignment,
+  validateMemberStatusUpdate
 }; 

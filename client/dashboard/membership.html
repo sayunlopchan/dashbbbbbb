@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <!-- sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
             <h3>Knox Barbell</h3>
@@ -88,6 +89,13 @@
                     <i class="fas fa-wallet"></i>
                     <span>Finance</span>
                     <div class="tooltip">Finance</div>
+                </a>
+            </li>
+            <li>
+                <a href="/locker">
+                    <i class="fas fa-box"></i>
+                    <span>Locker</span>
+                    <div class="tooltip">Locker</div>
                 </a>
             </li>
             <li>
@@ -205,37 +213,30 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Add New Membership</h2>
-                <button class="close-modal" id="closeAddModal">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             <form id="addMembershipForm" class="modal-body">
-                <div class="form-group">
+                <div class="form-container-membership">
+                <div class="column">
                     <label for="membershipTitle">Membership Title</label>
                     <input type="text" id="membershipTitle" name="title" required placeholder="e.g., Silver, Gold, Platinum">
-                </div>
-                <div class="form-group">
                     <label for="membershipPrice">Price (Rs)</label>
                     <input type="number" id="membershipPrice" name="price" required min="0" placeholder="e.g., 4000">
-                </div>
-                <div class="form-group">
                     <label for="membershipDuration">Duration</label>
                     <input type="text" id="membershipDuration" name="duration" required placeholder="e.g., 1 Month, 3 Months">
-                </div>
-                <div class="form-group">
                     <label>Card Background</label>
+                    <div class="color-type-selector">
+                        <label class="radio-label">
+                            <input type="radio" name="colorType" value="simple" checked>
+                            <span>Simple</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="colorType" value="gradient">
+                            <span>Gradient</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="column">
                     <div class="color-customization">
-                        <div class="color-type-selector">
-                            <label class="radio-label">
-                                <input type="radio" name="colorType" value="simple" checked>
-                                <span>Simple Color</span>
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="colorType" value="gradient">
-                                <span>Gradient</span>
-                            </label>
-                        </div>
-                        
                         <div id="simpleColorSection" class="color-section">
                             <label for="simpleColor">Background Color</label>
                             <div class="color-input-group">
@@ -284,10 +285,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-actions">
+                <div class="form-actions row">
                     <button type="button" class="btn btn-secondary" id="cancelAddMembership">Cancel</button>
                     <button type="submit" class="btn">Add Membership</button>
                 </div>
+            </div>
+                
             </form>
         </div>
     </div>
@@ -395,7 +398,6 @@
         // DOM elements
         const addMembershipBtn = document.getElementById('addMembershipBtn');
         const addMembershipModal = document.getElementById('addMembershipModal');
-        const closeAddModal = document.getElementById('closeAddModal');
         const cancelAddMembership = document.getElementById('cancelAddMembership');
         const addMembershipForm = document.getElementById('addMembershipForm');
 
@@ -420,11 +422,6 @@
             // Add membership modal
             addMembershipBtn.addEventListener('click', () => {
                 addMembershipModal.classList.add('active');
-            });
-
-            closeAddModal.addEventListener('click', () => {
-                addMembershipModal.classList.remove('active');
-                addMembershipForm.reset();
             });
 
             cancelAddMembership.addEventListener('click', () => {
