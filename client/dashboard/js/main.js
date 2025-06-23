@@ -1,5 +1,5 @@
-const baseUrl = "http://localhost:4000";
-// const baseUrl = "https://dashbbbbbb-1.onrender.com";
+// const baseUrl = "http://localhost:4000";
+const baseUrl = "https://dashbbbbbb-1.onrender.com";
 
 // token verification
 document.addEventListener("DOMContentLoaded", async () => {
@@ -205,26 +205,26 @@ if (typeof window.toast !== "function") {
 
 // Notification Modal Toggle Logic
 document.addEventListener("DOMContentLoaded", function () {
-  const notificationIcon = document.querySelector('.notification > .fa-bell');
-  const notificationModal = document.querySelector('.notification-modal');
-  const closeNotificationsBtn = document.querySelector('.close-notifications');
-  const notificationList = document.querySelector('.notification-list');
-  const notificationBadge = document.querySelector('.notification-badge');
+  const notificationIcon = document.querySelector(".notification > .fa-bell");
+  const notificationModal = document.querySelector(".notification-modal");
+  const closeNotificationsBtn = document.querySelector(".close-notifications");
+  const notificationList = document.querySelector(".notification-list");
+  const notificationBadge = document.querySelector(".notification-badge");
 
   // Function to fetch notifications
   async function fetchNotifications() {
     try {
-      const response = await fetch('/api/notifications');
+      const response = await fetch("/api/notifications");
       const result = await response.json();
 
       if (result.success) {
         displayNotifications(result.data);
         updateNotificationBadge(result.data);
       } else {
-        throw new Error(result.message || 'Failed to fetch notifications');
+        throw new Error(result.message || "Failed to fetch notifications");
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:", error);
       notificationList.innerHTML = `
         <div class="notification-empty">
           <p>Error loading notifications. Please try again.</p>
@@ -246,30 +246,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Sort notifications by date (newest first) and unread status
     notifications.sort((a, b) => {
-      if (a.status === 'unread' && b.status !== 'unread') return -1;
-      if (a.status !== 'unread' && b.status === 'unread') return 1;
+      if (a.status === "unread" && b.status !== "unread") return -1;
+      if (a.status !== "unread" && b.status === "unread") return 1;
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
 
-    const notificationsHTML = notifications.map(notification => `
-      <div class="notification-item ${notification.status === 'unread' ? 'unread' : ''}" style="cursor: pointer;">
+    const notificationsHTML = notifications
+      .map(
+        (notification) => `
+      <div class="notification-item ${
+        notification.status === "unread" ? "unread" : ""
+      }" style="cursor: pointer;">
         <div class="notification-title">${notification.title}</div>
         <div class="notification-message">${notification.message}</div>
-        <div class="notification-time">${formatNotificationDate(notification.createdAt)}</div>
+        <div class="notification-time">${formatNotificationDate(
+          notification.createdAt
+        )}</div>
       </div>
-    `).join('');
+    `
+      )
+      .join("");
 
     notificationList.innerHTML = notificationsHTML;
 
     // Add click handlers for notification items
-    document.querySelectorAll('.notification-item').forEach((item, index) => {
-      item.addEventListener('click', () => {
+    document.querySelectorAll(".notification-item").forEach((item, index) => {
+      item.addEventListener("click", () => {
         // Mark as read if unread
-        if (notifications[index].status === 'unread') {
+        if (notifications[index].status === "unread") {
           markNotificationAsRead(notifications[index]._id);
         }
         // Redirect to notifications page
-        window.location.href = '/notifications';
+        window.location.href = "/notifications";
       });
     });
   }
@@ -285,13 +293,13 @@ document.addEventListener("DOMContentLoaded", function () {
       const hours = Math.floor(diffTime / (1000 * 60 * 60));
       if (hours === 0) {
         const minutes = Math.floor(diffTime / (1000 * 60));
-        return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+        return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
       }
-      return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
     } else if (diffDays === 1) {
-      return 'Yesterday';
+      return "Yesterday";
     } else if (diffDays < 7) {
-      return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+      return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
     } else {
       return date.toLocaleDateString();
     }
@@ -300,42 +308,47 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to update notification badge
   function updateNotificationBadge(notifications) {
     if (!notificationBadge) return; // Skip if badge element doesn't exist
-    
-    const unreadCount = notifications.filter(n => n.status === 'unread').length;
+
+    const unreadCount = notifications.filter(
+      (n) => n.status === "unread"
+    ).length;
     notificationBadge.textContent = unreadCount;
-    notificationBadge.style.display = unreadCount > 0 ? 'flex' : 'none';
+    notificationBadge.style.display = unreadCount > 0 ? "flex" : "none";
   }
 
   // Function to mark notification as read
   async function markNotificationAsRead(notificationId) {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH'
-      });
-      
+      const response = await fetch(
+        `/api/notifications/${notificationId}/read`,
+        {
+          method: "PATCH",
+        }
+      );
+
       if (response.ok) {
         // Refresh notifications after marking as read
         fetchNotifications();
       }
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      console.error("Error marking notification as read:", error);
     }
   }
 
   if (notificationIcon && notificationModal) {
     // Add click handler for both bell icon and notification badge
     const notificationTriggers = [notificationIcon];
-    
+
     // Only add badge to triggers if it exists
     if (notificationBadge) {
       notificationTriggers.push(notificationBadge);
     }
-    
-    notificationTriggers.forEach(trigger => {
-      trigger.addEventListener('click', function (e) {
+
+    notificationTriggers.forEach((trigger) => {
+      trigger.addEventListener("click", function (e) {
         e.stopPropagation();
-        notificationModal.classList.toggle('active');
-        if (notificationModal.classList.contains('active')) {
+        notificationModal.classList.toggle("active");
+        if (notificationModal.classList.contains("active")) {
           fetchNotifications(); // Fetch notifications when opening modal
         }
       });
@@ -343,21 +356,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Close modal when clicking the close button
     if (closeNotificationsBtn) {
-      closeNotificationsBtn.addEventListener('click', function (e) {
+      closeNotificationsBtn.addEventListener("click", function (e) {
         e.stopPropagation();
-        notificationModal.classList.remove('active');
+        notificationModal.classList.remove("active");
       });
     }
 
     // Close modal when clicking outside
-    document.addEventListener('click', function (e) {
+    document.addEventListener("click", function (e) {
       if (
-        notificationModal.classList.contains('active') &&
+        notificationModal.classList.contains("active") &&
         !notificationModal.contains(e.target) &&
         !notificationIcon.contains(e.target) &&
         (!notificationBadge || !notificationBadge.contains(e.target))
       ) {
-        notificationModal.classList.remove('active');
+        notificationModal.classList.remove("active");
       }
     });
   }
