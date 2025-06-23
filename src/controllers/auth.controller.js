@@ -43,6 +43,7 @@ const login = async (req, res) => {
           id: user._id,
           username: user.username,
           email: user.email,
+          role: user.role,
         },
       },
     });
@@ -75,6 +76,7 @@ const verifyToken = (req, res) => {
       id: req.user.id,
       username: req.user.username,
       email: req.user.email,
+      role: req.user.role,
     },
   });
 };

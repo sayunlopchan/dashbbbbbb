@@ -92,7 +92,7 @@
       </li>
       <li>
         <a href="/locker">
-            <i class="fas fa-box"></i>
+            <i class="fas fa-lock"></i>
             <span>Locker</span>
             <div class="tooltip">Locker</div>
         </a>
@@ -139,7 +139,7 @@
       </div>
 
       <!-- Notifications Area -->
-      <div id="notifications">
+      <div id="notifications-container">
         <div class="tabs">
           <button class="tab active" data-type="all">All (0)</button>
           <button class="tab" data-type="unread">Unread (0)</button>
@@ -164,6 +164,16 @@
       const tabs = document.querySelectorAll('.tab');
       let currentFilter = 'all';
       let allNotifications = [];
+
+      // Show loading state
+      function showLoading() {
+        notificationList.innerHTML = `
+          <div class="notification-loading" style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: #CB0101; margin-bottom: 15px;"></i>
+            <p style="color: #666;">Loading your notifications...</p>
+          </div>
+        `;
+      }
 
       // Function to format date
       function formatDate(dateString) {
@@ -210,9 +220,9 @@
       function renderNotifications(notifications) {
         if (notifications.length === 0) {
           notificationList.innerHTML = `
-            <div class="notification-empty">
-              <i class="fas fa-bell-slash"></i>
-              <p>No notifications found</p>
+            <div class="notification-empty" style="text-align: center; padding: 40px;">
+              <i class="fas fa-bell-slash fa-2x" style="color: #666; margin-bottom: 15px;"></i>
+              <p style="color: #666;">No notifications found</p>
             </div>
           `;
           return;
@@ -271,6 +281,7 @@
               notification.status = 'read';
               updateTabCounts();
               renderNotifications(filterNotifications(currentFilter));
+              window.toast('Notification marked as read', 'success');
             }
           } else {
             throw new Error('Failed to mark notification as read');
@@ -296,11 +307,7 @@
       // Function to fetch notifications
       async function fetchNotifications() {
         try {
-          notificationList.innerHTML = `
-            <div class="notification-loading">
-              <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-            </div>
-          `;
+          showLoading();
 
           const response = await fetch('/api/notifications', {
             headers: {
@@ -324,10 +331,10 @@
         } catch (error) {
           console.error('Error fetching notifications:', error);
           notificationList.innerHTML = `
-            <div class="notification-error">
-              <i class="fas fa-exclamation-circle"></i>
-              <p>Failed to load notifications: ${error.message}</p>
-              <button onclick="fetchNotifications()" class="btn-retry">
+            <div class="notification-error" style="text-align: center; padding: 40px;">
+              <i class="fas fa-exclamation-circle fa-2x" style="color: #e74c3c; margin-bottom: 15px;"></i>
+              <p style="color: #666; margin-bottom: 15px;">Failed to load notifications: ${error.message}</p>
+              <button onclick="fetchNotifications()" class="btn-retry" style="padding: 8px 16px; background: #CB0101; color: white; border: none; border-radius: 4px; cursor: pointer;">
                 <i class="fas fa-sync-alt"></i> Retry
               </button>
             </div>
@@ -348,8 +355,13 @@
         });
       });
 
-      // Initial fetch
-      fetchNotifications();
+      // Show initial loading state
+      showLoading();
+
+      // Fetch notifications after a delay
+      setTimeout(() => {
+        fetchNotifications();
+      }, 2000); // 2 seconds delay
 
       // Refresh notifications every minute
       setInterval(fetchNotifications, 60000);

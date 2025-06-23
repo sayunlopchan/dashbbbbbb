@@ -526,12 +526,14 @@
     color: #2c3e50;
     font-weight: 600;
     border-bottom: 2px solid #e9ecef;
+    text-align: center;
 }
 
 .member-alerts td {
     padding: 12px;
     border-bottom: 1px solid #e9ecef;
     color: #2c3e50;
+    text-align: center;
 }
 
 .member-alerts tr:last-child td {
@@ -718,12 +720,14 @@
     color: #2c3e50;
     font-weight: 600;
     border-bottom: 2px solid #e9ecef;
+    text-align: center;
 }
 
 .trainer-assignments td {
     padding: 12px;
     border-bottom: 1px solid #e9ecef;
     color: #2c3e50;
+    text-align: center;
 }
 
 .trainer-assignments tr:last-child td {

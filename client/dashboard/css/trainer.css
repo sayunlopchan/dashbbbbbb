@@ -19,11 +19,13 @@
   font-weight: 400;
   color: #6a6a6a;
   font-size: 0.95rem;
+  text-align: center;
 }
 
 .trainer-table th {
   background-color: #e9e9e9;
   font-weight: 600;
+  text-align: center;
 }
 
 .trainer-table tr {
@@ -63,11 +65,13 @@
   font-weight: 400;
   color: #6a6a6a;
   font-size: 0.95rem;
+  text-align: center;
 }
 
 .trainer-assignments-table th {
   background-color: #e9e9e9;
   font-weight: 600;
+  text-align: center;
 }
 
 .trainer-assignments-table tr {
@@ -89,63 +93,6 @@
   background-color: var(--accent-color);
 }
 
-/* Add delete button style for assignments table */
-.trainer-assignments-table .action-btn.delete {
-  color: var(--danger-color);
-  border: 1px solid var(--danger-color);
-  padding: 5px;
-}
-
-.trainer-assignments-table .action-btn.delete:hover {
-  color: #fff;
-  background-color: var(--danger-color);
-}
-
-/* Member Search Styles */
-.search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  display: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.search-results.active {
-  display: block;
-}
-
-.search-result-item {
-  padding: 10px 15px;
-  cursor: pointer;
-  border-bottom: 1px solid #eee;
-  transition: background-color 0.2s;
-}
-
-.search-result-item:hover {
-  background-color: #f8f9fa;
-}
-
-.search-result-item:last-child {
-  border-bottom: none;
-}
-
-.search-result-item .member-name {
-  font-weight: 500;
-  color: #333;
-}
-
-.search-result-item .member-details {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 2px;
-}
 
 /* Selected Member Info */
 .selected-member-info {
@@ -179,26 +126,3 @@
   font-size: 0.9rem;
 }
 
-/* Status Badge for Assignments */
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-}
-
-.status-badge.active {
-  background-color: var(--success-color);
-  color: white;
-}
-
-.status-badge.inactive {
-  background-color: var(--danger-color);
-  color: white;
-}
-
-/* Text Center Utility */
-.text-center {
-  text-align: center;
-}

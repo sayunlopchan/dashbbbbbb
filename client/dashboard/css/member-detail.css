@@ -230,6 +230,7 @@
   font-weight: 600;
   color: var(--secondary-color);
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .member-payment-table td {

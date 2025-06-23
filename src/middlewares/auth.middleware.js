@@ -35,6 +35,19 @@ const authenticate = (req, res, next) => {
 
     // Attach user to request
     req.user = decoded;
+
+    // Check if the user has the 'admin' role
+    if (req.user.role !== "admin") {
+      // If not an admin, deny access
+      if (isAPIRequest) {
+        return res.status(403).json({
+          success: false,
+          message: "Forbidden: Access denied",
+        });
+      }
+      return res.status(403).redirect("/unauthorized");
+    }
+
     next();
   } catch (error) {
     console.error("Token verification error:", error);

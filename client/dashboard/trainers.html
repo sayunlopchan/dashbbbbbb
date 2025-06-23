@@ -92,7 +92,7 @@
         </li>
         <li>
           <a href="/locker">
-            <i class="fas fa-box"></i>
+            <i class="fas fa-lock"></i>
             <span>Locker</span>
             <div class="tooltip">Locker</div>
           </a>
@@ -220,7 +220,7 @@
             </tbody>
           </table>
         </div>
-        
+
         <!-- Pagination Controls -->
         <div class="pagination-controls">
           <button id="prevPage" class="pagination-btn" disabled>
@@ -355,7 +355,7 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="memberSearch" placeholder="Search by member ID, name, or email..."
                   autocomplete="off">
-                <div class="search-results" id="memberSearchResults"></div>
+                <div class="search-result-container"></div>
               </div>
             </div>
             <div class="form-group full-width">
@@ -367,7 +367,7 @@
                     <span id="selectedMemberId"></span>
                     <span id="selectedMemberEmail"></span>
                   </div>
-                  <button type="button" id="removeSelectedMember" class="btn btn-secondary">
+                  <button type="button" id="removeSelectedMember" class="btn btn-secondary reset">
                     <i class="fa-solid fa-times"></i>
                   </button>
                 </div>
@@ -567,7 +567,7 @@
 
         // Add click event for trainerId link
         trainerTableBody.querySelectorAll('.trainer-detail-link').forEach(link => {
-          link.addEventListener('click', function() {
+          link.addEventListener('click', function () {
             const trainerId = this.getAttribute('data-trainer-id');
             if (trainerId) {
               window.location.href = `/trainer-detail?trainerId=${encodeURIComponent(trainerId)}`;
@@ -804,7 +804,55 @@
       // Assign Member Modal Event Listeners
       document.getElementById('memberSearch').addEventListener('input', function (e) {
         const query = e.target.value.trim();
-        searchMembers(query);
+        const resultsContainer = document.querySelector('#assignMemberModal .search-result-container');
+        if (!query || query.length < 2) {
+          resultsContainer.innerHTML = '';
+          resultsContainer.classList.remove('active');
+          return;
+        }
+
+        // Fetch and display search results
+        (async () => {
+          try {
+            const response = await fetch(`/api/members/search?q=${encodeURIComponent(query)}`);
+            const result = await response.json();
+
+            if (result.success) {
+              if (!result.data || result.data.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-result-item">No members found</div>';
+                resultsContainer.classList.add('active');
+                return;
+              }
+              resultsContainer.innerHTML = result.data.map(member => `
+                <div class="search-result-item" data-member-id="${member.memberId}" data-member-name="${member.fullName}" data-member-email="${member.email}">
+                  <div class="search-result-primary"><strong>${member.fullName}</strong> <span>${member.memberId}</span></div>
+                  <div class="search-result-secondary"><small>${member.email}</small></div>
+                </div>
+              `).join('');
+              resultsContainer.classList.add('active');
+
+              // Add click listeners to search results
+              resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
+                item.addEventListener('click', () => {
+                  selectMember({
+                    memberId: item.dataset.memberId,
+                    fullName: item.dataset.memberName,
+                    email: item.dataset.memberEmail
+                  });
+                  resultsContainer.classList.remove('active');
+                  resultsContainer.innerHTML = '';
+                });
+              });
+            } else {
+              resultsContainer.innerHTML = '<div class="search-result-item">No members found</div>';
+              resultsContainer.classList.add('active');
+            }
+          } catch (error) {
+            console.error('Error searching members:', error);
+            resultsContainer.innerHTML = '<div class="search-result-item">Error searching members</div>';
+            resultsContainer.classList.add('active');
+          }
+        })();
       });
 
       document.getElementById('removeSelectedMember').addEventListener('click', function () {
@@ -997,7 +1045,11 @@
 
         // Reset form
         document.getElementById('memberSearch').value = '';
-        document.getElementById('memberSearchResults').innerHTML = '';
+        const resultsContainer = document.querySelector('#assignMemberModal .search-result-container');
+        if (resultsContainer) {
+          resultsContainer.innerHTML = '';
+          resultsContainer.classList.remove('active');
+        }
         document.getElementById('assignMemberBtn').disabled = true;
         selectedMember = null;
 
@@ -1008,9 +1060,12 @@
 
       // Search members
       async function searchMembers(query) {
+        const resultsContainer = document.querySelector('#assignMemberModal .search-result-container');
         if (!query || query.length < 2) {
-          document.getElementById('memberSearchResults').innerHTML = '';
-          document.getElementById('memberSearchResults').classList.remove('active');
+          if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+            resultsContainer.classList.remove('active');
+          }
           return;
         }
 
@@ -1021,19 +1076,25 @@
           if (result.success) {
             displaySearchResults(result.data);
           } else {
-            document.getElementById('memberSearchResults').innerHTML = '<div class="search-result-item">No members found</div>';
-            document.getElementById('memberSearchResults').classList.add('active');
+            if (resultsContainer) {
+              resultsContainer.innerHTML = '<div class="search-result-item">No members found</div>';
+              resultsContainer.classList.add('active');
+            }
           }
         } catch (error) {
           console.error('Error searching members:', error);
-          document.getElementById('memberSearchResults').innerHTML = '<div class="search-result-item">Error searching members</div>';
-          document.getElementById('memberSearchResults').classList.add('active');
+          if (resultsContainer) {
+            resultsContainer.innerHTML = '<div class="search-result-item">Error searching members</div>';
+            resultsContainer.classList.add('active');
+          }
         }
       }
 
       // Display search results
       function displaySearchResults(members) {
-        const resultsContainer = document.getElementById('memberSearchResults');
+        const resultsContainer = document.querySelector('#assignMemberModal .search-result-container');
+
+        if (!resultsContainer) return;
 
         if (!members || members.length === 0) {
           resultsContainer.innerHTML = '<div class="search-result-item">No members found</div>';
@@ -1059,6 +1120,8 @@
               fullName: item.dataset.memberName,
               email: item.dataset.memberEmail
             });
+            resultsContainer.classList.remove('active');
+            resultsContainer.innerHTML = '';
           });
         });
       }
@@ -1066,18 +1129,9 @@
       // Select member from search results
       function selectMember(member) {
         selectedMember = member;
-
-        // Update selected member info
         document.getElementById('selectedMemberName').textContent = member.fullName;
         document.getElementById('selectedMemberId').textContent = member.memberId;
         document.getElementById('selectedMemberEmail').textContent = member.email;
-
-        // Show selected member info
-
-        // Hide search results
-        document.getElementById('memberSearchResults').classList.remove('active');
-
-        // Enable assign button
         document.getElementById('assignMemberBtn').disabled = false;
       }
 
@@ -1197,7 +1251,7 @@
             <td>${assignment.memberName || '-'}</td>
             <td>${assignment.assignedDate ? new Date(assignment.assignedDate).toLocaleDateString() : '-'}</td>
             <td>
-              ${assignment.status ? `<span class="status-badge ${assignment.status}">${assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}</span>` : '-'}
+              ${assignment.status ? `<span class="status ${assignment.status}">${assignment.status.charAt(0).toUpperCase() + assignment.status.slice(1)}</span>` : '-'}
             </td>
             <td>
               ${assignment.memberId ? `<button class="action-btn delete" data-trainer-id="${assignment.trainerId}" data-member-id="${assignment.memberId}" title="Remove Assignment"><i class="fa-solid fa-trash"></i></button>` : ''}

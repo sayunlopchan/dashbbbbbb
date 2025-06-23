@@ -278,11 +278,11 @@ input:focus {
 .topbar-right {
   display: flex;
   align-items: center;
+  gap: 20px;
 }
 
 .notification {
   position: relative;
-  margin-right: 20px;
   cursor: pointer;
 }
 
@@ -347,7 +347,7 @@ input:focus {
 .content {
   width: 100%;
   padding: 25px;
-  overflow-y: auto;
+  /* overflow-y: auto; */
   position: relative;
   display: grid;
   gap: 1rem;
@@ -475,19 +475,20 @@ input:focus {
 .members-table th,
 .members-table td {
   padding: 12px 10px;
-  text-align: left;
 }
 
 .members-table th {
   background-color: #e9e9e9;
   font-weight: 600;
   font-size: 1rem;
+  text-align: center;
 }
 
 .members-table td {
   font-weight: 400;
   color: #6a6a6a;
   font-size: 0.95rem;
+  text-align: center;
 }
 
 .members-table tr {
@@ -500,8 +501,8 @@ input:focus {
 }
 
 
-.members-table tr td .action-btn,
-.trainer-table tr td .action-btn {
+.action-btn,
+.action-btn {
   background: none;
   border: none;
   font-size: 1rem;
@@ -511,37 +512,37 @@ input:focus {
   transition: all 0.3s ease-in-out;
 }
 
-.members-table tr td .action-btn.approve i,
-.trainer-table tr td .action-btn.approve i {
+.action-btn.approve i,
+.action-btn.approve i {
   transition: transform 0.3s ease;
 }
 
-.members-table tr td .action-btn.approve:hover i,
-.trainer-table tr td .action-btn.approve:hover i {
+.action-btn.approve:hover i,
+.action-btn.approve:hover i {
   transform: scale(1.2);
 }
 
-.members-table tr td .action-btn.edit,
-.trainer-table tr td .action-btn.edit {
+.action-btn.edit,
+.action-btn.edit {
   color: var(--warning-color);
   border: 1px solid var(--warning-color);
 }
 
-.members-table tr td .action-btn.delete,
-.trainer-table tr td .action-btn.delete {
+.action-btn.delete,
+.action-btn.delete {
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
 }
 
-.members-table tr td .action-btn.edit:hover,
-.trainer-table tr td .action-btn.edit:hover {
+.action-btn.edit:hover,
+.action-btn.edit:hover {
   color: #ffffff;
   background-color: var(--warning-color);
 
 }
 
-.members-table tr td .action-btn.delete:hover,
-.trainer-table tr td .action-btn.delete:hover {
+.action-btn.delete:hover,
+.action-btn.delete:hover {
   color: #ffffff;
   background-color: var(--danger-color);
 }
@@ -678,7 +679,6 @@ input:focus {
   display: grid;
   gap: 15px;
   margin-bottom: 15px;
-  overflow-y: auto;
 }
 
 .form-grid-event {
@@ -819,10 +819,7 @@ textarea {
   position: absolute;
   z-index: 1000;
   background-color: whitesmoke;
-  max-height: 300px;
-  overflow-y: auto;
   width: fit-content;
-  bottom: -190%;
   left: 0;
   right: 0;
   width: 100%;
@@ -1075,10 +1072,7 @@ textarea {
   padding: 5px;
 }
 
-.notification-list {
-  max-height: 600px;
-  overflow-y: auto;
-}
+
 
 .notification-item {
   padding: 12px 15px;

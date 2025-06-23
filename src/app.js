@@ -3,6 +3,7 @@ const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
+const rateLimit = require("express-rate-limit");
 
 // /////////////
 const { loadEnv } = require("./config/env");
@@ -63,7 +64,9 @@ app.use(express.static(path.join(__dirname, "public")));
 // Serve uploaded images
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Routes without .html extension
+
+
+// to access Routes without .html extension
 const htmlPages = [
   "dashboard",
   "events",
