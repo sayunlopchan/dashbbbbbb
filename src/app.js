@@ -3,7 +3,6 @@ const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
-const rateLimit = require("express-rate-limit");
 
 // /////////////
 const { loadEnv } = require("./config/env");
@@ -43,6 +42,7 @@ dotenv.config();
 
 // Initialize app
 const app = express();
+app.set("trust proxy", 1);
 
 // Get __dirname (already available in CommonJS)
 const clientPath = path.resolve(__dirname, "../client/dashboard");

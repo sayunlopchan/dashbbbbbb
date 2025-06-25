@@ -1,6 +1,6 @@
 const Member = require("../models/Member.model");
 const dayjs = require("dayjs");
-const { sendMembershipExpiryReminder, sendMemberCreationEmail } = require("../utils/emailService");
+const { sendMembershipExpiryReminder, sendMemberCreationEmail, sendExpiryEmail } = require("../utils/emailService");
 const { createPaymentService } = require("./payment.service");
 const mongoose = require("mongoose");
 const Trainer = require("../models/Trainer.model");
@@ -458,7 +458,7 @@ const getMemberAlertsService = async (filter = 'all') => {
 
   // Get members with their membership details
   const members = await Member.find(query)
-    .select('memberId fullName membershipType startDate endDate memberStatus payments')
+    .select('memberId fullName email membershipType startDate endDate memberStatus payments')
     .sort({ endDate: 1 }); // Sort by end date ascending
 
   console.log(`Found ${members.length} members matching query`);
@@ -482,6 +482,15 @@ const getMemberAlertsService = async (filter = 'all') => {
 
       if (currentDate > member.endDate) {
         newStatus = 'expired';
+        // Send expiry email if status is changing to expired
+        if (member.memberStatus !== 'expired') {
+          try {
+            await sendExpiryEmail(member.email, member.fullName, member);
+            console.log(`📧 Sent expiry email to ${member.fullName} (${member.email})`);
+          } catch (emailErr) {
+            console.error(`❌ Failed to send expiry email to ${member.fullName} (${member.email}):`, emailErr);
+          }
+        }
       } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
         // Only set to active if payment has been made
         if (member.payments && member.payments.length > 0) {
@@ -552,7 +561,7 @@ const updateMemberStatusesService = async () => {
     const members = await Member.find({
       memberStatus: { $nin: ['cancelled'] },
       endDate: { $exists: true }
-    }).select('memberId fullName membershipType startDate endDate memberStatus payments');
+    }).select('memberId fullName email membershipType startDate endDate memberStatus payments');
 
     console.log(`Found ${members.length} members to check for status updates`);
 
@@ -563,6 +572,15 @@ const updateMemberStatusesService = async () => {
       // Determine new status based on dates and payment status
       if (currentDate > member.endDate) {
         newStatus = 'expired';
+        // Send expiry email if status is changing to expired
+        if (member.memberStatus !== 'expired') {
+          try {
+            await sendExpiryEmail(member.email, member.fullName, member);
+            console.log(`📧 Sent expiry email to ${member.fullName} (${member.email})`);
+          } catch (emailErr) {
+            console.error(`❌ Failed to send expiry email to ${member.fullName} (${member.email}):`, emailErr);
+          }
+        }
       } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
         // Only set to active if payment has been made
         if (member.payments && member.payments.length > 0) {
