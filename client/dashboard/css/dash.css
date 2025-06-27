@@ -17,7 +17,7 @@
 
 
 /* Expiry Alert Section */
-.expiry-alert {
+.expiry-alert,.newsletter-subscribers {
   background-color: white;
   border-radius: 8px;
   padding: 20px;
@@ -89,6 +89,7 @@ tr:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
+  margin-bottom: 30px;
 }
 
 .events-container, .announcements-container {

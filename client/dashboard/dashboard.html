@@ -338,6 +338,27 @@
                     </div>
                 </div>
             </div>
+
+            <!-- NEWSLETTER SUBSCRIIBERS -->
+            <div class="newsletter-subscribers">
+                <div class="section-header">
+                    <h3>Newsletter Subscribers</h3>
+                </div>
+                <table class="subscribers-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Email</th>
+                            <th>Subscribed Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="newsletterSubscribersTableBody">
+                        <tr>
+                            <td colspan="3">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -377,7 +398,7 @@
         async function updateRevenueInfoBox() {
             try {
                 console.log(`Updating revenue info box for: ${isDaily ? 'Daily' : 'Monthly'} view`);
-                
+
                 const revenueResponse = await fetch(`${baseUrl}/api/payments/stats`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -410,9 +431,9 @@
                         // Show daily revenue
                         const dailyRevenue = revenueData.data.dailyRevenue || 0;
                         const yesterdayRevenue = revenueData.data.yesterdayRevenue || 0;
-                        
+
                         console.log(`Daily Revenue: ${dailyRevenue}, Yesterday Revenue: ${yesterdayRevenue}`);
-                        
+
                         if (revenueNumber) {
                             const formattedRevenue = dailyRevenue.toLocaleString('en-IN', {
                                 style: 'currency',
@@ -434,7 +455,7 @@
 
                         // Update percentage text
                         changePercentage.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
-                        
+
                         // Update comparison text
                         if (revenueText) {
                             revenueText.textContent = 'vs yesterday';
@@ -443,9 +464,9 @@
                         // Show monthly revenue
                         const monthlyRevenue = revenueData.data.monthlyRevenue || 0;
                         const lastMonthRevenue = revenueData.data.lastMonthRevenue || 0;
-                        
+
                         console.log(`Monthly Revenue: ${monthlyRevenue}, Last Month Revenue: ${lastMonthRevenue}`);
-                        
+
                         if (revenueNumber) {
                             const formattedRevenue = monthlyRevenue.toLocaleString('en-IN', {
                                 style: 'currency',
@@ -467,7 +488,7 @@
 
                         // Update percentage text
                         changePercentage.textContent = `${isPositive ? '+' : ''}${percentageChange.toFixed(1)}%`;
-                        
+
                         // Update comparison text
                         if (revenueText) {
                             revenueText.textContent = 'vs last month';
@@ -796,11 +817,10 @@
             }
         }
 
+
         // Function to fetch and display events and announcements
         async function updateEventsAndAnnouncements() {
             try {
-
-
                 // Fetch events
                 const eventsResponse = await fetch(`${baseUrl}/api/events`, {
                     headers: {
@@ -809,11 +829,9 @@
                 });
 
                 const eventsText = await eventsResponse.text();
-
                 let eventsData;
                 try {
                     eventsData = JSON.parse(eventsText);
-
                 } catch (parseError) {
                     throw new Error('Invalid events data format');
                 }
@@ -831,40 +849,53 @@
                         try {
                             if (!event.startTime) return false;
                             const eventDate = new Date(event.startTime);
-                            const isUpcoming = eventDate > currentDate;
-                            return isUpcoming;
-                        } catch (error) {
+                            return eventDate > currentDate;
+                        } catch {
                             return false;
                         }
                     })
                     .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
-                    .slice(0, 2); // Get only 2 most recent upcoming events
-
+                    .slice(0, 2); // Top 2
 
                 // Update events container
                 const eventsContainer = document.querySelector('.events-container');
                 if (eventsContainer) {
-                    const eventCards = eventsContainer.querySelectorAll('.event-card');
-                    eventCards.forEach((card, index) => {
-                        if (upcomingEvents[index]) {
-                            const event = upcomingEvents[index];
-                            card.style.display = 'block';
-                            card.querySelector('.event-title').textContent = event.title;
+                    const sectionHeader = eventsContainer.querySelector('.section-header');
+                    eventsContainer.innerHTML = '';
+                    if (sectionHeader) eventsContainer.appendChild(sectionHeader);
 
-                            // Handle description which is an array of strings
+                    if (upcomingEvents.length === 0) {
+                        const fallback = `<div class="event-card" style="text-align:center; color:#888; padding:24px 0;">
+                    <i class='fas fa-calendar-times' style='font-size:1.5em; margin-bottom:6px; display:block; color:#bbb;'></i>
+                    No upcoming events found
+                </div>`;
+                        eventsContainer.innerHTML += fallback;
+                    } else {
+                        upcomingEvents.forEach(event => {
+                            const card = document.createElement('div');
+                            card.className = 'event-card';
+
+                            const title = document.createElement('div');
+                            title.className = 'event-title';
+                            title.textContent = event.title;
+
+                            const description = document.createElement('div');
+                            description.className = 'event-description';
+
                             let descriptionText = 'No description available';
-                            if (event.description && Array.isArray(event.description)) {
+                            if (Array.isArray(event.description)) {
                                 descriptionText = event.description.join(' ');
                                 if (descriptionText.length > 100) {
                                     descriptionText = descriptionText.substring(0, 100) + '...';
                                 }
                             }
-                            card.querySelector('.event-description').textContent = descriptionText;
 
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
+                            description.textContent = descriptionText;
+                            card.appendChild(title);
+                            card.appendChild(description);
+                            eventsContainer.appendChild(card);
+                        });
+                    }
                 }
 
                 // Fetch announcements
@@ -875,7 +906,6 @@
                 });
 
                 const announcementsText = await announcementsResponse.text();
-
                 let announcementsData;
                 try {
                     announcementsData = JSON.parse(announcementsText);
@@ -887,52 +917,81 @@
                     throw new Error(announcementsData.message || 'Failed to fetch announcements');
                 }
 
-                // Get most recent announcement
-                const recentAnnouncement = announcementsData.docs[0];
-
                 // Update announcements container
                 const announcementsContainer = document.querySelector('.announcements-container');
                 if (announcementsContainer) {
-                    const announcementItem = announcementsContainer.querySelector('.announcement-item');
-                    if (announcementItem) {
-                        if (recentAnnouncement) {
-                            announcementItem.style.display = 'block';
-                            announcementItem.querySelector('.announcement-title').textContent = recentAnnouncement.title;
-                            announcementItem.querySelector('.announcement-description').textContent =
-                                recentAnnouncement.description ? recentAnnouncement.description.substring(0, 150) + '...' : 'No description available';
-                            announcementItem.querySelector('.announcement-meta span:first-child').textContent =
-                                `by ${recentAnnouncement.authorName || 'Unknown'}`;
-                            announcementItem.querySelector('.announcement-meta span:last-child').textContent =
-                                new Date(recentAnnouncement.createdAt).toLocaleDateString();
-                        } else {
-                            announcementItem.style.display = 'none';
-                        }
+                    const sectionHeader = announcementsContainer.querySelector('.section-header');
+                    announcementsContainer.innerHTML = '';
+                    if (sectionHeader) announcementsContainer.appendChild(sectionHeader);
+
+                    if (!announcementsData.docs || announcementsData.docs.length === 0) {
+                        const fallback = `<div class="announcement-item" style="text-align:center; color:#888; padding:24px 0;">
+                    <i class='fas fa-bullhorn' style='font-size:1.5em; margin-bottom:6px; display:block; color:#bbb;'></i>
+                    No announcements found
+                </div>`;
+                        announcementsContainer.innerHTML += fallback;
+                    } else {
+                        const recent = announcementsData.docs[0];
+
+                        const item = document.createElement('div');
+                        item.className = 'announcement-item';
+
+                        const titleDiv = document.createElement('div');
+                        titleDiv.className = 'announcement-title';
+                        titleDiv.textContent = recent.title;
+
+                        const descDiv = document.createElement('div');
+                        descDiv.className = 'announcement-description';
+                        descDiv.textContent = recent.description
+                            ? recent.description.substring(0, 150) + '...'
+                            : 'No description available';
+
+                        const metaDiv = document.createElement('div');
+                        metaDiv.className = 'announcement-meta';
+                        metaDiv.innerHTML = `
+                    <span>by ${recent.authorName || 'Unknown'}</span>
+                    <span>${new Date(recent.createdAt).toLocaleDateString()}</span>
+                `;
+
+                        item.appendChild(titleDiv);
+                        item.appendChild(descDiv);
+                        item.appendChild(metaDiv);
+
+                        announcementsContainer.appendChild(item);
                     }
                 }
-
 
             } catch (error) {
-                // Show error state in UI
-                const eventsContainer = document.querySelector('.events-container');
-                const announcementsContainer = document.querySelector('.announcements-container');
+                console.error('Error loading events or announcements:', error);
 
+                // Error fallback UI
+                const eventsContainer = document.querySelector('.events-container');
                 if (eventsContainer) {
-                    const eventCards = eventsContainer.querySelectorAll('.event-card');
-                    eventCards.forEach(card => {
-                        card.style.display = 'block';
-                        card.querySelector('.event-title').textContent = 'Error loading events';
-                        card.querySelector('.event-description').textContent = 'Please try again later';
-                    });
+                    const sectionHeader = eventsContainer.querySelector('.section-header');
+                    eventsContainer.innerHTML = '';
+                    if (sectionHeader) eventsContainer.appendChild(sectionHeader);
+                    const errorCard = document.createElement('div');
+                    errorCard.className = 'event-card';
+                    errorCard.innerHTML = `
+                <div class="event-title">Error loading events</div>
+                <div class="event-description">Please try again later</div>
+            `;
+                    eventsContainer.appendChild(errorCard);
                 }
 
+                const announcementsContainer = document.querySelector('.announcements-container');
                 if (announcementsContainer) {
-                    const announcementItem = announcementsContainer.querySelector('.announcement-item');
-                    if (announcementItem) {
-                        announcementItem.style.display = 'block';
-                        announcementItem.querySelector('.announcement-title').textContent = 'Error loading announcement';
-                        announcementItem.querySelector('.announcement-description').textContent = 'Please try again later';
-                        announcementItem.querySelector('.announcement-meta').innerHTML = '<span>Error</span>';
-                    }
+                    const sectionHeader = announcementsContainer.querySelector('.section-header');
+                    announcementsContainer.innerHTML = '';
+                    if (sectionHeader) announcementsContainer.appendChild(sectionHeader);
+                    const errorItem = document.createElement('div');
+                    errorItem.className = 'announcement-item';
+                    errorItem.innerHTML = `
+                <div class="announcement-title">Error loading announcement</div>
+                <div class="announcement-description">Please try again later</div>
+                <div class="announcement-meta"><span>Error</span></div>
+            `;
+                    announcementsContainer.appendChild(errorItem);
                 }
             }
         }
@@ -943,139 +1002,38 @@
             updateEventsAndAnnouncements();
         });
 
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const notificationIcon = document.querySelector('.notification');
-            const notificationModal = document.querySelector('.notification-modal');
-            const closeNotifications = document.querySelector('.close-notifications');
-            const notificationList = document.querySelector('.notification-list');
-            const notificationBadge = document.querySelector('.notification-badge');
-
-            // Toggle notification modal
-            notificationIcon.addEventListener('click', function (e) {
-                e.stopPropagation();
-                notificationModal.classList.toggle('active');
-                if (notificationModal.classList.contains('active')) {
-                    fetchNotifications();
+        // Newsletter Subscribers Table Logic
+        async function fetchNewsletterSubscribers() {
+            const tbody = document.getElementById('newsletterSubscribersTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
+            try {
+                const res = await fetch('/api/newsletter/subscribers');
+                const data = await res.json();
+                if (!data.success || !Array.isArray(data.data)) {
+                    tbody.innerHTML = '<tr><td colspan="3">Failed to load subscribers</td></tr>';
+                    return;
                 }
-            });
-
-            // Close notification modal
-            closeNotifications.addEventListener('click', function (e) {
-                e.stopPropagation();
-                notificationModal.classList.remove('active');
-            });
-
-            // Close modal when clicking outside
-            document.addEventListener('click', function (e) {
-                if (!notificationModal.contains(e.target) && !notificationIcon.contains(e.target)) {
-                    notificationModal.classList.remove('active');
+                if (data.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; font-size:1.1em; padding:24px 0;">
+                        <i class='fas fa-user-slash' style='font-size:1.5em; margin-bottom:6px; display:block; color:#bbb;'></i>
+                        No subscribers found
+                    </td></tr>`;
+                    return;
                 }
-            });
-
-            // Fetch unread count
-            async function fetchUnreadCount() {
-                try {
-                    const response = await fetch(`${baseUrl}/api/notifications/unread-count`);
-                    const data = await response.json();
-                    if (data.success) {
-                        notificationBadge.textContent = data.data.unreadCount;
-                        // Show/hide badge based on count
-                        notificationBadge.style.display = data.data.unreadCount > 0 ? 'flex' : 'none';
-                    }
-                } catch (error) { }
+                tbody.innerHTML = data.data.map((subscriber, idx) => `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${subscriber.email}</td>
+                        <td>${new Date(subscriber.subscribedAt).toLocaleDateString()}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="3">Error loading subscribers</td></tr>';
             }
+        }
 
-            // Fetch notifications from API
-            async function fetchNotifications() {
-                try {
-                    notificationList.innerHTML = `
-                        <div class="notification-loading">
-                            <i class="fas fa-spinner fa-spin"></i> Loading notifications...
-                        </div>
-                    `;
-
-                    const response = await fetch(`${baseUrl}/api/notifications`);
-                    const data = await response.json();
-
-                    if (data.success) {
-                        const notifications = data.data;
-
-                        if (notifications.length === 0) {
-                            notificationList.innerHTML = `
-                                <div class="notification-empty">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <p>No new notifications</p>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        // Render notifications
-                        notificationList.innerHTML = notifications.map(notif => `
-                            <div class="notification-item ${notif.status === 'unread' ? 'unread' : ''}" 
-                                 data-notification-id="${notif._id}">
-                                <div class="notification-title">
-                                    ${notif.title}
-                                    ${notif.status === 'unread' ? '<span class="unread-dot"></span>' : ''}
-                                </div>
-                                <div class="notification-message">${notif.message}</div>
-                                <div class="notification-time">${new Date(notif.createdAt).toLocaleString()}</div>
-                            </div>
-                        `).join('');
-
-                        // Add click handler to mark notifications as read
-                        const notificationItems = document.querySelectorAll('.notification-item');
-                        notificationItems.forEach(item => {
-                            item.addEventListener('click', async () => {
-                                const notificationId = item.dataset.notificationId;
-                                if (item.classList.contains('unread')) {
-                                    try {
-                                        const response = await fetch(`${baseUrl}/api/notifications/${notificationId}/read`, {
-                                            method: 'PATCH',
-                                            credentials: 'include'
-                                        });
-
-                                        if (response.ok) {
-                                            // Update UI
-                                            item.classList.remove('unread');
-                                            const unreadDot = item.querySelector('.unread-dot');
-                                            if (unreadDot) unreadDot.remove();
-
-                                            // Update unread count
-                                            await fetchUnreadCount();
-                                        }
-                                    } catch (error) {
-                                    }
-                                }
-
-                                // Close notification modal
-                                notificationModal.classList.remove('active');
-
-                                // Redirect to application page
-                                window.location.href = '/application';
-                            });
-                        });
-                    } else {
-                        throw new Error(data.message || 'Failed to fetch notifications');
-                    }
-                } catch (error) {
-                    notificationList.innerHTML = `
-                        <div class="notification-empty">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Failed to load notifications</p>
-                        </div>
-                    `;
-                }
-            }
-
-            // Initial fetch of notifications and unread count
-            fetchNotifications();
-            fetchUnreadCount();
-
-            // Refresh unread count periodically
-            setInterval(fetchUnreadCount, 30000); // Every 30 seconds
-        });
+        document.addEventListener('DOMContentLoaded', fetchNewsletterSubscribers);
     </script>
 </body>
 

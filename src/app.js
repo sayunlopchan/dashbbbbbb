@@ -29,6 +29,7 @@ const membershipRoutes = require("./routes/membership.routes");
 const applicationHistoryRoutes = require("./routes/applicationHistory.routes");
 const paymentRoutes = require("./routes/payments.routes");
 const productRoutes = require("./routes/product.routes");
+const newsletterRoutes = require('./routes/newsletter.routes');
 
 // Load env and connect DB
 loadEnv();
@@ -50,7 +51,7 @@ const clientPath = path.resolve(__dirname, "../client/dashboard");
 // Core middlewares
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://dashbbbbbb-1.onrender.com",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -110,7 +111,7 @@ htmlPages.forEach((page) => {
 
 // Default route to serve login.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(clientPath, "login.html"));
+  res.sendFile(path.join(clientPath, "dashboard.html"));
 });
 
 // API routes
@@ -128,6 +129,7 @@ app.use("/api/memberships", membershipRoutes);
 app.use("/api/application-history", applicationHistoryRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/products", productRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 // Debug route for authentication
 app.get("/debug-auth", (req, res) => {
