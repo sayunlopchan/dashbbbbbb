@@ -2059,13 +2059,27 @@
               let daysDisplay = "";
 
               if (status === 'expiring') {
-                daysDisplay = `${daysUntilExpiry} days left`;
+                // For expiring memberships, show days remaining
+                if (daysUntilExpiry > 0) {
+                  daysDisplay = `${daysUntilExpiry} days remain`;
+                } else if (daysUntilExpiry === 0) {
+                  daysDisplay = "Expires today";
+                } else {
+                  // If somehow we have negative days but status is expiring, show as expired
+                  daysDisplay = `${Math.abs(daysUntilExpiry)} days ago`;
+                }
               } else if (status === 'expired') {
                 daysDisplay = `${daysSinceExpiry} days ago`;
               } else if (status === 'cancelled') {
                 daysDisplay = "N/A";
               } else {
-                daysDisplay = `${Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24))} days active`;
+                // For active/pending members, show days since start
+                const daysActive = Math.ceil((currentDate - startDate) / (1000 * 60 * 60 * 24));
+                if (daysActive >= 0) {
+                  daysDisplay = `${daysActive} days active`;
+                } else {
+                  daysDisplay = "Not started yet";
+                }
               }
 
               row.innerHTML = `

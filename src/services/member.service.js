@@ -4,6 +4,7 @@ const { sendMembershipExpiryReminder, sendMemberCreationEmail, sendExpiryEmail }
 const { createPaymentService } = require("./payment.service");
 const mongoose = require("mongoose");
 const Trainer = require("../models/Trainer.model");
+const { createMembershipNotificationService } = require('../services/notification.service');
 
 // Create Member
 const createMemberService = async (data, options = {}) => {
@@ -482,26 +483,29 @@ const getMemberAlertsService = async (filter = 'all') => {
 
       if (currentDate > member.endDate) {
         newStatus = 'expired';
-        // Send expiry email if status is changing to expired
+        // Send expiry email and create notification if status is changing to expired
         if (member.memberStatus !== 'expired') {
           try {
             await sendExpiryEmail(member.email, member.fullName, member);
             console.log(`📧 Sent expiry email to ${member.fullName} (${member.email})`);
+            // Create notification for expired membership
+            await createMembershipNotificationService(member, "MEMBERSHIP_EXPIRED");
           } catch (emailErr) {
             console.error(`❌ Failed to send expiry email to ${member.fullName} (${member.email}):`, emailErr);
           }
         }
       } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
-        // Only set to active if payment has been made
         if (member.payments && member.payments.length > 0) {
-          // If within 7 days of expiry, mark as expiring
           if (daysUntilExpiry <= 7) {
             newStatus = 'expiring';
+            // Create notification for expiring membership if status is changing
+            if (member.memberStatus !== 'expiring') {
+              await createMembershipNotificationService(member, "MEMBERSHIP_EXPIRING");
+            }
           } else {
             newStatus = 'active';
           }
         } else {
-          // If no payment made, keep as pending even if start date has passed
           newStatus = 'pending';
         }
       } else if (currentDate < member.startDate) {
@@ -572,25 +576,28 @@ const updateMemberStatusesService = async () => {
       // Determine new status based on dates and payment status
       if (currentDate > member.endDate) {
         newStatus = 'expired';
-        // Send expiry email if status is changing to expired
+        // Send expiry email and create notification if status is changing to expired
         if (member.memberStatus !== 'expired') {
           try {
             await sendExpiryEmail(member.email, member.fullName, member);
             console.log(`📧 Sent expiry email to ${member.fullName} (${member.email})`);
+            // Create notification for expired membership
+            await createMembershipNotificationService(member, "MEMBERSHIP_EXPIRED");
           } catch (emailErr) {
             console.error(`❌ Failed to send expiry email to ${member.fullName} (${member.email}):`, emailErr);
           }
         }
       } else if (currentDate >= member.startDate && currentDate <= member.endDate) {
-        // Only set to active if payment has been made
         if (member.payments && member.payments.length > 0) {
           if (daysUntilExpiry <= 7) {
             newStatus = 'expiring';
+            if (member.memberStatus !== 'expiring') {
+              await createMembershipNotificationService(member, "MEMBERSHIP_EXPIRING");
+            }
           } else {
             newStatus = 'active';
           }
         } else {
-          // If no payment made, keep as pending even if start date has passed
           newStatus = 'pending';
         }
       } else if (currentDate < member.startDate) {

@@ -145,7 +145,7 @@
           <button class="tab" data-type="unread">Unread (0)</button>
           <button class="tab" data-type="expiry">Membership Expiry (0)</button>
         </div>
-        <div class="notification-list">
+        <div class="notifications-data-list">
           <!-- Notifications will be populated here -->
           <div class="notification-loading">
             <i class="fas fa-spinner fa-spin"></i> Loading notifications...
@@ -160,7 +160,7 @@
   <script src="./js/logout.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const notificationList = document.querySelector('.notification-list');
+      const notificationList = document.querySelector('.notifications-data-list');
       const tabs = document.querySelectorAll('.tab');
       let currentFilter = 'all';
       let allNotifications = [];
@@ -209,7 +209,7 @@
       // Function to update tab counts
       function updateTabCounts() {
         const unreadCount = allNotifications.filter(n => n.status === 'unread').length;
-        const expiryCount = allNotifications.filter(n => n.type === 'MEMBERSHIP_EXPIRING').length;
+        const expiryCount = allNotifications.filter(n => n.type === 'membershipExpiry' || n.type === 'MEMBERSHIP_EXPIRING' || n.type === 'MEMBERSHIP_EXPIRED').length;
         
         document.querySelector('[data-type="all"]').textContent = `All (${allNotifications.length})`;
         document.querySelector('[data-type="unread"]').textContent = `Unread (${unreadCount})`;
@@ -298,7 +298,7 @@
           case 'unread':
             return allNotifications.filter(n => n.status === 'unread');
           case 'expiry':
-            return allNotifications.filter(n => n.type === 'MEMBERSHIP_EXPIRING');
+            return allNotifications.filter(n => n.type === 'membershipExpiry' || n.type === 'MEMBERSHIP_EXPIRING' || n.type === 'MEMBERSHIP_EXPIRED');
           default:
             return allNotifications;
         }

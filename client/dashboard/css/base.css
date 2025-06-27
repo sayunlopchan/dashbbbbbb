@@ -951,6 +951,10 @@ textarea {
   transform: translateX(100%);
   transition: all 0.3s ease-in-out;
 }
+.notification-list{
+  overflow: scroll;
+  max-height: 460px;
+}
 
 .notification-popup.success {
   background-color: var(--success-color);
@@ -1213,7 +1217,7 @@ textarea {
 }
 
 .revenue-comparison {
-  display: flex;
+  /* display: flex; */
   align-items: baseline;
   gap: 10px;
   margin-bottom: 5px;
@@ -1228,6 +1232,7 @@ textarea {
   border-radius: 12px;
   background-color: rgba(46, 204, 113, 0.1);
   color: #2ecc71;
+  width: fit-content;
 }
 
 .revenue-change.negative {
@@ -1382,5 +1387,8 @@ textarea {
 
   .events-announcements {
     grid-template-columns: 1fr;
+  }
+  .user-greeting{
+    display: none;
   }
 }
