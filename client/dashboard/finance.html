@@ -517,7 +517,7 @@
                             const titleElement = membershipRevenueElement.querySelector('.info-box-title');
                             const numberElement = membershipRevenueElement.querySelector('.info-box-number');
                             const textElement = membershipRevenueElement.querySelector('.info-box-text');
-                            titleElement.textContent = 'Daily Membership Revenue';
+                            titleElement.textContent = 'Membership Revenue';
                             numberElement.textContent = formatCurrency(stats.dailyMembershipRevenue || 0);
                             textElement.textContent = 'vs yesterday';
                             updateRevenueChange(membershipRevenueElement, stats.dailyMembershipRevenue, stats.yesterdayMembershipRevenue);
@@ -529,7 +529,7 @@
                             const titleElement = productRevenueElement.querySelector('.info-box-title');
                             const numberElement = productRevenueElement.querySelector('.info-box-number');
                             const textElement = productRevenueElement.querySelector('.info-box-text');
-                            titleElement.textContent = 'Daily Product Revenue';
+                            titleElement.textContent = 'Product Revenue';
                             numberElement.textContent = formatCurrency(stats.dailyProductRevenue || 0);
                             textElement.textContent = 'vs yesterday';
                             updateRevenueChange(productRevenueElement, stats.dailyProductRevenue, stats.yesterdayProductRevenue);

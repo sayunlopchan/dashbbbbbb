@@ -30,6 +30,7 @@ const applicationHistoryRoutes = require("./routes/applicationHistory.routes");
 const paymentRoutes = require("./routes/payments.routes");
 const productRoutes = require("./routes/product.routes");
 const newsletterRoutes = require('./routes/newsletter.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 // Load env and connect DB
 loadEnv();
@@ -109,9 +110,14 @@ htmlPages.forEach((page) => {
   }
 });
 
-// Default route to serve login.html
-app.get("/", (req, res) => {
+// Default route with authentication check
+app.get("/", protectRoute, (req, res) => {
   res.sendFile(path.join(clientPath, "dashboard.html"));
+});
+
+// Optionally, redirect /dashboard to /
+app.get("/dashboard", (req, res) => {
+  res.redirect("/");
 });
 
 // API routes
@@ -130,6 +136,7 @@ app.use("/api/application-history", applicationHistoryRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/products", productRoutes);
 app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Debug route for authentication
 app.get("/debug-auth", (req, res) => {

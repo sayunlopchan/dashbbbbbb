@@ -1,5 +1,6 @@
 const Event = require("../models/Event.model");
 const Member = require("../models/Member.model");
+const NewsletterSubscriber = require("../models/NewsletterSubscriber.model");
 const mongoose = require("mongoose");
 const { sendEventNotificationToAllMembers } = require("../utils/emailService");
 
@@ -86,18 +87,40 @@ const createEventService = async (eventData, userId) => {
       _id: event._id
     });
 
-    // Send event notification to all members
+    // Send event notification to all members and newsletter subscribers
     try {
       // Fetch all members regardless of status
       const allMembers = await Member.find({}).select('fullName email memberStatus');
+      // Fetch all newsletter subscribers
+      const allSubscribers = await NewsletterSubscriber.find({}).select('email');
 
       console.log(`🔍 Found ${allMembers.length} total members`);
+      console.log(`🔍 Found ${allSubscribers.length} newsletter subscribers`);
 
-      if (allMembers.length > 0) {
-        console.log(`📧 Sending event notification to ${allMembers.length} members`);
-        console.log('📧 Members to notify:', allMembers.map(m => `${m.fullName} (${m.email}) - Status: ${m.memberStatus}`));
+      // Prepare a combined list for email sending
+      const memberEmails = allMembers.map(m => ({
+        fullName: m.fullName,
+        email: m.email,
+        memberStatus: m.memberStatus
+      }));
+      // Subscribers may not have fullName/memberStatus, so use email only
+      const subscriberEmails = allSubscribers.map(s => ({
+        fullName: s.email, // fallback to email as name
+        email: s.email,
+        memberStatus: 'subscriber'
+      }));
+      // Merge and deduplicate by email
+      const allRecipientsMap = new Map();
+      [...memberEmails, ...subscriberEmails].forEach(rec => {
+        allRecipientsMap.set(rec.email, rec);
+      });
+      const allRecipients = Array.from(allRecipientsMap.values());
+
+      if (allRecipients.length > 0) {
+        console.log(`📧 Sending event notification to ${allRecipients.length} recipients (members + subscribers)`);
+        console.log('📧 Recipients to notify:', allRecipients.map(m => `${m.fullName} (${m.email}) - Status: ${m.memberStatus}`));
         
-        const emailResults = await sendEventNotificationToAllMembers(event, allMembers);
+        const emailResults = await sendEventNotificationToAllMembers(event, allRecipients);
         
         console.log(`📊 Event notification email results:`, {
           total: emailResults.total,
@@ -110,7 +133,7 @@ const createEventService = async (eventData, userId) => {
           console.warn('❌ Failed emails:', emailResults.errors);
         }
       } else {
-        console.log('📧 No members found to send event notifications to');
+        console.log('📧 No recipients found to send event notifications to');
       }
     } catch (emailError) {
       console.error('❌ Error sending event notification emails:', emailError.message);

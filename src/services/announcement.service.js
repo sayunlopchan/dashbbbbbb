@@ -1,5 +1,6 @@
 const Announcement = require("../models/Announcement.model");
 const Member = require("../models/Member.model");
+const NewsletterSubscriber = require("../models/NewsletterSubscriber.model");
 const mongoose = require("mongoose");
 const { sendAnnouncementNotificationToAllMembers } = require("../utils/emailService");
 
@@ -80,18 +81,40 @@ const createAnnouncementService = async (announcementData) => {
       _id: announcement._id
     });
 
-    // Send announcement notification to all members
+    // Send announcement notification to all members and newsletter subscribers
     try {
       // Fetch all members regardless of status
       const allMembers = await Member.find({}).select('fullName email memberStatus');
+      // Fetch all newsletter subscribers
+      const allSubscribers = await NewsletterSubscriber.find({}).select('email');
 
       console.log(`🔍 Found ${allMembers.length} total members`);
+      console.log(`🔍 Found ${allSubscribers.length} newsletter subscribers`);
 
-      if (allMembers.length > 0) {
-        console.log(`📧 Sending announcement notification to ${allMembers.length} members`);
-        console.log('📧 Members to notify:', allMembers.map(m => `${m.fullName} (${m.email}) - Status: ${m.memberStatus}`));
+      // Prepare a combined list for email sending
+      const memberEmails = allMembers.map(m => ({
+        fullName: m.fullName,
+        email: m.email,
+        memberStatus: m.memberStatus
+      }));
+      // Subscribers may not have fullName/memberStatus, so use email only
+      const subscriberEmails = allSubscribers.map(s => ({
+        fullName: s.email, // fallback to email as name
+        email: s.email,
+        memberStatus: 'subscriber'
+      }));
+      // Merge and deduplicate by email
+      const allRecipientsMap = new Map();
+      [...memberEmails, ...subscriberEmails].forEach(rec => {
+        allRecipientsMap.set(rec.email, rec);
+      });
+      const allRecipients = Array.from(allRecipientsMap.values());
+
+      if (allRecipients.length > 0) {
+        console.log(`📧 Sending announcement notification to ${allRecipients.length} recipients (members + subscribers)`);
+        console.log('📧 Recipients to notify:', allRecipients.map(m => `${m.fullName} (${m.email}) - Status: ${m.memberStatus}`));
         
-        const emailResults = await sendAnnouncementNotificationToAllMembers(announcement, allMembers);
+        const emailResults = await sendAnnouncementNotificationToAllMembers(announcement, allRecipients);
         
         console.log(`📊 Announcement notification email results:`, {
           total: emailResults.total,
@@ -104,7 +127,7 @@ const createAnnouncementService = async (announcementData) => {
           console.warn('❌ Failed emails:', emailResults.errors);
         }
       } else {
-        console.log('📧 No members found to send announcement notifications to');
+        console.log('📧 No recipients found to send announcement notifications to');
       }
     } catch (emailError) {
       console.error('❌ Error sending announcement notification emails:', emailError.message);

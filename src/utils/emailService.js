@@ -8,6 +8,7 @@ const { membershipCancellationTemplate } = require('./emailTemplates/membershipC
 const { memberCreationTemplate } = require('./emailTemplates/memberCreation');
 const { eventNotificationTemplate } = require('./emailTemplates/eventNotification');
 const { announcementNotificationTemplate } = require('./emailTemplates/announcementNotification');
+const { contactFormTemplate } = require('./emailTemplates/contactForm');
 
 // Create a transporter using the default SMTP transport
 const createTransporter = () => {
@@ -492,6 +493,27 @@ const sendAnnouncementNotificationToAllMembers = async (announcementDetails, mem
   return results;
 };
 
+/**
+ * Send contact form email to admin
+ * @param {Object} params - Contact form fields
+ * @param {string} params.firstName
+ * @param {string} params.lastName
+ * @param {string} params.email
+ * @param {string} params.phone
+ * @param {string} params.subject
+ * @param {string} params.message
+ * @returns {Promise<void>}
+ */
+const sendContactFormEmail = async ({ firstName, lastName, email, phone, subject, message }) => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  if (!adminEmail) throw new Error('Admin email is not configured');
+  return sendEmail(adminEmail, 'Admin', {
+    subject: `Contact Form: ${subject}`,
+    html: contactFormTemplate({ firstName, lastName, email, phone, subject, message }),
+    replyTo: email
+  });
+};
+
 module.exports = {
   sendEmail,
   sendWelcomeEmail,
@@ -504,5 +526,6 @@ module.exports = {
   sendEventNotificationEmail,
   sendEventNotificationToAllMembers,
   sendAnnouncementNotificationEmail,
-  sendAnnouncementNotificationToAllMembers
+  sendAnnouncementNotificationToAllMembers,
+  sendContactFormEmail
 };
